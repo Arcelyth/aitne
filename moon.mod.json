@@ -7,4 +7,6 @@
   "license": "Apache-2.0",
   "keywords": ["web", "wasm", "framework"],
   "description": "A modern lightweight and high-performance web framework.",
+  "preferred-target": "js",
+  "supported-targets": "js",
 }

@@ -1,0 +1,3 @@
+import {
+  "Arcelyth/aitne/src/reactive" @reactive,
+}

@@ -1,6 +1,7 @@
-// import {
-//   "username/aitne" @lib,
-// }
+import {
+  "Arcelyth/aitne/src/dom" @dom,
+  "Arcelyth/aitne/src/reactive" @reactive,
+}
 
 options(
   "is-main": true,

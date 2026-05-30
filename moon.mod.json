@@ -1,0 +1,10 @@
+{
+  "name": "Arcelyth/aitne",
+  "version": "0.0.1",
+  "deps": {},
+  "readme": "README.mbt.md",
+  "repository": "https://github.com/Arcelyth/aitne",
+  "license": "Apache-2.0",
+  "keywords": ["web", "wasm", "framework"],
+  "description": "A modern lightweight and high-performance web framework.",
+}

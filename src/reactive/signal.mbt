@@ -1,16 +1,34 @@
+
+pub struct Signal[T] {
+  mut value: T
+  subs: @hashset.HashSet[ASubscriber]
+}
+
+///|
+pub impl[T] Hash for Signal[T] with hash_combine(self, hasher : Hasher) {
+}
+
+///|
+pub impl[T] Eq for Signal[T] with equal(self, another: Signal[T]) -> Bool {
+  true
+}
+
+///|
+/// TODO: Implement `Debug` trait for Signal[T]
+pub impl[T : Debug] Debug for Signal[T] with to_repr(self) -> Repr {
+  @debug.Repr::tuple([self.value.to_repr(), @debug.Repr::string("subs")])
+}
+
+///| TODO: Implement `Default` trait for Signal[T] 
+///pub impl[T : Default] Default for Signal[T] with default() -> Signal[T] {
+///}
+
+
 let next_effect_id : Ref[Int] = { val: 0 }
 
 let current_effect : Ref[Option[Subscriber]] = { val: None }
 
-struct Subscriber {
-  id : Int
-  run : () -> Unit
-}
 
-pub struct Signal[T] {
-  mut value: T
-  subs: Array[Subscriber]
-}
 
 pub fn[T] Signal::new(value: T) -> Signal[T] {
   { value, subs: [] }

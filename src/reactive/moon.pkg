@@ -1,0 +1,4 @@
+import {
+  "moonbitlang/core/hashset" @hashset,
+  "moonbitlang/core/debug" @debug,
+}

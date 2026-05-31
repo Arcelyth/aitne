@@ -17,7 +17,7 @@ pub fn counter() -> @dom.Html {
       .children([
         @dom.text("+1")
       ])
-      .on(Click, fn() {
+      .on(Click, fn(_e) {
         set_count.update(fn(v) { v + 1 })
       }),
 
@@ -25,7 +25,7 @@ pub fn counter() -> @dom.Html {
       .children([
         @dom.text("-1")
       ])
-      .on(Click, fn() {
+      .on(Click, fn(_e) {
         set_count.update(fn(v) { v - 1 })
       }),
   ])

@@ -29,7 +29,7 @@ pub extern "js" fn dom_get_body() -> Node =
   #|() => document.body
 
 
-pub(all) enum Event {
+pub(all) enum EventType {
   Click
   Input
   Change
@@ -38,7 +38,7 @@ pub(all) enum Event {
   Keyup
 }
 
-fn Event::to_string(self : Event) -> String {
+fn EventType::to_string(self : EventType) -> String {
   match self {
     Click   => "click"
     Input   => "input"
@@ -95,7 +95,7 @@ pub fn Html::bool_attr(self : Html, key : String, _val : Bool) -> Html {
   }
 }
 
-pub fn Html::on(self : Html, ev : Event, handler : () -> Unit) -> Html {
+pub fn Html::on(self : Html, ev : EventType, handler : () -> Unit) -> Html {
   match self {
     Element(b) => Element({ ..b, events: b.events + [(ev.to_string(), handler)] })
     other => other

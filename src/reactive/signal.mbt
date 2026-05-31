@@ -37,6 +37,7 @@ pub impl[T] Hash for WriteSignal[T] with hash_combine(self, hasher : Hasher) {
 }
 
 ///|
+#inline
 pub impl[T] Eq for WriteSignal[T] with equal(self, another : WriteSignal[T]) -> Bool {
   self.inner.val.id == another.inner.val.id
 }
@@ -88,6 +89,46 @@ pub impl[T] Notify for WriteSignal[T] with notify(self) -> Unit {
   self.mark_stale()
 }
 
+///|
+#inline
+pub impl[T] IsDisposed for WriteSignal[T] with is_disposed(_self) -> Bool {
+  false
+}
+
+///|
+pub impl[T] Source for WriteSignal[T] with add_sub(self, sub: ASubscriber) {
+  self.inner.val.subs.insert(sub)
+}
+
+///|
+pub impl[T] Source for WriteSignal[T] with remove_sub(self, sub: ASubscriber) {
+  self.inner.val.subs.remove(sub)
+}
+
+///|
+pub impl[T] Source for WriteSignal[T] with clear_subs(self) {
+  self.inner.val.subs.clear()
+}
+
+///|
+pub impl[T] ToASource for WriteSignal[T] with to_asource(self) {
+  {
+    id: self.inner.val.id,
+    src: Some(self as &Source)
+  }
+}
+
+///|
+pub impl[T] Track for WriteSignal[T] with track(self) -> Unit {
+  guard !self.is_disposed() else { return }
+  match Observer::get() {
+    Some(sub) => {
+      sub.add_source(self.to_asource())
+      self.add_sub(sub)
+    }
+    None => { () }
+  }
+}
 
 ///|
 pub fn[T] WriteSignal::new(value : T) -> WriteSignal[T] {
@@ -124,6 +165,7 @@ pub fn[T] WriteSignal::set(self : WriteSignal[T], value : T) -> Unit {
 }
 
 ///|
+#inline
 pub fn[T] WriteSignal::set_untracked(self : WriteSignal[T], value : T) -> Unit {
   let current_inner = self.inner.val
   self.inner.val = { ..current_inner, value: value }
@@ -141,6 +183,7 @@ pub impl[T] Hash for ReadSignal[T] with hash_combine(self, hasher : Hasher) {
 }
 
 ///|
+#inline
 pub impl[T] Eq for ReadSignal[T] with equal(self, another : ReadSignal[T]) -> Bool {
   self.inner.val.id == another.inner.val.id
 }
@@ -165,6 +208,70 @@ pub impl[T : Default] Default for ReadSignal[T] with default() -> ReadSignal[T] 
 }
 
 ///|
+#inline
+pub impl[T] IsDisposed for ReadSignal[T] with is_disposed(_self) -> Bool {
+  false
+}
+
+///|
+/// Implement `ReactiveNode` trait for ReadSignal
+pub impl[T] ReactiveNode for ReadSignal[T] with mark_stale(self) {
+  self.mark_all_pending()
+}
+
+///|
+pub impl[T] ReactiveNode for ReadSignal[T] with mark_pending(_self) { }
+
+///|
+pub impl[T] ReactiveNode for ReadSignal[T] with mark_all_pending(self) {
+  self.inner.val.subs.each(fn(sub) {
+    match sub.sub {
+      Some(node) => node.mark_stale()
+      None => ()
+    }
+  })
+}
+
+///|
+#inline
+pub impl[T] ReactiveNode for ReadSignal[T] with update_value(_self) { false }
+
+///|
+pub impl[T] Source for ReadSignal[T] with add_sub(self, sub: ASubscriber) {
+  self.inner.val.subs.insert(sub)
+}
+
+///|
+pub impl[T] Source for ReadSignal[T] with remove_sub(self, sub: ASubscriber) {
+  self.inner.val.subs.remove(sub)
+}
+
+///|
+pub impl[T] Source for ReadSignal[T] with clear_subs(self) {
+  self.inner.val.subs.clear()
+}
+
+///|
+pub impl[T] ToASource for ReadSignal[T] with to_asource(self) {
+  {
+    id: self.inner.val.id,
+    src: Some(self as &Source)
+  }
+}
+
+///|
+pub impl[T] Track for ReadSignal[T] with track(self) -> Unit {
+  guard !self.is_disposed() else { return }
+  match Observer::get() {
+    Some(sub) => {
+      sub.add_source(self.to_asource())
+      self.add_sub(sub)
+    }
+    None => { () }
+  }
+}
+
+///|
 pub fn[T, U] ReadSignal::try_with(self : ReadSignal[T], f: (T) -> U ) -> Option[U] {
 //  track_signal_dependency(self.inner.val.subs)
   Some(f(self.inner.val.value))
@@ -181,6 +288,7 @@ pub fn[T] ReadSignal::get(self: ReadSignal[T]) -> T {
 }
 
 ///|
+#inline
 pub fn[T] ReadSignal::get_untracked(self : ReadSignal[T]) -> T {
   self.inner.val.value
 }
@@ -204,6 +312,7 @@ pub impl[T] Hash for RwSignal[T] with hash_combine(self, hasher : Hasher) {
 }
 
 ///|
+#inline
 pub impl[T] Eq for RwSignal[T] with equal(self, another : RwSignal[T]) -> Bool {
   self.inner.val.id == another.inner.val.id
 }
@@ -232,6 +341,7 @@ pub impl[T] ReactiveNode for RwSignal[T] with mark_stale(self) {
 }
 
 ///|
+#inline
 pub impl[T] ReactiveNode for RwSignal[T] with mark_pending(_self) { }
 
 ///|
@@ -245,13 +355,56 @@ pub impl[T] ReactiveNode for RwSignal[T] with mark_all_pending(self) {
 }
 
 ///|
+#inline
 pub impl[T] ReactiveNode for RwSignal[T] with update_value(_self) { false }
+
+///|
+#inline
+pub impl[T] IsDisposed for RwSignal[T] with is_disposed(_self) -> Bool {
+  false
+}
 
 ///|
 /// Implement `Notify` trait for WriteSignal
 pub impl[T] Notify for RwSignal[T] with notify(self) -> Unit {
   self.mark_stale()
 }
+
+///|
+pub impl[T] Source for RwSignal[T] with add_sub(self, sub: ASubscriber) {
+  self.inner.val.subs.insert(sub)
+}
+
+///|
+pub impl[T] Source for RwSignal[T] with remove_sub(self, sub: ASubscriber) {
+  self.inner.val.subs.remove(sub)
+}
+
+///|
+pub impl[T] Source for RwSignal[T] with clear_subs(self) {
+  self.inner.val.subs.clear()
+}
+
+///|
+pub impl[T] ToASource for RwSignal[T] with to_asource(self) {
+  {
+    id: self.inner.val.id,
+    src: Some(self as &Source)
+  }
+}
+
+///|
+pub impl[T] Track for RwSignal[T] with track(self) -> Unit {
+  guard !self.is_disposed() else { return }
+  match Observer::get() {
+    Some(sub) => {
+      sub.add_source(self.to_asource())
+      self.add_sub(sub)
+    }
+    None => { () }
+  }
+}
+
 
 ///|
 pub fn[T] RwSignal::new(value : T) -> RwSignal[T] {
@@ -261,6 +414,7 @@ pub fn[T] RwSignal::new(value : T) -> RwSignal[T] {
 }
 
 ///|
+#inline
 pub fn[T] RwSignal::read_only(self : RwSignal[T]) -> ReadSignal[T] {
   ReadSignal::{
     inner: self.inner
@@ -268,6 +422,7 @@ pub fn[T] RwSignal::read_only(self : RwSignal[T]) -> ReadSignal[T] {
 }
 
 ///|
+#inline
 pub fn[T] RwSignal::write_only(self : RwSignal[T]) -> WriteSignal[T] {
   WriteSignal::{
     inner: self.inner
@@ -315,6 +470,7 @@ pub fn[T] RwSignal::get(self : RwSignal[T]) -> T {
 }
 
 ///|
+#inline
 pub fn[T] RwSignal::get_untracked(self : RwSignal[T]) -> T {
   self.inner.val.value
 }
@@ -347,6 +503,7 @@ pub fn[T] RwSignal::set(self : RwSignal[T], value : T) -> Unit {
 }
 
 ///|
+#inline
 pub fn[T] RwSignal::set_untracked(self : RwSignal[T], value : T) -> Unit {
   let current_inner = self.inner.val
   self.inner.val = { ..current_inner, value: value }

@@ -1,5 +1,5 @@
 fn main {
-  let app = counter_component(0)
+  let app = counter()
   
   @dom.mount_to_body(app)
 }

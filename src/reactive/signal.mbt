@@ -12,7 +12,7 @@ fn next_signal_id() -> UInt {
 /// The shared inner state of a signal.
 pub struct SignalInner[T] {
   id    : UInt
-  value : T
+  mut value : T
   subs  : @hashset.HashSet[ASubscriber]
 }
 
@@ -139,9 +139,7 @@ pub fn[T] WriteSignal::new(value : T) -> WriteSignal[T] {
 
 ///|
 pub fn[T] WriteSignal::try_update(self : WriteSignal[T], f : (T) -> T) -> Option[Unit] {
-  let current_inner = self.inner.val
-  let new_value = f(current_inner.value)
-  self.inner.val = { ..current_inner, value: new_value }
+  self.inner.val.value = f(self.inner.val.value)
   self.mark_stale()
   Some(())
 }
@@ -153,10 +151,10 @@ pub fn[T] WriteSignal::update(self : WriteSignal[T], f : (T) -> T) -> Unit {
 
 ///|
 pub fn[T] WriteSignal::try_set(self : WriteSignal[T], value : T) -> Option[T] {
-  let current_inner = self.inner.val
-  self.inner.val = { ..current_inner, value: value }
+  let old_value = self.inner.val.value
+  self.inner.val.value = value
   self.mark_stale()
-  None
+  Some(old_value)
 }
 
 ///|
@@ -273,7 +271,7 @@ pub impl[T] Track for ReadSignal[T] with track(self) -> Unit {
 
 ///|
 pub fn[T, U] ReadSignal::try_with(self : ReadSignal[T], f: (T) -> U ) -> Option[U] {
-//  track_signal_dependency(self.inner.val.subs)
+  self.track()
   Some(f(self.inner.val.value))
 }
 
@@ -405,7 +403,6 @@ pub impl[T] Track for RwSignal[T] with track(self) -> Unit {
   }
 }
 
-
 ///|
 pub fn[T] RwSignal::new(value : T) -> RwSignal[T] {
   RwSignal::{
@@ -450,7 +447,7 @@ pub fn[T] RwSignal::unite(
 
 ///|
 pub fn[T, U] RwSignal::try_with(self : RwSignal[T], f: (T) -> U) -> Option[U] {
-  // track_signal_dependency(self.inner.val.subs)
+  self.track()
   Some(f(self.inner.val.value))
 }
 

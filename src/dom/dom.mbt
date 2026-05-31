@@ -157,3 +157,4 @@ pub fn label()  -> Html { el("label")  }
 pub fn text(s : String) -> Html { Html::Text(s) }
 pub fn text_dyn(f : () -> String) -> Html { Html::DynText(f) }
 pub fn unit_view() -> Html { Html::Text("") }
+

@@ -1,5 +1,5 @@
 ///|
-pub trait ReactiveNode {
+pub(open) trait ReactiveNode {
   fn mark_stale(Self) -> Unit 
   fn mark_pending(Self) -> Unit
   fn mark_all_pending(Self) -> Unit

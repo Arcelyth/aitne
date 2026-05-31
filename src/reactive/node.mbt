@@ -1,3 +1,4 @@
+///|
 pub trait ReactiveNode {
   fn mark_stale(Self) -> Unit 
   fn mark_pending(Self) -> Unit
@@ -5,6 +6,7 @@ pub trait ReactiveNode {
   fn update_value(Self) -> Bool
 }
 
+///|
 pub(all) enum ReactiveNodeState {
   Clean
   Pending 

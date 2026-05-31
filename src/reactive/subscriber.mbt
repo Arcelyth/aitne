@@ -77,10 +77,4 @@ pub impl Subscriber for ASubscriber with clean_sources(self, subscriber : ASubsc
 }
 
 
-//pub struct Subscriber {
-//  id : Int
-//  run : () -> Unit
-//} 
-
-
 

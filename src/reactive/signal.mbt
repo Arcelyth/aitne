@@ -1,6 +1,5 @@
 ///|
-// Simple signal id generator.
-/// If you already have a runtime-wide id allocator, replace this.
+/// Simple signal id generator.
 let signal_id_counter : Ref[UInt] = @ref.new(0)
 
 fn next_signal_id() -> UInt {
@@ -26,6 +25,7 @@ pub fn[T] SignalInner::new(value : T) -> @ref.Ref[SignalInner[T]] {
   })
 }
 
+// ----- WriteSignal -----
 ///|
 pub struct WriteSignal[T] {
   inner : @ref.Ref[SignalInner[T]]
@@ -61,12 +61,75 @@ pub impl[T : Default] Default for WriteSignal[T] with default() -> WriteSignal[T
 }
 
 ///|
+/// Implement `ReactiveNode` trait for WriteSignal
+pub impl[T] ReactiveNode for WriteSignal[T] with mark_stale(self) {
+  self.mark_all_pending()
+}
+
+///|
+pub impl[T] ReactiveNode for WriteSignal[T] with mark_pending(_self) { }
+
+///|
+pub impl[T] ReactiveNode for WriteSignal[T] with mark_all_pending(self) {
+  self.inner.val.subs.each(fn(sub) {
+    match sub.sub {
+      Some(node) => node.mark_stale()
+      None => ()
+    }
+  })
+}
+
+///|
+pub impl[T] ReactiveNode for WriteSignal[T] with update_value(_self) { false }
+
+///|
+/// Implement `Notify` trait for WriteSignal
+pub impl[T] Notify for WriteSignal[T] with notify(self) -> Unit {
+  self.mark_stale()
+}
+
+
+///|
 pub fn[T] WriteSignal::new(value : T) -> WriteSignal[T] {
   WriteSignal::{
     inner: SignalInner::new(value)
   }
 }
 
+///|
+pub fn[T] WriteSignal::try_update(self : WriteSignal[T], f : (T) -> T) -> Option[Unit] {
+  let current_inner = self.inner.val
+  let new_value = f(current_inner.value)
+  self.inner.val = { ..current_inner, value: new_value }
+  self.mark_stale()
+  Some(())
+}
+
+///|
+pub fn[T] WriteSignal::update(self : WriteSignal[T], f : (T) -> T) -> Unit {
+  let _ = self.try_update(f)
+}
+
+///|
+pub fn[T] WriteSignal::try_set(self : WriteSignal[T], value : T) -> Option[T] {
+  let current_inner = self.inner.val
+  self.inner.val = { ..current_inner, value: value }
+  self.mark_stale()
+  None
+}
+
+///|
+pub fn[T] WriteSignal::set(self : WriteSignal[T], value : T) -> Unit {
+  let _ = self.try_set(value)
+}
+
+///|
+pub fn[T] WriteSignal::set_untracked(self : WriteSignal[T], value : T) -> Unit {
+  let current_inner = self.inner.val
+  self.inner.val = { ..current_inner, value: value }
+}
+
+// ----- ReadSignal -----
 ///|
 pub struct ReadSignal[T] {
   inner : @ref.Ref[SignalInner[T]]
@@ -83,7 +146,7 @@ pub impl[T] Eq for ReadSignal[T] with equal(self, another : ReadSignal[T]) -> Bo
 }
 
 ///|
-/// TODO: Implement `Debug` trait for ReadSignal[T]
+/// Implement `Debug` trait for ReadSignal[T]
 pub impl[T : Debug] Debug for ReadSignal[T] with to_repr(self) -> Repr {
   @debug.Repr::tuple([
     @debug.Repr::string("id"),
@@ -102,12 +165,34 @@ pub impl[T : Default] Default for ReadSignal[T] with default() -> ReadSignal[T] 
 }
 
 ///|
+pub fn[T, U] ReadSignal::try_with(self : ReadSignal[T], f: (T) -> U ) -> Option[U] {
+//  track_signal_dependency(self.inner.val.subs)
+  Some(f(self.inner.val.value))
+}
+
+///|
+pub fn[T] ReadSignal::try_get(self: ReadSignal[T]) -> Option[T] {
+  self.try_with(fn(v) { v })
+}
+
+///|
+pub fn[T] ReadSignal::get(self: ReadSignal[T]) -> T {
+  self.try_get().unwrap()
+}
+
+///|
+pub fn[T] ReadSignal::get_untracked(self : ReadSignal[T]) -> T {
+  self.inner.val.value
+}
+
+///|
 pub fn[T] ReadSignal::new(value : T) -> ReadSignal[T] {
   ReadSignal::{
     inner: SignalInner::new(value)
   }
 }
 
+// ----- RwSignal -----
 ///|
 pub struct RwSignal[T] {
   inner : @ref.Ref[SignalInner[T]]
@@ -138,6 +223,34 @@ pub impl[T : Debug] Debug for RwSignal[T] with to_repr(self) -> Repr {
 ///|
 pub impl[T : Default] Default for RwSignal[T] with default() -> RwSignal[T] {
   RwSignal::new(T::default())
+}
+
+///|
+/// Implement `ReactiveNode` for RwSignal
+pub impl[T] ReactiveNode for RwSignal[T] with mark_stale(self) {
+  self.mark_all_pending()
+}
+
+///|
+pub impl[T] ReactiveNode for RwSignal[T] with mark_pending(_self) { }
+
+///|
+pub impl[T] ReactiveNode for RwSignal[T] with mark_all_pending(self) {
+  self.inner.val.subs.each(fn(sub) {
+    match sub.sub {
+      Some(node) => node.mark_stale()
+      None => ()
+    }
+  })
+}
+
+///|
+pub impl[T] ReactiveNode for RwSignal[T] with update_value(_self) { false }
+
+///|
+/// Implement `Notify` trait for WriteSignal
+pub impl[T] Notify for RwSignal[T] with notify(self) -> Unit {
+  self.mark_stale()
 }
 
 ///|
@@ -180,3 +293,67 @@ pub fn[T] RwSignal::unite(
   }
 }
 
+///|
+pub fn[T, U] RwSignal::try_with(self : RwSignal[T], f: (T) -> U) -> Option[U] {
+  // track_signal_dependency(self.inner.val.subs)
+  Some(f(self.inner.val.value))
+}
+
+///|
+pub fn[T, U] RwSignal::with_val(self : RwSignal[T], f: (T) -> U) -> U {
+  self.try_with(f).unwrap()
+}
+
+///|
+pub fn[T] RwSignal::try_get(self : RwSignal[T]) -> Option[T] {
+  self.try_with(fn(v) { v })
+}
+
+///|
+pub fn[T] RwSignal::get(self : RwSignal[T]) -> T {
+  self.try_get().unwrap()
+}
+
+///|
+pub fn[T] RwSignal::get_untracked(self : RwSignal[T]) -> T {
+  self.inner.val.value
+}
+
+///|
+pub fn[T] RwSignal::try_update(self : RwSignal[T], f : (T) -> T) -> Option[Unit] {
+  let current_inner = self.inner.val
+  let new_value = f(current_inner.value)
+  self.inner.val = { ..current_inner, value: new_value }
+  self.mark_stale()
+  Some(())
+}
+
+///|
+pub fn[T] RwSignal::update(self : RwSignal[T], f : (T) -> T) -> Unit {
+  let _ = self.try_update(f)
+}
+
+///|
+pub fn[T] RwSignal::try_set(self : RwSignal[T], value : T) -> Option[T] {
+  let current_inner = self.inner.val
+  self.inner.val = { ..current_inner, value: value }
+  self.mark_stale()
+  None
+}
+
+///|
+pub fn[T] RwSignal::set(self : RwSignal[T], value : T) -> Unit {
+  let _ = self.try_set(value)
+}
+
+///|
+pub fn[T] RwSignal::set_untracked(self : RwSignal[T], value : T) -> Unit {
+  let current_inner = self.inner.val
+  self.inner.val = { ..current_inner, value: value }
+}
+
+// ----- Signal functions -----
+///|
+pub fn[T] create_signal(value : T) -> (ReadSignal[T], WriteSignal[T]) {
+  RwSignal::new(value).split()
+}

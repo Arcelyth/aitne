@@ -17,6 +17,19 @@ pub impl Hash for ASource with hash_combine(self, hasher : Hasher) {
 }
 
 ///|
+pub impl Eq for ASource with equal(self, other: ASource) -> Bool {
+  self.id == other.id
+}
+
+/// Implement `Debug` trait for WriteSignal[T]
+pub impl Debug for ASource with to_repr(self) -> Repr {
+ @debug.Repr::tuple([
+    @debug.Repr::string("id"),
+    @debug.Repr::string(self.id.to_string()),
+  ])
+}
+
+///|
 pub impl ReactiveNode for ASource with mark_stale(self) -> Unit {
   match self.src {
     Some(src) => src.mark_stale()

@@ -16,6 +16,19 @@ pub impl Hash for ASubscriber with hash_combine(self, hasher : Hasher) {
 }
 
 ///|
+pub impl Eq for ASubscriber with equal(self, other: ASubscriber) -> Bool {
+  self.id == other.id
+}
+
+/// Implement `Debug` trait for WriteSignal[T]
+pub impl Debug for ASubscriber with to_repr(self) -> Repr {
+ @debug.Repr::tuple([
+    @debug.Repr::string("id"),
+    @debug.Repr::string(self.id.to_string()),
+  ])
+}
+
+///|
 pub impl ReactiveNode for ASubscriber with mark_stale(self) -> Unit {
   match self.sub {
     Some(sub) => sub.mark_stale()

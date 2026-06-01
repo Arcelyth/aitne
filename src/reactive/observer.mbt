@@ -1,5 +1,5 @@
 ///|
-struct ObserverState {
+pub struct ObserverState {
   subscriber : ASubscriber
   untracked  : Bool
 }
@@ -7,7 +7,7 @@ struct ObserverState {
 let observer_context : @ref.Ref[Option[ObserverState]] = @ref.new(None)
 
 ///| 
-pub struct Observer {}
+pub(all) struct Observer {}
 
 ///|
 pub fn Observer::get() -> Option[ASubscriber] {

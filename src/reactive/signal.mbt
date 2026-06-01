@@ -11,9 +11,9 @@ fn next_signal_id() -> UInt {
 ///|
 /// The shared inner state of a signal.
 pub struct SignalInner[T] {
-  id    : UInt
+  id : UInt
   mut value : T
-  subs  : @hashset.HashSet[ASubscriber]
+  subs : @hashset.HashSet[ASubscriber]
 }
 
 ///|
@@ -51,7 +51,7 @@ pub impl[T : Debug] Debug for WriteSignal[T] with to_repr(self) -> Repr {
     @debug.Repr::string("value"),
     self.inner.val.value.to_repr(),
     @debug.Repr::string("subs"),
-    self.inner.val.subs.to_repr(),
+    to_repr(self.inner.val.subs),
   ])
 }
 
@@ -97,7 +97,7 @@ pub impl[T] IsDisposed for WriteSignal[T] with is_disposed(_self) -> Bool {
 
 ///|
 pub impl[T] Source for WriteSignal[T] with add_sub(self, sub: ASubscriber) {
-  self.inner.val.subs.insert(sub)
+  self.inner.val.subs.add(sub)
 }
 
 ///|
@@ -195,7 +195,7 @@ pub impl[T : Debug] Debug for ReadSignal[T] with to_repr(self) -> Repr {
     @debug.Repr::string("value"),
     self.inner.val.value.to_repr(),
     @debug.Repr::string("subs"),
-    self.inner.val.subs.to_repr(),
+    to_repr(self.inner.val.subs),
   ])
 }
 
@@ -236,7 +236,7 @@ pub impl[T] ReactiveNode for ReadSignal[T] with update_value(_self) { false }
 
 ///|
 pub impl[T] Source for ReadSignal[T] with add_sub(self, sub: ASubscriber) {
-  self.inner.val.subs.insert(sub)
+  self.inner.val.subs.add(sub)
 }
 
 ///|
@@ -323,7 +323,7 @@ pub impl[T : Debug] Debug for RwSignal[T] with to_repr(self) -> Repr {
     @debug.Repr::string("value"),
     self.inner.val.value.to_repr(),
     @debug.Repr::string("subs"),
-    self.inner.val.subs.to_repr(),
+    to_repr(self.inner.val.subs),
   ])
 }
 
@@ -370,7 +370,7 @@ pub impl[T] Notify for RwSignal[T] with notify(self) -> Unit {
 
 ///|
 pub impl[T] Source for RwSignal[T] with add_sub(self, sub: ASubscriber) {
-  self.inner.val.subs.insert(sub)
+  self.inner.val.subs.add(sub)
 }
 
 ///|

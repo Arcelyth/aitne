@@ -15,6 +15,11 @@ pub trait ToASource: IsDisposed {
 }
 
 ///|
+pub trait ToASubscriber {
+  fn to_asubscriber(Self) -> ASubscriber
+}
+
+///|
 pub trait Track: Source + ToASource {
   fn track(Self) -> Unit
 }

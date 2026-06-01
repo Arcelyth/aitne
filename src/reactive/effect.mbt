@@ -12,6 +12,7 @@ fn next_effect_id() -> UInt {
 pub struct Effect {
   id : UInt
   callback : () -> Unit
+  mut sources : Array[ASource] 
 }
 
 ///|
@@ -20,6 +21,9 @@ fn Effect::run(effect : Ref[Effect]) -> Unit {
     id: effect.val.id,
     sub: Some(effect as &Subscriber)
   }
+
+  let subscriber_trait = effect as &Subscriber
+  subscriber_trait.clean_sources(sub)
 
   Observer::with_replace(Some(sub), fn() {
     (effect.val.callback)()
@@ -31,6 +35,7 @@ pub fn create_effect(f : () -> Unit) -> Unit {
   let effect = @ref.new(Effect::{
     id: next_effect_id(),
     callback: f,
+    sources: [],
   })
 
   Effect::run(effect)
@@ -38,7 +43,7 @@ pub fn create_effect(f : () -> Unit) -> Unit {
 
 ///|
 pub impl ReactiveNode for Ref[Effect] with mark_stale(self) {
-  Effect::run(self)
+  schedule_effect(self)
 }
 
 ///|
@@ -55,11 +60,15 @@ pub impl ReactiveNode for Ref[Effect] with mark_all_pending(self) {
 pub impl ReactiveNode for Ref[Effect] with update_value(_self) { false }
 
 ///|
-pub impl Subscriber for Ref[Effect] with add_source(_self, _source : ASource) -> Unit {
-  ()
+pub impl Subscriber for Ref[Effect] with add_source(self, source : ASource) -> Unit {
+  self.val.sources.push(source)
 }
 
 ///|
-pub impl Subscriber for Ref[Effect] with clean_sources(_self, _subscriber : ASubscriber) -> Unit {
-  ()
+pub impl Subscriber for Ref[Effect] with clean_sources(self, subscriber : ASubscriber) -> Unit {
+  for source in self.val.sources {
+    source.remove_sub(subscriber) 
+  }
+  self.val.sources = []
 }
+

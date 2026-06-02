@@ -1,29 +1,30 @@
+using @dom {type Html, div, h1, p, button, text, text_dyn}
 
-pub fn counter() -> @dom.Html {
+pub fn counter() -> Html {
   let (count, set_count) = @reactive.create_signal(0)
 
-  @dom.div().children([
-    @dom.h1().children([
-      @dom.text("Counter")
+  div().children([
+    h1().children([
+      text("Counter")
     ]),
 
-    @dom.p().children([
-      @dom.text_dyn(fn() {
+    p().children([
+      text_dyn(fn() {
         count.get().to_string()
       })
     ]),
 
-    @dom.button()
+    button()
       .children([
-        @dom.text("+1")
+        text("+1")
       ])
       .on(Click, fn(_e) {
         set_count.update(fn(v) { v + 1 })
       }),
 
-    @dom.button()
+    button()
       .children([
-        @dom.text("-1")
+        text("-1")
       ])
       .on(Click, fn(_e) {
         set_count.update(fn(v) { v - 1 })

@@ -1,3 +1,5 @@
 import {
   "Arcelyth/aitne/src/reactive" @reactive,
+  "moonbitlang/core/hashmap" @hashmap,
+  "moonbitlang/core/ref" @ref,
 }

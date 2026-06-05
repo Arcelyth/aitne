@@ -1,0 +1,372 @@
+///|
+suberror MbxcError { 
+  ParserError(String) 
+} derive(Debug)
+
+///|
+pub(all) enum Token {
+  Start             // <
+  End               // >
+  SlashEnd          // />
+  Slash             // /
+  Equal             // =
+  Colon             // :
+  Ident(StringView) 
+  AttrValue(StringView)
+  RawText(StringView)
+  CodeBlock(StringView)
+} derive(Debug, Eq)
+
+///|
+pub enum MbxState {
+  MS    // MoonBit String
+  M     // MoonBit Code
+  X     // MBX Tag
+} derive(Debug, Eq)
+
+///|
+pub(all) struct Lexer {
+  src : String
+  mut cur : Int
+  mut state : MbxState
+}
+
+///|
+pub fn Lexer::new(src : String) -> Lexer {
+  Lexer::{ src, cur: 0, state: MbxState::M }
+}
+
+///|
+pub fn Lexer::is_end(self : Lexer) -> Bool {
+  self.cur >= self.src.length()
+}
+
+///|
+pub fn Lexer::peek(self : Lexer, count : Int) -> Option[UInt16] {
+  if self.cur + count >= self.src.length() {
+    None
+  } else {
+    Some(self.src[self.cur + count])
+  }
+}
+
+///|
+fn is_ident_char(c : UInt16) -> Bool {
+  (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-'
+}
+
+///|
+pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
+  guard !self.is_end() else { return None }
+  let c = self.src[self.cur]
+
+  match self.state {
+    MbxState::MS => {
+      let start = self.cur
+      self.cur += 1
+      while !self.is_end() && self.src[self.cur] != '\"' {
+        if self.src[self.cur] == '\\' && self.cur + 1 < self.src.length() {
+          self.cur += 2
+        } else {
+          self.cur += 1
+        }
+      }
+      if !self.is_end() { self.cur += 1 }
+      self.state = MbxState::M
+      return Some(Token::RawText(self.src[start:self.cur]))
+    }
+    MbxState::M => {
+      if c == '\"' {
+        self.cur += 1
+        self.state = MbxState::MS
+        return self.next_token()
+      }
+      if c == '<' {
+        match self.peek(1) {
+          Some(next) if (next >= 'a' && next <= 'z') || next == '/' => {
+            self.cur += 1
+            self.state = MbxState::X
+            return Some(Token::Start)
+          }
+          _ => {()}
+        }
+      }
+      
+      let start = self.cur
+      self.cur += 1
+      while !self.is_end() && self.src[self.cur] != '<' && self.src[self.cur] != '\"' {
+        self.cur += 1
+      }
+      return Some(Token::RawText(self.src[start:self.cur]))
+    }
+
+    _ => {
+      match c {
+        ' ' | '\n' | '\r' | '\t' => {
+          self.cur += 1
+          return self.next_token()
+        }
+        '{' => {
+          let start = self.cur
+          let mut brace_count = 1
+          self.cur += 1
+          while !self.is_end() && brace_count > 0 {
+            let current = self.src[self.cur]
+            if current == '{' { brace_count += 1 }
+            else if current == '}' { brace_count -= 1 }
+            self.cur += 1
+          }
+          return Some(Token::CodeBlock(self.src[start:self.cur]))
+        }
+        '>' => {
+          self.cur += 1
+          self.state = MbxState::M
+          return Some(Token::End)
+        }
+        '=' => { self.cur += 1; return Some(Token::Equal) }
+        ':' => { self.cur += 1; return Some(Token::Colon) }
+        '/' => {
+          match self.peek(1) {
+            Some('>') => {
+              self.cur += 2
+              self.state = MbxState::M
+              return Some(Token::SlashEnd)
+            }
+            _ => { self.cur += 1; return Some(Token::Slash) }
+          }
+        }
+        '\"' | '\'' => {
+          let quote = c
+          let start = self.cur
+          self.cur += 1
+          while !self.is_end() && self.src[self.cur] != quote {
+            self.cur += 1
+          }
+          if !self.is_end() { self.cur += 1 }
+          return Some(Token::AttrValue(self.src[start:self.cur]))
+        }
+        _ if is_ident_char(c) => {
+          let start = self.cur
+          while !self.is_end() && is_ident_char(self.src[self.cur]) {
+            self.cur += 1
+          }
+          return Some(Token::Ident(self.src[start:self.cur]))
+        }
+        _ => {
+          self.cur += 1
+          self.next_token()
+        }
+      }
+    }
+  }
+}
+
+///|
+pub fn Lexer::tokenizer(self : Lexer) -> Array[Token] {
+  let tokens = []
+  while true {
+    match self.next_token() {
+      Some(t) => tokens.push(t)
+      None => break
+    }
+  }
+  tokens
+}
+
+///|
+pub(all) enum MbxAST {
+  PureCode(StringView)
+  TextNode(StringView)
+  DynamicNode(StringView)
+  ElementNode(StringView, Array[MbxAttribute], Array[MbxAST])
+} derive(Debug)
+
+///|
+pub struct MbxAttribute {
+  name : StringView
+  scope : Option[StringView]
+  value : AttrVal
+} derive(Debug)
+
+///|
+pub enum AttrVal {
+  Static(StringView)
+  Dynamic(StringView)
+} derive(Debug)
+
+///|
+pub(all) struct Parser {
+  tokens : Array[Token]
+  mut cur : Int
+}
+
+///|
+pub fn Parser::new(tokens : Array[Token]) -> Parser {
+  Parser::{ tokens, cur: 0 }
+}
+
+///|
+fn Parser::is_end(self : Parser) -> Bool {
+  self.cur >= self.tokens.length()
+}
+
+///|
+fn Parser::peek(self : Parser) -> Option[Token] {
+  if self.is_end() { None } else { Some(self.tokens[self.cur]) }
+}
+
+///|
+fn Parser::advance(self : Parser) -> Unit {
+  self.cur += 1
+}
+
+///|
+fn Parser::parse_attributes(self : Parser) -> Array[MbxAttribute] {
+  let attrs = []
+  while !self.is_end() {
+    match self.peek() {
+      Some(Token::Ident(name)) => {
+        self.advance()
+        let mut ns = None
+        let mut final_name = name
+        
+        match self.peek() {
+          Some(Token::Colon) => {
+            self.advance()
+            match self.peek() {
+              Some(Token::Ident(sub_name)) => {
+                self.advance()
+                ns = Some(final_name)
+                final_name = sub_name
+              }
+              _ => {()}
+            }
+          }
+          _ => {()}
+        }
+
+        match self.peek() {
+          Some(Token::Equal) => {
+            self.advance()
+            match self.peek() {
+              Some(Token::AttrValue(v)) => {
+                self.advance()
+                attrs.push({ name: final_name, scope: ns, value: AttrVal::Static(v) })
+              }
+              Some(Token::CodeBlock(c)) => {
+                self.advance()
+                attrs.push({ name: final_name, scope: ns, value: AttrVal::Dynamic(c) })
+              }
+              _ => {()}
+            }
+          }
+          _ => {
+            attrs.push({ name: final_name, scope: ns, value: AttrVal::Static("") })
+          }
+        }
+      }
+      _ => break
+    }
+  }
+  attrs
+}
+
+///|
+pub fn Parser::parse_node(self : Parser) -> Option[MbxAST] raise MbxcError {
+  guard !self.is_end() else { return None }
+  
+  match self.peek().unwrap() {
+    Token::RawText(code) => {
+      self.advance()
+      Some(MbxAST::PureCode(code))
+    }
+    Token::Start => {
+      self.advance()
+      match self.peek() {
+        Some(Token::Ident(tag)) => {
+          self.advance()
+          let attrs = self.parse_attributes()
+          
+          match self.peek() {
+            Some(Token::SlashEnd) => {
+              self.advance()
+              Some(MbxAST::ElementNode(tag, attrs, []))
+            }
+            Some(Token::End) => {
+              self.advance()
+              let children = []
+              
+              while !self.is_end() {
+                match self.peek() {
+                  Some(Token::Start) => {
+                    if self.cur + 1 < self.tokens.length() {
+                      match self.tokens[self.cur + 1] {
+                        Token::Slash => {
+                          self.cur += 2
+                          match self.peek() {
+                            Some(Token::Ident(close_tag)) => {
+                              if close_tag != tag {
+                                raise ParserError("Warning: Mismatched tag! Expected </\{tag}>, found </\{close_tag}>")
+                              }
+                              self.advance()
+                              self.advance()
+                              break
+                            }
+                            _ => {
+                              break
+                            }
+                          }
+                        }
+                        _ => {()}
+                      }
+                    }
+                    match self.parse_node() {
+                      Some(child) => {
+                        children.push(child)
+                      }
+                      None => {()}
+                    }
+                  }
+                  Some(Token::CodeBlock(c)) => {
+                    self.advance()
+                    children.push(MbxAST::DynamicNode(c))
+                  }
+                  Some(Token::RawText(t)) => {
+                    self.advance()
+                    children.push(MbxAST::TextNode(t))
+                  }
+                  _ => {
+                    match self.parse_node() {
+                      Some(child) => {
+                        children.push(child)
+                      }
+                      None => {()}
+                    }
+                  }
+                }
+              }
+              Some(MbxAST::ElementNode(tag, attrs, children))
+            }
+            _ => None
+          }
+        }
+        _ => None
+      }
+    }
+    _ => { self.advance(); None }
+  }
+}
+
+///|
+pub fn Parser::parse(self : Parser) -> Array[MbxAST] raise MbxcError {
+  let ast_list = []
+
+  while !self.is_end() {
+    match self.parse_node() {
+      Some(ast) => ast_list.push(ast)
+      None => ()
+    }
+  }
+
+  ast_list
+}

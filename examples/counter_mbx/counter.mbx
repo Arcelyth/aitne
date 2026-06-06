@@ -1,0 +1,17 @@
+pub fn counter() -> Html {
+  let (count, set_count) = @reactive.create_signal(0)
+
+  <div>
+    <h1>Counter</h1>
+    
+    <p>{ count.get().to_string() }</p>
+
+    <button on:click={fn(_e) { set_count.update(fn(v) { v + 1 }) }}>
+      +1
+    </button>
+
+    <button on:click={fn(_e) { set_count.update(fn(v) { v - 1 }) }}>
+      -1
+    </button>
+  </div>
+}

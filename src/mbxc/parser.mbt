@@ -29,11 +29,12 @@ pub(all) struct Lexer {
   src : String
   mut cur : Int
   mut state : MbxState
+  mut tag_depth : Int
 }
 
 ///|
 pub fn Lexer::new(src : String) -> Lexer {
-  Lexer::{ src, cur: 0, state: MbxState::M }
+  Lexer::{ src, cur: 0, state: MbxState::M, tag_depth: 0 }
 }
 
 ///|
@@ -84,7 +85,14 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
       }
       if c == '<' {
         match self.peek(1) {
-          Some(next) if (next >= 'a' && next <= 'z') || next == '/' => {
+          Some(next) if (next >= 'a' && next <= 'z') => {
+            self.tag_depth += 1
+            self.cur += 1
+            self.state = MbxState::X
+            return Some(Token::Start)
+          }
+          Some('/') => {
+            if self.tag_depth > 0 { self.tag_depth -= 1 }
             self.cur += 1
             self.state = MbxState::X
             return Some(Token::Start)
@@ -93,6 +101,19 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
         }
       }
       
+      if c == '{' && self.tag_depth > 0 {
+        let start = self.cur
+        let mut brace_count = 1
+        self.cur += 1
+        while !self.is_end() && brace_count > 0 {
+          let current = self.src[self.cur]
+          if current == '{' { brace_count += 1 }
+          else if current == '}' { brace_count -= 1 }
+          self.cur += 1
+        }
+        return Some(Token::CodeBlock(self.src[start:self.cur]))
+      }
+
       let start = self.cur
       self.cur += 1
       while !self.is_end() && self.src[self.cur] != '<' && self.src[self.cur] != '\"' {
@@ -131,6 +152,7 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
             Some('>') => {
               self.cur += 2
               self.state = MbxState::M
+              if self.tag_depth > 0 { self.tag_depth -= 1 }
               return Some(Token::SlashEnd)
             }
             _ => { self.cur += 1; return Some(Token::Slash) }
@@ -155,7 +177,7 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
         }
         _ => {
           self.cur += 1
-          self.next_token()
+          return self.next_token()
         }
       }
     }

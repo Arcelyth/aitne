@@ -1,11 +1,18 @@
 {
   "name": "Arcelyth/aitne",
   "version": "0.1.0",
-  "deps": {},
+  "deps": {
+    "moonbitlang/x": "0.4.45"
+  },
   "readme": "README.mbt.md",
   "repository": "https://github.com/Arcelyth/aitne",
   "license": "Apache-2.0",
-  "keywords": ["web", "reactive", "framework", "fine-grained"],
+  "keywords": [
+    "web",
+    "reactive",
+    "framework",
+    "fine-grained"
+  ],
   "description": "A lightweight and high-performance reactive web framework.",
   "preferred-target": "js",
   "supported-targets": "js"

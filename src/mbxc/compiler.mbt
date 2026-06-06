@@ -1,7 +1,7 @@
 ///|
 suberror MbxcError { 
   ParserError(String) 
-} derive(Debug)
+} derive(Debug, Show)
 
 ///|
 pub(all) enum Token {
@@ -15,7 +15,7 @@ pub(all) enum Token {
   AttrValue(StringView)
   RawText(StringView)
   CodeBlock(StringView)
-} derive(Debug, Eq)
+} derive(Debug, Eq, Show)
 
 ///|
 pub enum MbxState {
@@ -51,6 +51,7 @@ pub fn Lexer::peek(self : Lexer, count : Int) -> Option[UInt16] {
 }
 
 ///|
+#inline
 fn is_ident_char(c : UInt16) -> Bool {
   (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-'
 }
@@ -179,20 +180,20 @@ pub(all) enum MbxAST {
   TextNode(StringView)
   DynamicNode(StringView)
   ElementNode(StringView, Array[MbxAttribute], Array[MbxAST])
-} derive(Debug)
+} derive(Debug, Show, Eq)
 
 ///|
 pub struct MbxAttribute {
   name : StringView
   scope : Option[StringView]
   value : AttrVal
-} derive(Debug)
+} derive(Debug, Show, Eq)
 
 ///|
 pub enum AttrVal {
   Static(StringView)
   Dynamic(StringView)
-} derive(Debug)
+} derive(Debug, Show, Eq)
 
 ///|
 pub(all) struct Parser {
@@ -369,4 +370,34 @@ pub fn Parser::parse(self : Parser) -> Array[MbxAST] raise MbxcError {
   }
 
   ast_list
+}
+
+test "lexer_parser_test" {
+  let src =
+#|fn comp() -> Html {
+#|  let (count, set_count) = @reactive.create_signal(0)
+#|  <div> Hello, World </div>
+#|}
+  let lexer = Lexer::new(src)
+  let tokens = lexer.tokenizer() 
+  // TODO: Maybe change to debug_inspect when its usage seems more convenient.
+  assert_eq(tokens, [
+    Token::RawText("fn comp() -> Html {\n  let (count, set_count) = @reactive.create_signal(0)\n  "),
+    Token::Start, Token::Ident("div"), Token::End, Token::RawText(" Hello, World "), 
+    Token::Start, Token::Slash, Token::Ident("div"), Token::End, Token::RawText("\n}")
+  ])
+  let parser = Parser::new(tokens)
+  let ast = parser.parse()
+  assert_eq(ast, [
+    MbxAST::PureCode("fn comp() -> Html {\n  let (count, set_count) = @reactive.create_signal(0)\n  "),
+    
+    MbxAST::ElementNode(
+      "div", 
+      [], 
+      [
+        MbxAST::TextNode(" Hello, World ")
+      ]
+    ),
+    MbxAST::PureCode("\n}")
+  ])
 }

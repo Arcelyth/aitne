@@ -93,10 +93,10 @@ fn CodeGen::compile_island(_self : CodeGen, nodes : Array[MbxAST]) -> String {
               let path_str = path_to_str(path)
               match attr.scope {
                 Some(ns) if ns.to_owned() == "on" => {
-                  bindings.push("  @dom.on(_root, \{path_str}, \"\{attr_name}\", \{code})")
+                  bindings.push("  @Arcelyth/aitne/src/dom.on(_root, \{path_str}, \"\{attr_name}\", \{code})")
                 }
                 _ => {
-                  bindings.push("  @dom.set_attr(_root, \{path_str}, \"\{attr_name}\", \{code})")
+                  bindings.push("  @Arcelyth/aitne/src/dom.set_attr(_root, \{path_str}, \"\{attr_name}\", \{code})")
                 }
               }
             }
@@ -126,7 +126,7 @@ fn CodeGen::compile_island(_self : CodeGen, nodes : Array[MbxAST]) -> String {
         html += "" 
         let code = code_view.to_owned()
         let path_str = path_to_str(path)
-        bindings.push("  @dom.insert_dynamic(_root, \{path_str}, \{code})")
+        bindings.push("    @Arcelyth/aitne/src/dom.insert_dynamic(_root, \{path_str}, \{code})")
       }
       MbxAST::PureCode(_) => () 
     }
@@ -140,14 +140,14 @@ fn CodeGen::compile_island(_self : CodeGen, nodes : Array[MbxAST]) -> String {
 
   let safe_html = escape_moonbit_str(html)
   let mut block = "\n  {\n"
-  block += "    let _tpl = @dom.create_template(\"\{safe_html}\")\n"
-  block += "    let _root = @dom.clone_node(_tpl)\n"
+  block += "    let _tpl = @Arcelyth/aitne/src/dom.create_template(\"\{safe_html}\")\n"
+  block += "    let _root = @Arcelyth/aitne/src/dom.clone_node(_tpl)\n"
   
   for bind in bindings {
     block += "  " + bind + "\n"
   }
   
-  block += "    _root\n  }\n"
+  block += "   @Arcelyth/aitne/src/dom.Html::RawNode(_root)\n  }\n"
   return block
 }
 

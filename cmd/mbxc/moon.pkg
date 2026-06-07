@@ -1,0 +1,9 @@
+import {
+  "Arcelyth/aitne/src/mbxc" @mbxc,
+  "moonbitlang/x/fs" @fs,
+  "moonbitlang/x/sys" @sys,
+}
+
+options(
+  "is-main": true,
+)

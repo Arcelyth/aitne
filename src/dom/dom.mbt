@@ -129,6 +129,18 @@ pub extern "js" fn dom_add_event(node : Node, ev : String, handler : (Event) -> 
   #|(node, ev, handler) => { node.addEventListener(ev, handler); }
 
 ///|
+pub extern "js" fn prim_first_child(node : Node) -> Node =
+  #|(node) => node.firstChild
+
+///|
+pub extern "js" fn prim_create_template(html : String) -> Node =
+  #|(html) => { const tpl = document.createElement('template'); tpl.innerHTML = html; return tpl.content; }
+
+///|
+pub extern "js" fn prim_clone_node(node : Node) -> Node =
+  #|(node) => node.cloneNode(true)
+
+///|
 pub fn dom_create_element(tag : String) -> Node {
   prim_create_element(document(), tag)
 }
@@ -203,6 +215,7 @@ pub(all) enum Html {
   Text(String)
   DynText(() -> String)
   For(() -> Array[String], (String) -> String, (String) -> Html)
+  RawNode(Node)
 }
 
 ///|
@@ -266,6 +279,53 @@ pub fn Html::children(self : Html, kids : Array[Html]) -> Html {
 }
 
 ///|
+pub fn create_template(html : String) -> Node {
+  prim_create_template(html)
+}
+
+///|
+pub fn clone_node(template : Node) -> Node {
+  prim_clone_node(template)
+}
+
+fn walk_path(root : Node, path : Array[Int]) -> Node {
+  let mut current = root
+  for i in 0..<path.length(){
+    let idx = path[i]
+    let mut child = prim_first_child(current)
+    
+    if prim_is_null(child) && idx == 0 {
+      let empty_text = dom_create_text_node("")
+      dom_append(current, empty_text)
+      child = empty_text
+    }
+    
+    current = child
+    for _ in 0..<idx {
+      current = prim_next_sibling(current)
+    }
+  }
+  current
+}
+
+///|
+pub fn insert_dynamic(root : Node, path : Array[Int], value_fn : () -> String) -> Unit {
+  let target_node = walk_path(root, path)
+  
+  dom_set_text(target_node, value_fn())
+  
+  @reactive.create_effect(fn() {
+    dom_set_text(target_node, value_fn())
+  })
+}
+
+///|
+pub fn on(root : Node, path : Array[Int], ev_name : String, handler : (Event) -> Unit) -> Unit {
+  let target_node = walk_path(root, path)
+  dom_add_event(target_node, ev_name, handler)
+}
+
+///|
 pub fn mount_to_id(id : String, app : Html) -> Unit {
   match dom_get_element_by_id(id) {
     Some(parent) => {let _ = app.mount(parent, None)}
@@ -316,6 +376,10 @@ pub fn Html::mount(self : Html, parent : Node, before_node : Option[Node]) -> No
     }
     For(data_signal, key_fn, view_fn) => {
       mount_dynamic_list(parent, before_node, data_signal, key_fn, view_fn)
+    }
+    RawNode(node) => {
+      insert(node)
+      node
     }
   }
 }
@@ -428,3 +492,5 @@ pub fn text(s : String) -> Html { Html::Text(s) }
 pub fn text_dyn(f : () -> String) -> Html { Html::DynText(f) }
 ///|
 pub fn unit_view() -> Html { Html::Text("") }
+
+

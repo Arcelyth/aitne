@@ -1,5 +1,5 @@
 ///|
-pub fn from_file(path : String, show~ : Bool = false) -> Option[String] {
+pub fn from_file(path : String, show~ : Bool = false, to~ : Option[String] = None) -> Option[String] {
   let res = try? @fs.read_file_to_string(path)
   match res {
     Ok(content) => {
@@ -16,9 +16,28 @@ pub fn from_file(path : String, show~ : Bool = false) -> Option[String] {
       }
      
       let codegen = CodeGen::new(asts) 
-      
-      Some(codegen.generate())
+      let gen = codegen.generate()
+      match to {
+        Some(target) => {
+          let res2 = try? @fs.write_string_to_file(target, gen)
+          match res2 {
+            Ok(_) => Some(gen)
+            Err(e) => {
+              debug(e)
+              None
+            }
+          }
+        }
+        None => {
+          Some(gen)
+        }
+      }
     }
-    Err(_) => None 
+    Err(e) => {
+      debug(e)
+      None
+    }
   }
 }
+
+

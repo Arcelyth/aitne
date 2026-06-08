@@ -460,17 +460,17 @@ pub fn mount_dynamic_list(
       match found_node {
         Some(existing_node) => {
           // If this data has rendered before and not at the same location then move it
-          if option_node_eq(current_dom_cursor, Some(existing_node)) {
-             dom_insert_before(parent, existing_node, current_dom_cursor.unwrap_or(end_anchor))
-          } else {
-             current_dom_cursor = dom_next_sibling(existing_node)
+          if !option_node_eq(current_dom_cursor, Some(existing_node)) {
+            dom_insert_before(parent, existing_node, current_dom_cursor.unwrap_or(end_anchor))
           }
+          current_dom_cursor = dom_next_sibling(existing_node)
           new_cache.val.set(key, existing_node)
         }
         None => {
-          // Add the new data 
           let new_node = view_fn(item).mount(parent, current_dom_cursor)
+          // Add the new data 
           new_cache.val.set(key, new_node)
+          current_dom_cursor = dom_next_sibling(new_node)
         }
       }
     }

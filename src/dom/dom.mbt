@@ -1,3 +1,5 @@
+using @hashmap { type HashMap}
+
 type Window
 type Document
 type Element
@@ -107,7 +109,6 @@ extern "js" fn prim_next_sibling(node : Node) -> Node =
 extern "js" fn prim_is_null(node : Node) -> Bool =
   #|(node) => node === null || node === undefined
 
-
 ///|
 pub extern "js" fn dom_set_text(node : Node, text : String) -> Unit =
   #|(node, text) => { node.textContent = text; }
@@ -139,6 +140,10 @@ pub extern "js" fn prim_create_template(html : String) -> Node =
 ///|
 pub extern "js" fn prim_clone_node(node : Node) -> Node =
   #|(node) => node.cloneNode(true)
+
+///|
+pub extern "js" fn dom_set_prop(node : Node, key : String, val : String) -> Unit =
+  #|(node, key, val) => { node[key] = val; }
 
 ///|
 pub fn dom_create_element(tag : String) -> Node {
@@ -220,11 +225,12 @@ pub(all) enum Html {
 
 ///|
 pub struct ElementBuilder {
-  tag: String
-  classes: Array[String]
-  attrs: Array[(String, String)]
-  events: Array[(String, (Event) -> Unit)]
-  children: Array[Html]
+  tag : String
+  classes : Array[String]
+  attrs : Array[(String, String)]
+  props : HashMap[String, () -> String]
+  events : HashMap[String, (Event) -> Unit]
+  children : Array[Html]
 }
 
 ///|
@@ -233,7 +239,8 @@ fn el(tag : String) -> Html {
     tag, 
     classes: [],
     attrs: [],
-    events: [],
+    props: HashMap([]),
+    events: HashMap([]),
     children: [],
   })
 }
@@ -263,9 +270,28 @@ pub fn Html::bool_attr(self : Html, key : String, _val : Bool) -> Html {
 }
 
 ///|
+pub fn Html::prop(self : Html, key : String, getter : () -> String) -> Html {
+  match self {
+    Element(b) as el => {
+      b.props[key] = getter
+      el
+    }
+    other => other
+  }
+}
+
+///|
+pub fn Html::value(self : Html, getter : () -> String) -> Html {
+  self.prop("value", getter)
+}
+
+///|
 pub fn Html::on(self : Html, ev : EventType, handler : (Event) -> Unit) -> Html {
   match self {
-    Element(b) => Element({ ..b, events: b.events + [(ev.to_string(), handler)] })
+    Element(b) as el => {
+      b.events[ev.to_string()] = handler
+      el
+    }
     other => other
   }
 }
@@ -367,7 +393,13 @@ pub fn Html::mount(self : Html, parent : Node, before_node : Option[Node]) -> No
       let node = dom_create_element(b.tag)
       for cls in b.classes { dom_add_class(node, cls) }
       b.attrs.each(fn(p) { dom_set_attr(node, p.0, p.1) })
-      b.events.each(fn(p) { dom_add_event(node, p.0, p.1) })
+      b.props.each(fn(k, v) {
+        dom_set_prop(node, k, v())
+        @reactive.create_effect(fn() {
+          dom_set_prop(node, k, v())
+        })
+      })
+      b.events.each(fn(k, v) { dom_add_event(node, k, v) })
       for child in b.children { 
         let _ = child.mount(node, None) 
       }
@@ -406,12 +438,12 @@ pub fn mount_dynamic_list(
     }
   }
 
-  let cached_nodes : Ref[@hashmap.HashMap[String, Node]] = @ref.new(@hashmap.HashMap([])) 
+  let cached_nodes : Ref[HashMap[String, Node]] = @ref.new(HashMap([])) 
 
   @reactive.create_effect(fn() {
     let new_data = data_signal()
     let old_cache = cached_nodes.val
-    let new_cache: Ref[@hashmap.HashMap[String, Node]] = @ref.new(@hashmap.HashMap([])) 
+    let new_cache: Ref[HashMap[String, Node]] = @ref.new(HashMap([])) 
 
     let mut current_dom_cursor = dom_next_sibling(start_anchor)
 

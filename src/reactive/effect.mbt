@@ -4,7 +4,7 @@ let effect_id_counter : Ref[UInt] = @ref.new(0)
 ///|
 fn next_effect_id() -> UInt {
   let id = effect_id_counter.val
-  effect_id_counter.val = id + 1U
+  effect_id_counter.val = id + 1
   id
 }
 
@@ -12,7 +12,7 @@ fn next_effect_id() -> UInt {
 pub struct Effect {
   id : UInt
   callback : () -> Unit
-  mut sources : Array[ASource] 
+  mut sources : HashSet[ASource] 
 }
 
 ///|
@@ -35,7 +35,7 @@ pub fn create_effect(f : () -> Unit) -> Unit {
   let effect = @ref.new(Effect::{
     id: next_effect_id(),
     callback: f,
-    sources: [],
+    sources: HashSet([]),
   })
 
   Effect::run(effect)
@@ -61,7 +61,7 @@ pub impl ReactiveNode for Ref[Effect] with update_value(_self) { false }
 
 ///|
 pub impl Subscriber for Ref[Effect] with add_source(self, source : ASource) -> Unit {
-  self.val.sources.push(source)
+  self.val.sources.add(source)
 }
 
 ///|
@@ -69,6 +69,6 @@ pub impl Subscriber for Ref[Effect] with clean_sources(self, subscriber : ASubsc
   for source in self.val.sources {
     source.remove_sub(subscriber) 
   }
-  self.val.sources = []
+  self.val.sources = HashSet([])
 }
 

@@ -1,6 +1,5 @@
 using @dom { type Html, div, h1, button, text, input, ul, li, event_target_value }
 
-// TODO: dynamic bindings
 fn todo_app() -> Html {
   let (input_val, set_input_val) = @reactive.create_signal("")
   
@@ -12,6 +11,7 @@ fn todo_app() -> Html {
     div().children([
       input()
         .attr("type", "text")
+        .value(fn() { input_val.get() })
         .on(Input, fn(ev) {
           set_input_val.set(event_target_value(ev))
         }),

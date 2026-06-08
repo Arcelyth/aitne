@@ -1,5 +1,6 @@
 ///|
 suberror MbxcError { 
+  LexerError(String)
   ParserError(String) 
 } derive(Debug, Show)
 
@@ -7,6 +8,9 @@ suberror MbxcError {
 pub(all) enum Token {
   Start             // <
   End               // >
+  DocStart          // <!
+  ComStart          // <!-- 
+  ComEnd            // -->
   SlashEnd          // />
   Slash             // /
   Equal             // =
@@ -20,6 +24,7 @@ pub(all) enum Token {
 ///|
 pub enum MbxState {
   MS    // MoonBit String
+  MC    // MBX Comment
   M     // MoonBit Code
   X     // MBX Tag
 } derive(Debug, Eq)
@@ -58,7 +63,7 @@ fn is_ident_char(c : UInt16) -> Bool {
 }
 
 ///|
-pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
+pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
   guard !self.is_end() else { return None }
   let c = self.src[self.cur]
 
@@ -66,6 +71,8 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
     MbxState::MS => {
       let start = self.cur
       self.cur += 1
+
+    
       while !self.is_end() && self.src[self.cur] != '\"' {
         if self.src[self.cur] == '\\' && self.cur + 1 < self.src.length() {
           self.cur += 2
@@ -73,10 +80,39 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
           self.cur += 1
         }
       }
-      if !self.is_end() { self.cur += 1 }
+      if self.is_end() {
+        raise LexerError("Unclosed string literal in MoonBit block")
+      }
+      self.cur += 1
       self.state = MbxState::M
       return Some(Token::RawText(self.src[start:self.cur]))
     }
+
+    MbxState::MC => {
+      match (self.peek(0), self.peek(1), self.peek(2)) {
+        (Some('-'), Some('-'), Some('>')) => {
+          self.cur += 3
+          self.state = MbxState::M
+          return Some(Token::ComEnd)
+        }
+        _ => {
+          let start = self.cur
+          while !self.is_end() {
+            match (self.peek(0), self.peek(1), self.peek(2)) {
+              (Some('-'), Some('-'), Some('>')) => break
+              _ => self.cur += 1
+            }
+          }
+          
+          if self.is_end() {
+            raise LexerError("Unclosed comment: expected '-->'")
+          }
+          
+          return Some(Token::RawText(self.src[start:self.cur]))
+        }
+      }
+    }
+
     MbxState::M => {
       if c == '\"' {
         self.cur += 1
@@ -96,6 +132,20 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
             self.cur += 1
             self.state = MbxState::X
             return Some(Token::Start)
+          }
+          Some('!') => {
+            match (self.peek(2), self.peek(3)) {
+              (Some('-'), Some('-')) => {
+                self.cur += 4
+                self.state = MbxState::MC
+                return Some(Token::ComStart)
+              }
+              _ => {
+                self.cur += 2
+                self.state = MbxState::X 
+                return Some(Token::DocStart)
+              }
+            }
           }
           _ => {()}
         }
@@ -122,11 +172,11 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
       return Some(Token::RawText(self.src[start:self.cur]))
     }
 
-    _ => {
+    MbxState::X => {
       match c {
         ' ' | '\n' | '\r' | '\t' => {
           self.cur += 1
-          return self.next_token()
+          return self.next_token!()
         }
         '{' => {
           let start = self.cur
@@ -137,6 +187,9 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
             if current == '{' { brace_count += 1 }
             else if current == '}' { brace_count -= 1 }
             self.cur += 1
+          }
+          if brace_count > 0 {
+            raise LexerError("Unclosed code block in tag attributes: expected '}'")
           }
           return Some(Token::CodeBlock(self.src[start:self.cur]))
         }
@@ -165,7 +218,10 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
           while !self.is_end() && self.src[self.cur] != quote {
             self.cur += 1
           }
-          if !self.is_end() { self.cur += 1 }
+          if self.is_end() {
+            raise LexerError("Unclosed attribute value: expected matching quote")
+          }
+          self.cur += 1
           return Some(Token::AttrValue(self.src[start:self.cur]))
         }
         _ if is_ident_char(c) => {
@@ -185,7 +241,7 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] {
 }
 
 ///|
-pub fn Lexer::tokenizer(self : Lexer) -> Array[Token] {
+pub fn Lexer::tokenizer(self : Lexer) -> Array[Token] raise MbxcError {
   let tokens = []
   while true {
     match self.next_token() {

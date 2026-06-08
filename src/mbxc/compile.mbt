@@ -4,7 +4,7 @@ pub fn from_file(path : String, show~ : Bool = false, to~ : Option[String] = Non
   match res {
     Ok(content) => {
       let lexer = Lexer::new(content) 
-      let tokens = lexer.tokenizer()
+      let tokens = try! lexer.tokenizer()
       if show {
         debug(tokens)
       }

@@ -1,6 +1,6 @@
 {
   "name": "Arcelyth/aitne",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "deps": {
     "moonbitlang/x": "0.4.45"
   },

@@ -76,5 +76,7 @@ pub impl Subscriber for ASubscriber with clean_sources(self, subscriber : ASubsc
   }
 }
 
-
-
+///|
+pub impl Notify for ASubscriber with notify(self) -> Unit {
+  self.mark_stale()
+}

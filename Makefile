@@ -8,6 +8,11 @@ exp_page:
 	chmod +x ./examples/page/run.sh
 	./examples/page/run.sh
 
+exp_route: 
+	moon build ./examples/route
+	chmod +x ./examples/route/run.sh
+	./examples/route/run.sh
+
 exp_todo: 
 	moon build ./examples/todo
 	chmod +x ./examples/todo/run.sh

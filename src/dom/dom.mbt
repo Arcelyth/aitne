@@ -620,6 +620,10 @@ pub fn a()      -> Html { el("a")      }
 pub fn form()   -> Html { el("form")   }
 ///|
 pub fn label()  -> Html { el("label")  }
+///|
+pub fn nav()    -> Html { el("nav")  }
+///|
+pub fn hr()    -> Html { el("hr")  }
 
 ///|
 pub fn text(s : String) -> Html { Html::Text(s) }

@@ -382,7 +382,7 @@ fn match_routes(
 }
 
 ///|
-pub struct RouterBuilder {
+pub(all) struct RouterBuilder {
   routes : Array[Route]
   fallback : () -> Html
 }

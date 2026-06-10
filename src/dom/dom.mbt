@@ -221,6 +221,7 @@ pub(all) enum Html {
   DynText(() -> String)
   For(() -> Array[String], (String) -> String, (String) -> Html)
   RawNode(Node)
+  Router(RouterBuilder)
 }
 
 ///|
@@ -413,6 +414,9 @@ pub fn Html::mount(self : Html, parent : Node, before_node : Option[Node]) -> No
       insert(node)
       node
     }
+    Router(builder) => {
+      mount_router(parent, before_node, builder)
+    }
   }
 }
 
@@ -489,6 +493,105 @@ pub fn mount_dynamic_list(
   })
 
   start_anchor 
+}
+
+///|
+///|
+pub fn mount_router(
+  parent : Node,
+  external_before : Option[Node],
+  builder : RouterBuilder,
+) -> Node {
+  let start_anchor = dom_create_comment("Router-Start")
+  let end_anchor = dom_create_comment("Router-End")
+
+  match external_before {
+    Some(ref_node) => {
+      dom_insert_before(parent, start_anchor, ref_node)
+      dom_insert_before(parent, end_anchor, ref_node)
+    }
+    None => {
+      dom_append(parent, start_anchor)
+      dom_append(parent, end_anchor)
+    }
+  }
+
+  let ctx = ensure_router_context()
+  router_context.val = Some(ctx)
+
+  let current_owner : @ref.Ref[Option[Owner]] = @ref.new(None)
+
+  fn clear_between(start : Node, end : Node) -> Unit {
+    let mut next = dom_next_sibling(start)
+    while true {
+      match next {
+        Some(node) => {
+          if option_node_eq(Some(node), Some(end)) {
+            break
+          }
+          let after = dom_next_sibling(node)
+          dom_remove_self(node)
+          next = after
+        }
+        None => break
+      }
+    }
+  }
+
+  let remove_popstate = on_popstate(fn() {
+    ctx.location.sync()
+  })
+
+  @reactive.create_effect(fn() {
+    match current_owner.val {
+      Some(o) => o.cleanup()
+      None => ()
+    }
+    current_owner.val = None
+
+    clear_between(start_anchor, end_anchor)
+
+    let path = ctx.location.pathname.get()
+    let search = ctx.location.search.get()
+    let segments = split_path(path)
+
+    match match_routes(builder.routes, segments, 0, Params::empty(), Html::Text("")) {
+      Some(rendered) => {
+        let query_params = Params::from_search(search)
+        ctx.set_params.set(query_params.merge(rendered.params))
+        
+        let owner = Owner::new()
+        owner.with_(fn() {
+          let _ = rendered.html.mount(parent, Some(end_anchor))
+        })
+        current_owner.val = Some(owner)
+      }
+      None => {
+        ctx.set_params.set(Params::from_search(search))
+        let owner = Owner::new()
+        owner.with_(fn() {
+          let _ = (builder.fallback)().mount(parent, Some(end_anchor))
+        })
+        current_owner.val = Some(owner)
+      }
+    }
+  })
+
+  on_cleanup(fn() {
+    remove_popstate()
+
+    match current_owner.val {
+      Some(o) => o.cleanup()
+      None => ()
+    }
+    current_owner.val = None
+
+    clear_between(start_anchor, end_anchor)
+    dom_remove_self(start_anchor)
+    dom_remove_self(end_anchor)
+  })
+
+  start_anchor
 }
 
 ///|

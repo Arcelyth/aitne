@@ -1,5 +1,4 @@
-using @reactive { type Memo, type WriteSignal}
-using @dom { type Html }
+using @reactive { type Memo, type Owner, on_cleanup, type WriteSignal}
 
 ///|
 pub struct Params(Array[(String, Array[String])]) derive(Eq)
@@ -46,10 +45,14 @@ pub fn Params::contains(self : Params, key : String) -> Bool {
 
 ///|
 pub fn Params::merge(self : Params, other : Params) -> Params {
-  for pair in other.0 {
-    self.0.push(pair)
+  let new_arr = []
+  for pair in self.0 {
+    new_arr.push(pair)
   }
-  self
+  for pair in other.0 {
+    new_arr.push(pair)
+  }
+  Params(new_arr)
 }
 
 ///|
@@ -246,5 +249,165 @@ pub fn Route::parent(
   }
 }
 
+///|
+pub struct PathMatch {
+  matched : Bool
+  consumed : Int
+  params : Params
+}
 
+///|
+pub struct RenderedRoute {
+  html : Html
+  params : Params
+}
+
+///|
+fn split_path(path : String) -> Array[String] {
+  let parts = path.split("/")
+  let segs = []
+
+  for part in parts {
+    if part != "" {
+      segs.push(part.to_owned())
+    }
+  }
+
+  segs
+}
+
+///|
+fn join_segments(segments : Array[String], start : Int) -> String {
+  let mut out = ""
+  let mut first = true
+  let mut i = start
+
+  while i < segments.length() {
+    if !first {
+      out = out + "/"
+    }
+    out = out + segments[i]
+    first = false
+    i = i + 1
+  }
+
+  out
+}
+
+///|
+fn match_path(pattern : String, segments : Array[String], start : Int) -> PathMatch {
+  let pat = split_path(pattern)
+
+  if pat.length() == 0 {
+    return PathMatch::{ matched: true, consumed: 0, params: Params::empty() }
+  }
+
+  if start + pat.length() > segments.length() {
+    return PathMatch::{ matched: false, consumed: 0, params: Params::empty() }
+  }
+
+  let params = Params::empty()
+
+  let mut i = 0
+  while i < pat.length() {
+    let p = pat[i]
+    let s = segments[start + i]
+
+    if p == "*" {
+      params.add("*", join_segments(segments, start + i))
+      return PathMatch::{
+        matched: true,
+        consumed: segments.length() - start,
+        params: params,
+      }
+    } else if p.has_prefix(":") {
+      params.add(p[1:].to_owned(), s)
+    } else if p != s {
+      return PathMatch::{ matched: false, consumed: 0, params: Params::empty() }
+    }
+
+    i = i + 1
+  }
+
+  PathMatch::{ matched: true, consumed: pat.length(), params: params }
+}
+
+///|
+fn match_routes(
+  routes : Array[Route],
+  segments : Array[String],
+  start : Int,
+  inherited_params : Params,
+  outlet : Html,
+) -> Option[RenderedRoute] {
+  for route in routes {
+    let pm = match_path(route.path, segments, start)
+    if !pm.matched {
+      continue
+    }
+
+    let merged = inherited_params.merge(pm.params)
+    let next = start + pm.consumed
+
+    if route.children.length() == 0 {
+      if next == segments.length() {
+        return Some(RenderedRoute::{
+          html: (route.view)(outlet),
+          params: merged,
+        })
+      } else {
+        continue
+      }
+    }
+
+    match match_routes(route.children, segments, next, merged, outlet) {
+      Some(child) => {
+        return Some(RenderedRoute::{
+          html: (route.view)(child.html),
+          params: child.params,
+        })
+      }
+      None => {
+        if next == segments.length() {
+          return Some(RenderedRoute::{
+            html: (route.view)(outlet),
+            params: merged,
+          })
+        }
+      }
+    }
+  }
+
+  None
+}
+
+///|
+pub struct RouterBuilder {
+  routes : Array[Route]
+  fallback : () -> Html
+}
+
+///|
+pub fn router(routes : Array[Route], fallback : () -> Html) -> Html {
+  Html::Router(RouterBuilder::{
+    routes: routes,
+    fallback: fallback,
+  })
+}
+
+///|
+pub fn routes(routes : Array[Route], fallback : () -> Html) -> Html {
+  router(routes, fallback)
+}
+
+///|
+pub fn link(href : String, child : Html) -> Html {
+  a()
+    .attr("href", href)
+    .on(Click, fn(ev) {
+      event_prevent_default(ev)
+      navigate(href)
+    })
+    .children([child])
+}
 

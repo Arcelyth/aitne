@@ -1,4 +1,4 @@
-using @dom { type Route, type RouterBuilder,  mount_router, dom_get_body}
+using @dom { type Route, type RouterBuilder, mount_router, dom_get_body}
 
 fn main {
   let routes = [

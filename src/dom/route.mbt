@@ -263,7 +263,7 @@ pub struct RenderedRoute {
 }
 
 ///|
-fn split_path(path : String) -> Array[String] {
+pub fn split_path(path : String) -> Array[String] {
   let parts = path.split("/")
   let segs = []
 
@@ -277,7 +277,7 @@ fn split_path(path : String) -> Array[String] {
 }
 
 ///|
-fn join_segments(segments : Array[String], start : Int) -> String {
+pub fn join_segments(segments : Array[String], start : Int) -> String {
   let mut out = ""
   let mut first = true
   let mut i = start
@@ -295,7 +295,7 @@ fn join_segments(segments : Array[String], start : Int) -> String {
 }
 
 ///|
-fn match_path(pattern : String, segments : Array[String], start : Int) -> PathMatch {
+pub fn match_path(pattern : String, segments : Array[String], start : Int) -> PathMatch {
   let pat = split_path(pattern)
 
   if pat.length() == 0 {
@@ -333,7 +333,7 @@ fn match_path(pattern : String, segments : Array[String], start : Int) -> PathMa
 }
 
 ///|
-fn match_routes(
+pub fn match_routes(
   routes : Array[Route],
   segments : Array[String],
   start : Int,

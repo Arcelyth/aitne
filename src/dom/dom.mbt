@@ -496,7 +496,6 @@ pub fn mount_dynamic_list(
 }
 
 ///|
-///|
 pub fn mount_router(
   parent : Node,
   external_before : Option[Node],

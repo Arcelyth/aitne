@@ -1,19 +1,25 @@
 using @reactive { type Memo, type Owner, on_cleanup, type WriteSignal}
 
 ///|
+/// Route parameters container.
+/// Support path parameters (e.g. :id) and query parameters (?a=1&b=2).
 pub struct Params(Array[(String, Array[String])]) derive(Eq)
 
 ///|
+/// Creates an empty parameter collection.
 pub fn Params::empty() -> Params {
   Params([])
 }
 
 ///|
+/// Add a parameter value.
+/// Multiple values can exist under the same key.
 pub fn Params::add(self : Params, key : String, value : String) -> Unit {
   self.0.push((key, [value]))
 }
 
 ///|
+/// Return the first value associated with the given key.
 pub fn Params::get(self : Params, key : String) -> Option[String] {
   for pair in self.0 {
     if pair.0 == key {
@@ -26,6 +32,7 @@ pub fn Params::get(self : Params, key : String) -> Option[String] {
 }
 
 ///|
+/// Return all values associated with the given key.
 pub fn Params::get_all(self : Params, key : String) -> Array[String] {
   let values = []
   for pair in self.0 {
@@ -39,11 +46,13 @@ pub fn Params::get_all(self : Params, key : String) -> Array[String] {
 }
 
 ///|
+/// Check whether a parameter exists.
 pub fn Params::contains(self : Params, key : String) -> Bool {
   self.get(key) is Some(_)
 }
 
 ///|
+/// Merge two parameter collections.
 pub fn Params::merge(self : Params, other : Params) -> Params {
   let new_arr = []
   for pair in self.0 {
@@ -56,6 +65,10 @@ pub fn Params::merge(self : Params, other : Params) -> Params {
 }
 
 ///|
+/// Parse a URL query string into Params.
+///
+/// Example:
+/// "?page=1&sort=asc"
 pub fn Params::from_search(search : String) -> Params {
   let params = Params::empty()
 
@@ -100,6 +113,7 @@ pub(all) struct Url {
 }
 
 ///|
+/// Read the current browser URL.
 pub fn Url::current() -> Url {
   let search = current_search()
   Url::{
@@ -112,6 +126,7 @@ pub fn Url::current() -> Url {
 }
 
 ///|
+/// Reactive browser location state.
 pub(all) struct Location {
   pathname : Memo[String]
   search : Memo[String]
@@ -123,6 +138,7 @@ pub(all) struct Location {
 }
 
 ///|
+/// Create a reactive Location instance from the current browser URL.
 pub fn Location::new() -> Location {
   let (pathname_src, set_pathname_src) = @reactive.create_signal(current_pathname())
   let (search_src, set_search_src) = @reactive.create_signal(current_search())
@@ -140,6 +156,7 @@ pub fn Location::new() -> Location {
 }
 
 ///|
+/// Synchronize the location state with the browser URL.
 pub fn Location::sync(self : Location) -> Unit {
   self.set_pathname.set(current_pathname())
   self.set_search.set(current_search())
@@ -147,6 +164,7 @@ pub fn Location::sync(self : Location) -> Unit {
 }
 
 ///|
+/// Global router context shared by the routing system.
 pub struct RouterContext {
   location : Location
   params : Memo[Params]
@@ -175,6 +193,8 @@ fn create_router_context() -> RouterContext {
 }
 
 ///|
+/// Return the current router context.
+/// Create one if it does not exist.
 pub fn ensure_router_context() -> RouterContext {
   match router_context.val {
     Some(ctx) => ctx
@@ -186,7 +206,7 @@ pub fn ensure_router_context() -> RouterContext {
   }
 }
 
-///|
+///| Return the current reactive pathname.
 pub fn use_pathname() -> String {
   match router_context.val {
     Some(ctx) => ctx.location.pathname.get()
@@ -195,6 +215,7 @@ pub fn use_pathname() -> String {
 }
 
 ///|
+/// Return the current route parameters.
 pub fn use_params() -> Params {
   match router_context.val {
     Some(ctx) => ctx.params.get()
@@ -203,6 +224,7 @@ pub fn use_params() -> Params {
 }
 
 ///|
+/// Navigate to a new URL using pushState.
 pub fn navigate(path : String) -> Unit {
   history_push_state(path)
   match router_context.val {
@@ -212,6 +234,7 @@ pub fn navigate(path : String) -> Unit {
 }
 
 ///|
+/// Replace the current URL using replaceState.
 pub fn replace(path : String) -> Unit {
   history_replace_state(path)
   match router_context.val {
@@ -228,6 +251,7 @@ pub struct Route {
 }
 
 ///|
+/// Create a leaf route.
 pub fn Route::new(path : String, view : () -> Html) -> Route {
   Route::{
     path: path,
@@ -237,6 +261,7 @@ pub fn Route::new(path : String, view : () -> Html) -> Route {
 }
 
 ///|
+/// Create a parent route with nested children.
 pub fn Route::parent(
   path : String,
   view : (Html) -> Html,
@@ -250,6 +275,7 @@ pub fn Route::parent(
 }
 
 ///|
+/// Result of matching a route path.
 pub struct PathMatch {
   matched : Bool
   consumed : Int
@@ -257,12 +283,17 @@ pub struct PathMatch {
 }
 
 ///|
+/// Fully rendered route result.
 pub struct RenderedRoute {
   html : Html
   params : Params
 }
 
 ///|
+/// Split a URL path into path segments.
+///
+/// Example:
+/// "/users/123" => ["users", "123"]
 pub fn split_path(path : String) -> Array[String] {
   let parts = path.split("/")
   let segs = []
@@ -277,6 +308,7 @@ pub fn split_path(path : String) -> Array[String] {
 }
 
 ///|
+/// Join path segments starting from the specified index.
 pub fn join_segments(segments : Array[String], start : Int) -> String {
   let mut out = ""
   let mut first = true
@@ -295,6 +327,12 @@ pub fn join_segments(segments : Array[String], start : Int) -> String {
 }
 
 ///|
+/// Match a route pattern against URL segments.
+///
+/// Supported syntax:
+///   users
+///   :id
+///   *
 pub fn match_path(pattern : String, segments : Array[String], start : Int) -> PathMatch {
   let pat = split_path(pattern)
 
@@ -326,13 +364,14 @@ pub fn match_path(pattern : String, segments : Array[String], start : Int) -> Pa
       return PathMatch::{ matched: false, consumed: 0, params: Params::empty() }
     }
 
-    i = i + 1
+    i += 1
   }
 
   PathMatch::{ matched: true, consumed: pat.length(), params: params }
 }
 
 ///|
+/// Recursively match a route tree and produce a rendered route.
 pub fn match_routes(
   routes : Array[Route],
   segments : Array[String],
@@ -382,22 +421,19 @@ pub fn match_routes(
 }
 
 ///|
+/// Router configuration object.
 pub(all) struct RouterBuilder {
   routes : Array[Route]
   fallback : () -> Html
 }
 
 ///|
+#alias(routes)
 pub fn router(routes : Array[Route], fallback : () -> Html) -> Html {
   Html::Router(RouterBuilder::{
     routes: routes,
     fallback: fallback,
   })
-}
-
-///|
-pub fn routes(routes : Array[Route], fallback : () -> Html) -> Html {
-  router(routes, fallback)
 }
 
 ///|

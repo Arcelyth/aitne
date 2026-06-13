@@ -450,7 +450,6 @@ pub fn mount_dynamic_list(
     let new_cache: Ref[HashMap[String, Node]] = @ref.new(HashMap([])) 
 
     let mut current_dom_cursor = dom_next_sibling(start_anchor)
-
     for item in new_data {
       let key = key_fn(item)
       

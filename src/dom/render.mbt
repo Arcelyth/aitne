@@ -141,3 +141,41 @@ pub impl Mountable for RenderState with elements(self) -> Array[Node] {
     None => []
   }
 }
+
+///|
+pub impl Render for Unit with build(_self) -> RenderState {
+  RenderState::None
+}
+///|
+pub impl Render for Unit with rebuild(_self, _state : Ref[RenderState]) -> Unit {}
+///|
+pub impl RenderHtml for Unit with html_len(_self) -> Int { 0 }
+///|
+pub impl RenderHtml for Unit with to_html_with_buf(_self, _buf, _position) -> Unit {}
+
+///|
+pub impl Render for String with build(self) -> RenderState {
+  let node = dom_create_text_node(self)
+  RenderState::Text({ node })
+}
+
+///|
+pub impl Render for String with rebuild(self, state : Ref[RenderState]) -> Unit {
+  match state.val {
+    RenderState::Text(s) => {
+      dom_set_text(text_as_node(s.node), self)
+    }
+    _ => ()
+  }
+}
+
+///|
+pub impl RenderHtml for String with html_len(self) -> Int {
+  self.length()
+}
+
+///|
+pub impl RenderHtml for String with to_html_with_buf(self, buf, position) -> Unit {
+  buf.write_string(self)
+  position.val = Position::NextChild
+}

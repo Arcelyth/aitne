@@ -126,6 +126,15 @@ pub fn Owner::current() -> Option[Owner] {
 }
 
 ///|
+/// Returns the current owner, if none create a default owner.
+pub fn Owner::current_with_default() -> Owner {
+  match Owner::current() {
+    Some(owner) => owner
+    None => create_owner(None)
+  }
+}
+
+///|
 /// Sets this owner as current.
 pub fn Owner::set(self : Owner) -> Unit {
   if owner_exists(self.id) {

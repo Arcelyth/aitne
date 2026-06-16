@@ -118,10 +118,8 @@ pub extern "js" fn set_property(
 ) -> Unit =
   #|(el, prop_name, value) => { el[prop_name] = value; }
 
-pub extern "js" fn get_bool_property(
-  el : Element,
-  key : String
-) -> Bool =
+///|
+pub extern "js" fn get_bool_property(el : Element, key : String) -> Bool =
   #|(el, key) => {
   #|  const v = el[key];
   #|  return typeof v === "boolean" ? v : false;
@@ -311,7 +309,8 @@ pub extern "js" fn prim_add_event_listener_capture(
 pub extern "js" fn prim_call_event_handle(handle : EventHandle) -> Unit =
   #|(handle) => { handle(); }
 
-// ----- Event FFI 
+// ----- Event FFI
+
 ///|
 pub extern "js" fn event_default_prevented(ev : Event) -> Bool =
   #|(ev) => ev.defaultPrevented
@@ -340,12 +339,15 @@ pub extern "js" fn event_shift_key(ev : Event) -> Bool =
 pub extern "js" fn event_prevent_default(ev : Event) -> Unit =
   #|(ev) => ev.preventDefault()
 
+///|
 pub extern "js" fn event_composed_path(ev : Event) -> JsArray =
   #|(ev) => ev.composedPath()
 
+///|
 pub extern "js" fn js_array_length(arr : JsArray) -> Int =
   #|(arr) => arr.length
 
+///|
 pub extern "js" fn js_array_get(arr : JsArray, idx : Int) -> Node =
   #|(arr, idx) => arr[idx]
 
@@ -355,14 +357,18 @@ pub extern "js" fn js_array_get(arr : JsArray, idx : Int) -> Node =
 pub extern "js" fn node_is_anchor(node : Node) -> Bool =
   #|(node) => node instanceof HTMLAnchorElement
 
+///|
 pub extern "js" fn anchor_href(el : Element) -> String =
   #|(el) => el.href
 
+///|
 pub extern "js" fn anchor_target(el : Element) -> String =
   #|(el) => el.target
 
+///|
 pub extern "js" fn anchor_has_attr(el : Element, name : String) -> Bool =
   #|(el, name) => el.hasAttribute(name)
 
+///|
 pub extern "js" fn anchor_get_attr(el : Element, name : String) -> String =
   #|(el, name) => el.getAttribute(name) ?? ""

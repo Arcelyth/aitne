@@ -1,3 +1,4 @@
+///|
 test "params_basic_operations" {
   let p = Params::empty()
   p.add("id", "123")
@@ -13,6 +14,7 @@ test "params_basic_operations" {
   assert_eq(all[0], "123")
 }
 
+///|
 test "from_search_basic_parsing" {
   let p = Params::from_search("?a=1&b=2&c=")
   assert_eq(p.get("a"), Some("1"))
@@ -20,6 +22,7 @@ test "from_search_basic_parsing" {
   assert_eq(p.get("c"), Some(""))
 }
 
+///|
 test "from_search_duplicate_keys_behavior" {
   let p = Params::from_search("?a=1&a=2&b=3")
   assert_eq(p.get("a"), Some("2"))

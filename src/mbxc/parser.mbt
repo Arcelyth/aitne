@@ -1,21 +1,21 @@
 ///|
-suberror MbxcError { 
+suberror MbxcError {
   LexerError(String)
-  ParserError(String) 
+  ParserError(String)
 } derive(Debug, Show)
 
 ///|
 pub(all) enum Token {
-  Start             // <
-  End               // >
-  DocStart          // <!
-  ComStart          // <!-- 
-  ComEnd            // -->
-  SlashEnd          // />
-  Slash             // /
-  Equal             // =
-  Colon             // :
-  Ident(StringView) 
+  Start // <
+  End // >
+  DocStart // <!
+  ComStart // <!-- 
+  ComEnd // -->
+  SlashEnd // />
+  Slash // /
+  Equal // =
+  Colon // :
+  Ident(StringView)
   AttrValue(StringView)
   RawText(StringView)
   CodeBlock(StringView)
@@ -23,10 +23,10 @@ pub(all) enum Token {
 
 ///|
 pub enum MbxState {
-  MS    // MoonBit String
-  MC    // MBX Comment
-  M     // MoonBit Code
-  X     // MBX Tag
+  MS // MoonBit String
+  MC // MBX Comment
+  M // MoonBit Code
+  X // MBX Tag
 } derive(Debug, Eq)
 
 ///|
@@ -48,7 +48,7 @@ pub fn Lexer::is_end(self : Lexer) -> Bool {
 }
 
 ///|
-pub fn Lexer::peek(self : Lexer, count : Int) -> Option[UInt16] {
+pub fn Lexer::peek(self : Lexer, count : Int) -> UInt16? {
   if self.cur + count >= self.src.length() {
     None
   } else {
@@ -59,11 +59,15 @@ pub fn Lexer::peek(self : Lexer, count : Int) -> Option[UInt16] {
 ///|
 #inline
 fn is_ident_char(c : UInt16) -> Bool {
-  (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-'
+  (c >= 'a' && c <= 'z') ||
+  (c >= 'A' && c <= 'Z') ||
+  (c >= '0' && c <= '9') ||
+  c == '_' ||
+  c == '-'
 }
 
 ///|
-pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
+pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
   guard !self.is_end() else { return None }
   let c = self.src[self.cur]
 
@@ -72,7 +76,6 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
       let start = self.cur
       self.cur += 1
 
-    
       while !self.is_end() && self.src[self.cur] != '\"' {
         if self.src[self.cur] == '\\' && self.cur + 1 < self.src.length() {
           self.cur += 2
@@ -87,8 +90,7 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
       self.state = MbxState::M
       return Some(Token::RawText(self.src[start:self.cur]))
     }
-
-    MbxState::MC => {
+    MbxState::MC =>
       match (self.peek(0), self.peek(1), self.peek(2)) {
         (Some('-'), Some('-'), Some('>')) => {
           self.cur += 3
@@ -103,16 +105,14 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
               _ => self.cur += 1
             }
           }
-          
+
           if self.is_end() {
             raise LexerError("Unclosed comment: expected '-->'")
           }
-          
+
           return Some(Token::RawText(self.src[start:self.cur]))
         }
       }
-    }
-
     MbxState::M => {
       if c == '\"' {
         self.cur += 1
@@ -121,19 +121,21 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
       }
       if c == '<' {
         match self.peek(1) {
-          Some(next) if (next >= 'a' && next <= 'z') => {
+          Some(next) if next >= 'a' && next <= 'z' => {
             self.tag_depth += 1
             self.cur += 1
             self.state = MbxState::X
             return Some(Token::Start)
           }
           Some('/') => {
-            if self.tag_depth > 0 { self.tag_depth -= 1 }
+            if self.tag_depth > 0 {
+              self.tag_depth -= 1
+            }
             self.cur += 1
             self.state = MbxState::X
             return Some(Token::Start)
           }
-          Some('!') => {
+          Some('!') =>
             match (self.peek(2), self.peek(3)) {
               (Some('-'), Some('-')) => {
                 self.cur += 4
@@ -142,23 +144,25 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
               }
               _ => {
                 self.cur += 2
-                self.state = MbxState::X 
+                self.state = MbxState::X
                 return Some(Token::DocStart)
               }
             }
-          }
-          _ => {()}
+          _ => ()
         }
       }
-      
+
       if c == '{' && self.tag_depth > 0 {
         let start = self.cur
         let mut brace_count = 1
         self.cur += 1
         while !self.is_end() && brace_count > 0 {
           let current = self.src[self.cur]
-          if current == '{' { brace_count += 1 }
-          else if current == '}' { brace_count -= 1 }
+          if current == '{' {
+            brace_count += 1
+          } else if current == '}' {
+            brace_count -= 1
+          }
           self.cur += 1
         }
         return Some(Token::CodeBlock(self.src[start:self.cur]))
@@ -166,17 +170,18 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
 
       let start = self.cur
       self.cur += 1
-      while !self.is_end() && self.src[self.cur] != '<' && self.src[self.cur] != '\"' {
+      while !self.is_end() &&
+            self.src[self.cur] != '<' &&
+            self.src[self.cur] != '\"' {
         self.cur += 1
       }
       return Some(Token::RawText(self.src[start:self.cur]))
     }
-
-    MbxState::X => {
+    MbxState::X =>
       match c {
         ' ' | '\n' | '\r' | '\t' => {
           self.cur += 1
-          return self.next_token!()
+          return self.next_token()
         }
         '{' => {
           let start = self.cur
@@ -184,12 +189,17 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
           self.cur += 1
           while !self.is_end() && brace_count > 0 {
             let current = self.src[self.cur]
-            if current == '{' { brace_count += 1 }
-            else if current == '}' { brace_count -= 1 }
+            if current == '{' {
+              brace_count += 1
+            } else if current == '}' {
+              brace_count -= 1
+            }
             self.cur += 1
           }
           if brace_count > 0 {
-            raise LexerError("Unclosed code block in tag attributes: expected '}'")
+            raise LexerError(
+              "Unclosed code block in tag attributes: expected '}'",
+            )
           }
           return Some(Token::CodeBlock(self.src[start:self.cur]))
         }
@@ -198,19 +208,29 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
           self.state = MbxState::M
           return Some(Token::End)
         }
-        '=' => { self.cur += 1; return Some(Token::Equal) }
-        ':' => { self.cur += 1; return Some(Token::Colon) }
-        '/' => {
+        '=' => {
+          self.cur += 1
+          return Some(Token::Equal)
+        }
+        ':' => {
+          self.cur += 1
+          return Some(Token::Colon)
+        }
+        '/' =>
           match self.peek(1) {
             Some('>') => {
               self.cur += 2
               self.state = MbxState::M
-              if self.tag_depth > 0 { self.tag_depth -= 1 }
+              if self.tag_depth > 0 {
+                self.tag_depth -= 1
+              }
               return Some(Token::SlashEnd)
             }
-            _ => { self.cur += 1; return Some(Token::Slash) }
+            _ => {
+              self.cur += 1
+              return Some(Token::Slash)
+            }
           }
-        }
         '\"' | '\'' => {
           let quote = c
           let start = self.cur
@@ -219,7 +239,9 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
             self.cur += 1
           }
           if self.is_end() {
-            raise LexerError("Unclosed attribute value: expected matching quote")
+            raise LexerError(
+              "Unclosed attribute value: expected matching quote",
+            )
           }
           self.cur += 1
           return Some(Token::AttrValue(self.src[start:self.cur]))
@@ -236,7 +258,6 @@ pub fn Lexer::next_token(self : Lexer) -> Option[Token] raise MbxcError {
           return self.next_token()
         }
       }
-    }
   }
 }
 
@@ -263,7 +284,7 @@ pub(all) enum MbxAST {
 ///|
 pub struct MbxAttribute {
   name : StringView
-  scope : Option[StringView]
+  scope : StringView?
   value : AttrVal
 } derive(Debug, Show, Eq)
 
@@ -290,8 +311,12 @@ fn Parser::is_end(self : Parser) -> Bool {
 }
 
 ///|
-fn Parser::peek(self : Parser) -> Option[Token] {
-  if self.is_end() { None } else { Some(self.tokens[self.cur]) }
+fn Parser::peek(self : Parser) -> Token? {
+  if self.is_end() {
+    None
+  } else {
+    Some(self.tokens[self.cur])
+  }
 }
 
 ///|
@@ -308,7 +333,7 @@ fn Parser::parse_attributes(self : Parser) -> Array[MbxAttribute] {
         self.advance()
         let mut ns = None
         let mut final_name = name
-        
+
         match self.peek() {
           Some(Token::Colon) => {
             self.advance()
@@ -318,10 +343,10 @@ fn Parser::parse_attributes(self : Parser) -> Array[MbxAttribute] {
                 ns = Some(final_name)
                 final_name = sub_name
               }
-              _ => {()}
+              _ => ()
             }
           }
-          _ => {()}
+          _ => ()
         }
 
         match self.peek() {
@@ -330,18 +355,29 @@ fn Parser::parse_attributes(self : Parser) -> Array[MbxAttribute] {
             match self.peek() {
               Some(Token::AttrValue(v)) => {
                 self.advance()
-                attrs.push({ name: final_name, scope: ns, value: AttrVal::Static(v) })
+                attrs.push({
+                  name: final_name,
+                  scope: ns,
+                  value: AttrVal::Static(v),
+                })
               }
               Some(Token::CodeBlock(c)) => {
                 self.advance()
-                attrs.push({ name: final_name, scope: ns, value: AttrVal::Dynamic(c) })
+                attrs.push({
+                  name: final_name,
+                  scope: ns,
+                  value: AttrVal::Dynamic(c),
+                })
               }
-              _ => {()}
+              _ => ()
             }
           }
-          _ => {
-            attrs.push({ name: final_name, scope: ns, value: AttrVal::Static("") })
-          }
+          _ =>
+            attrs.push({
+              name: final_name,
+              scope: ns,
+              value: AttrVal::Static(""),
+            })
         }
       }
       _ => break
@@ -351,9 +387,9 @@ fn Parser::parse_attributes(self : Parser) -> Array[MbxAttribute] {
 }
 
 ///|
-pub fn Parser::parse_node(self : Parser) -> Option[MbxAST] raise MbxcError {
+pub fn Parser::parse_node(self : Parser) -> MbxAST? raise MbxcError {
   guard !self.is_end() else { return None }
-  
+
   match self.peek().unwrap() {
     Token::RawText(code) => {
       self.advance()
@@ -365,7 +401,7 @@ pub fn Parser::parse_node(self : Parser) -> Option[MbxAST] raise MbxcError {
         Some(Token::Ident(tag)) => {
           self.advance()
           let attrs = self.parse_attributes()
-          
+
           match self.peek() {
             Some(Token::SlashEnd) => {
               self.advance()
@@ -374,7 +410,7 @@ pub fn Parser::parse_node(self : Parser) -> Option[MbxAST] raise MbxcError {
             Some(Token::End) => {
               self.advance()
               let children = []
-              
+
               while !self.is_end() {
                 match self.peek() {
                   Some(Token::Start) => {
@@ -385,25 +421,23 @@ pub fn Parser::parse_node(self : Parser) -> Option[MbxAST] raise MbxcError {
                           match self.peek() {
                             Some(Token::Ident(close_tag)) => {
                               if close_tag != tag {
-                                raise ParserError("Warning: Mismatched tag! Expected </\{tag}>, found </\{close_tag}>")
+                                raise ParserError(
+                                  "Warning: Mismatched tag! Expected </\{tag}>, found </\{close_tag}>",
+                                )
                               }
                               self.advance()
                               self.advance()
                               break
                             }
-                            _ => {
-                              break
-                            }
+                            _ => break
                           }
                         }
-                        _ => {()}
+                        _ => ()
                       }
                     }
                     match self.parse_node() {
-                      Some(child) => {
-                        children.push(child)
-                      }
-                      None => {()}
+                      Some(child) => children.push(child)
+                      None => ()
                     }
                   }
                   Some(Token::CodeBlock(c)) => {
@@ -414,14 +448,11 @@ pub fn Parser::parse_node(self : Parser) -> Option[MbxAST] raise MbxcError {
                     self.advance()
                     children.push(MbxAST::TextNode(t))
                   }
-                  _ => {
+                  _ =>
                     match self.parse_node() {
-                      Some(child) => {
-                        children.push(child)
-                      }
-                      None => {()}
+                      Some(child) => children.push(child)
+                      None => ()
                     }
-                  }
                 }
               }
               Some(MbxAST::ElementNode(tag, attrs, children))
@@ -432,7 +463,10 @@ pub fn Parser::parse_node(self : Parser) -> Option[MbxAST] raise MbxcError {
         _ => None
       }
     }
-    _ => { self.advance(); None }
+    _ => {
+      self.advance()
+      None
+    }
   }
 }
 
@@ -450,32 +484,37 @@ pub fn Parser::parse(self : Parser) -> Array[MbxAST] raise MbxcError {
   ast_list
 }
 
+///|
 test "lexer_parser_test" {
   let src =
-#|fn comp() -> Html {
-#|  let (count, set_count) = @reactive.create_signal(0)
-#|  <div> Hello, World </div>
-#|}
+    #|fn comp() -> Html {
+    #|  let (count, set_count) = @reactive.create_signal(0)
+    #|  <div> Hello, World </div>
+    #|}
   let lexer = Lexer::new(src)
-  let tokens = lexer.tokenizer() 
+  let tokens = lexer.tokenizer()
   // TODO: Maybe change to debug_inspect when its usage seems more convenient.
   assert_eq(tokens, [
-    Token::RawText("fn comp() -> Html {\n  let (count, set_count) = @reactive.create_signal(0)\n  "),
-    Token::Start, Token::Ident("div"), Token::End, Token::RawText(" Hello, World "), 
-    Token::Start, Token::Slash, Token::Ident("div"), Token::End, Token::RawText("\n}")
+    Token::RawText(
+      "fn comp() -> Html {\n  let (count, set_count) = @reactive.create_signal(0)\n  ",
+    ),
+    Token::Start,
+    Token::Ident("div"),
+    Token::End,
+    Token::RawText(" Hello, World "),
+    Token::Start,
+    Token::Slash,
+    Token::Ident("div"),
+    Token::End,
+    Token::RawText("\n}"),
   ])
   let parser = Parser::new(tokens)
   let ast = parser.parse()
   assert_eq(ast, [
-    MbxAST::PureCode("fn comp() -> Html {\n  let (count, set_count) = @reactive.create_signal(0)\n  "),
-    
-    MbxAST::ElementNode(
-      "div", 
-      [], 
-      [
-        MbxAST::TextNode(" Hello, World ")
-      ]
+    MbxAST::PureCode(
+      "fn comp() -> Html {\n  let (count, set_count) = @reactive.create_signal(0)\n  ",
     ),
-    MbxAST::PureCode("\n}")
+    MbxAST::ElementNode("div", [], [MbxAST::TextNode(" Hello, World ")]),
+    MbxAST::PureCode("\n}"),
   ])
 }

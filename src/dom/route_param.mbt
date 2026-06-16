@@ -13,7 +13,7 @@ pub fn Params::empty() -> Params {
 /// Add a parameter value.
 /// Multiple values can exist under the same key.
 pub fn Params::add(self : Params, key : String, value : String) -> Unit {
-  match self.0.search_by((p) => p.0 == key){
+  match self.0.search_by(p => p.0 == key) {
     Some(idx) => self.0[idx].1.push(value)
     None => self.0.push((key, [value]))
   }
@@ -23,7 +23,7 @@ pub fn Params::add(self : Params, key : String, value : String) -> Unit {
 /// Add a parameter value.
 /// Replace any existing value under the same key.
 pub fn Params::replace(self : Params, key : String, value : String) -> Unit {
-  match self.0.search_by((p) => p.0 == key){
+  match self.0.search_by(p => p.0 == key) {
     Some(idx) => {
       self.0.clear()
       self.0[idx].1.push(value)
@@ -34,7 +34,7 @@ pub fn Params::replace(self : Params, key : String, value : String) -> Unit {
 
 ///|
 /// Return the last value associated with the given key.
-pub fn Params::get(self : Params, key : String) -> Option[String] {
+pub fn Params::get(self : Params, key : String) -> String? {
   for pair in self.0 {
     if pair.0 == key {
       if pair.1.length() > 0 {
@@ -90,11 +90,7 @@ pub fn Params::from_search(search : String) -> Params {
     return params
   }
 
-  let q = if search.has_prefix("?") {
-    search[1:]
-  } else {
-    search
-  }
+  let q = if search.has_prefix("?") { search[1:] } else { search }
 
   if q == "" {
     return params
@@ -116,4 +112,3 @@ pub fn Params::from_search(search : String) -> Params {
 
   params
 }
-

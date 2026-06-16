@@ -2,6 +2,7 @@
 /// Simple signal id generator.
 let signal_id_counter : Ref[UInt] = @ref.new(0)
 
+///|
 fn next_signal_id() -> UInt {
   let id = signal_id_counter.val
   signal_id_counter.val = id + 1
@@ -20,31 +21,32 @@ pub struct SignalInner[T] {
 pub fn[T] SignalInner::new(value : T) -> @ref.Ref[SignalInner[T]] {
   @ref.new(SignalInner::{
     id: next_signal_id(),
-    value: value,
-    subs: @hashset.HashSet([])
+    value,
+    subs: @hashset.HashSet([]),
   })
 }
 
 // ----- WriteSignal -----
+
 ///|
 pub struct WriteSignal[T] {
   inner : @ref.Ref[SignalInner[T]]
 }
 
 ///|
-pub impl[T] Hash for WriteSignal[T] with hash_combine(self, hasher : Hasher) {
+pub impl[T] Hash for WriteSignal[T] with fn hash_combine(self, hasher : Hasher) {
   hasher.combine_uint(self.inner.val.id)
 }
 
 ///|
 #inline
-pub impl[T] Eq for WriteSignal[T] with equal(self, another : WriteSignal[T]) -> Bool {
+pub impl[T] Eq for WriteSignal[T] with fn equal(self, another : WriteSignal[T]) -> Bool {
   self.inner.val.id == another.inner.val.id
 }
 
 ///|
 /// Implement `Debug` trait for WriteSignal[T]
-pub impl[T : Debug] Debug for WriteSignal[T] with to_repr(self) -> Repr {
+pub impl[T : Debug] Debug for WriteSignal[T] with fn to_repr(self) -> Repr {
   @debug.Repr::tuple([
     @debug.Repr::string("id"),
     @debug.Repr::string(self.inner.val.id.to_string()),
@@ -57,21 +59,25 @@ pub impl[T : Debug] Debug for WriteSignal[T] with to_repr(self) -> Repr {
 
 ///|
 /// Implement `Default` trait for WriteSignal[T] 
-pub impl[T : Default] Default for WriteSignal[T] with default() -> WriteSignal[T] {
+pub impl[T : Default] Default for WriteSignal[T] with fn default() -> WriteSignal[
+  T,
+] {
   WriteSignal::new(T::default())
 }
 
 ///|
 /// Implement `ReactiveNode` trait for WriteSignal
-pub impl[T] ReactiveNode for WriteSignal[T] with mark_stale(self) {
+pub impl[T] ReactiveNode for WriteSignal[T] with fn mark_stale(self) {
   self.mark_all_pending()
 }
 
 ///|
-pub impl[T] ReactiveNode for WriteSignal[T] with mark_pending(_self) { }
+pub impl[T] ReactiveNode for WriteSignal[T] with fn mark_pending(_self) {
+
+}
 
 ///|
-pub impl[T] ReactiveNode for WriteSignal[T] with mark_all_pending(self) {
+pub impl[T] ReactiveNode for WriteSignal[T] with fn mark_all_pending(self) {
   self.inner.val.subs.each(fn(sub) {
     match sub.sub {
       Some(node) => node.mark_stale()
@@ -81,64 +87,64 @@ pub impl[T] ReactiveNode for WriteSignal[T] with mark_all_pending(self) {
 }
 
 ///|
-pub impl[T] ReactiveNode for WriteSignal[T] with update_value(_self) { false }
+pub impl[T] ReactiveNode for WriteSignal[T] with fn update_value(_self) {
+  false
+}
 
 ///|
 /// Implement `Notify` trait for WriteSignal
-pub impl[T] Notify for WriteSignal[T] with notify(self) -> Unit {
+pub impl[T] Notify for WriteSignal[T] with fn notify(self) -> Unit {
   self.mark_stale()
 }
 
 ///|
 #inline
-pub impl[T] IsDisposed for WriteSignal[T] with is_disposed(_self) -> Bool {
+pub impl[T] IsDisposed for WriteSignal[T] with fn is_disposed(_self) -> Bool {
   false
 }
 
 ///|
-pub impl[T] Source for WriteSignal[T] with add_sub(self, sub: ASubscriber) {
+pub impl[T] Source for WriteSignal[T] with fn add_sub(self, sub : ASubscriber) {
   self.inner.val.subs.add(sub)
 }
 
 ///|
-pub impl[T] Source for WriteSignal[T] with remove_sub(self, sub: ASubscriber) {
+pub impl[T] Source for WriteSignal[T] with fn remove_sub(
+  self,
+  sub : ASubscriber,
+) {
   self.inner.val.subs.remove(sub)
 }
 
 ///|
-pub impl[T] Source for WriteSignal[T] with clear_subs(self) {
+pub impl[T] Source for WriteSignal[T] with fn clear_subs(self) {
   self.inner.val.subs.clear()
 }
 
 ///|
-pub impl[T] ToASource for WriteSignal[T] with to_asource(self) {
-  {
-    id: self.inner.val.id,
-    src: Some(self as &Source)
-  }
+pub impl[T] ToASource for WriteSignal[T] with fn to_asource(self) {
+  { id: self.inner.val.id, src: Some(self as &Source) }
 }
 
 ///|
-pub impl[T] Track for WriteSignal[T] with track(self) -> Unit {
+pub impl[T] Track for WriteSignal[T] with fn track(self) -> Unit {
   guard !self.is_disposed() else { return }
   match Observer::get() {
     Some(sub) => {
       sub.add_source(self.to_asource())
       self.add_sub(sub)
     }
-    None => { () }
+    None => ()
   }
 }
 
 ///|
 pub fn[T] WriteSignal::new(value : T) -> WriteSignal[T] {
-  WriteSignal::{
-    inner: SignalInner::new(value)
-  }
+  WriteSignal::{ inner: SignalInner::new(value) }
 }
 
 ///|
-pub fn[T] WriteSignal::try_update(self : WriteSignal[T], f : (T) -> T) -> Option[Unit] {
+pub fn[T] WriteSignal::try_update(self : WriteSignal[T], f : (T) -> T) -> Unit? {
   self.inner.val.value = f(self.inner.val.value)
   self.mark_stale()
   Some(())
@@ -150,7 +156,7 @@ pub fn[T] WriteSignal::update(self : WriteSignal[T], f : (T) -> T) -> Unit {
 }
 
 ///|
-pub fn[T] WriteSignal::try_set(self : WriteSignal[T], value : T) -> Option[T] {
+pub fn[T] WriteSignal::try_set(self : WriteSignal[T], value : T) -> T? {
   let old_value = self.inner.val.value
   self.inner.val.value = value
   self.mark_stale()
@@ -166,29 +172,30 @@ pub fn[T] WriteSignal::set(self : WriteSignal[T], value : T) -> Unit {
 #inline
 pub fn[T] WriteSignal::set_untracked(self : WriteSignal[T], value : T) -> Unit {
   let current_inner = self.inner.val
-  self.inner.val = { ..current_inner, value: value }
+  self.inner.val = { ..current_inner, value, }
 }
 
 // ----- ReadSignal -----
+
 ///|
 pub struct ReadSignal[T] {
   inner : @ref.Ref[SignalInner[T]]
 }
 
 ///|
-pub impl[T] Hash for ReadSignal[T] with hash_combine(self, hasher : Hasher) {
+pub impl[T] Hash for ReadSignal[T] with fn hash_combine(self, hasher : Hasher) {
   hasher.combine_uint(self.inner.val.id)
 }
 
 ///|
 #inline
-pub impl[T] Eq for ReadSignal[T] with equal(self, another : ReadSignal[T]) -> Bool {
+pub impl[T] Eq for ReadSignal[T] with fn equal(self, another : ReadSignal[T]) -> Bool {
   self.inner.val.id == another.inner.val.id
 }
 
 ///|
 /// Implement `Debug` trait for ReadSignal[T]
-pub impl[T : Debug] Debug for ReadSignal[T] with to_repr(self) -> Repr {
+pub impl[T : Debug] Debug for ReadSignal[T] with fn to_repr(self) -> Repr {
   @debug.Repr::tuple([
     @debug.Repr::string("id"),
     @debug.Repr::string(self.inner.val.id.to_string()),
@@ -201,27 +208,31 @@ pub impl[T : Debug] Debug for ReadSignal[T] with to_repr(self) -> Repr {
 
 ///|
 /// Implement `Default` trait for ReadSignal[T] 
-pub impl[T : Default] Default for ReadSignal[T] with default() -> ReadSignal[T] {
+pub impl[T : Default] Default for ReadSignal[T] with fn default() -> ReadSignal[
+  T,
+] {
   ReadSignal::new(T::default())
 }
 
 ///|
 #inline
-pub impl[T] IsDisposed for ReadSignal[T] with is_disposed(_self) -> Bool {
+pub impl[T] IsDisposed for ReadSignal[T] with fn is_disposed(_self) -> Bool {
   false
 }
 
 ///|
 /// Implement `ReactiveNode` trait for ReadSignal
-pub impl[T] ReactiveNode for ReadSignal[T] with mark_stale(self) {
+pub impl[T] ReactiveNode for ReadSignal[T] with fn mark_stale(self) {
   self.mark_all_pending()
 }
 
 ///|
-pub impl[T] ReactiveNode for ReadSignal[T] with mark_pending(_self) { }
+pub impl[T] ReactiveNode for ReadSignal[T] with fn mark_pending(_self) {
+
+}
 
 ///|
-pub impl[T] ReactiveNode for ReadSignal[T] with mark_all_pending(self) {
+pub impl[T] ReactiveNode for ReadSignal[T] with fn mark_all_pending(self) {
   self.inner.val.subs.each(fn(sub) {
     match sub.sub {
       Some(node) => node.mark_stale()
@@ -232,56 +243,55 @@ pub impl[T] ReactiveNode for ReadSignal[T] with mark_all_pending(self) {
 
 ///|
 #inline
-pub impl[T] ReactiveNode for ReadSignal[T] with update_value(_self) { false }
+pub impl[T] ReactiveNode for ReadSignal[T] with fn update_value(_self) {
+  false
+}
 
 ///|
-pub impl[T] Source for ReadSignal[T] with add_sub(self, sub: ASubscriber) {
+pub impl[T] Source for ReadSignal[T] with fn add_sub(self, sub : ASubscriber) {
   self.inner.val.subs.add(sub)
 }
 
 ///|
-pub impl[T] Source for ReadSignal[T] with remove_sub(self, sub: ASubscriber) {
+pub impl[T] Source for ReadSignal[T] with fn remove_sub(self, sub : ASubscriber) {
   self.inner.val.subs.remove(sub)
 }
 
 ///|
-pub impl[T] Source for ReadSignal[T] with clear_subs(self) {
+pub impl[T] Source for ReadSignal[T] with fn clear_subs(self) {
   self.inner.val.subs.clear()
 }
 
 ///|
-pub impl[T] ToASource for ReadSignal[T] with to_asource(self) {
-  {
-    id: self.inner.val.id,
-    src: Some(self as &Source)
-  }
+pub impl[T] ToASource for ReadSignal[T] with fn to_asource(self) {
+  { id: self.inner.val.id, src: Some(self as &Source) }
 }
 
 ///|
-pub impl[T] Track for ReadSignal[T] with track(self) -> Unit {
+pub impl[T] Track for ReadSignal[T] with fn track(self) -> Unit {
   guard !self.is_disposed() else { return }
   match Observer::get() {
     Some(sub) => {
       sub.add_source(self.to_asource())
       self.add_sub(sub)
     }
-    None => { () }
+    None => ()
   }
 }
 
 ///|
-pub fn[T, U] ReadSignal::try_with(self : ReadSignal[T], f: (T) -> U ) -> Option[U] {
+pub fn[T, U] ReadSignal::try_with(self : ReadSignal[T], f : (T) -> U) -> U? {
   self.track()
   Some(f(self.inner.val.value))
 }
 
 ///|
-pub fn[T] ReadSignal::try_get(self: ReadSignal[T]) -> Option[T] {
+pub fn[T] ReadSignal::try_get(self : ReadSignal[T]) -> T? {
   self.try_with(fn(v) { v })
 }
 
 ///|
-pub fn[T] ReadSignal::get(self: ReadSignal[T]) -> T {
+pub fn[T] ReadSignal::get(self : ReadSignal[T]) -> T {
   self.try_get().unwrap()
 }
 
@@ -293,30 +303,29 @@ pub fn[T] ReadSignal::get_untracked(self : ReadSignal[T]) -> T {
 
 ///|
 pub fn[T] ReadSignal::new(value : T) -> ReadSignal[T] {
-  ReadSignal::{
-    inner: SignalInner::new(value)
-  }
+  ReadSignal::{ inner: SignalInner::new(value) }
 }
 
 // ----- RwSignal -----
+
 ///|
 pub struct RwSignal[T] {
   inner : @ref.Ref[SignalInner[T]]
 }
 
 ///|
-pub impl[T] Hash for RwSignal[T] with hash_combine(self, hasher : Hasher) {
+pub impl[T] Hash for RwSignal[T] with fn hash_combine(self, hasher : Hasher) {
   hasher.combine_uint(self.inner.val.id)
 }
 
 ///|
 #inline
-pub impl[T] Eq for RwSignal[T] with equal(self, another : RwSignal[T]) -> Bool {
+pub impl[T] Eq for RwSignal[T] with fn equal(self, another : RwSignal[T]) -> Bool {
   self.inner.val.id == another.inner.val.id
 }
 
 ///|
-pub impl[T : Debug] Debug for RwSignal[T] with to_repr(self) -> Repr {
+pub impl[T : Debug] Debug for RwSignal[T] with fn to_repr(self) -> Repr {
   @debug.Repr::tuple([
     @debug.Repr::string("id"),
     @debug.Repr::string(self.inner.val.id.to_string()),
@@ -328,22 +337,24 @@ pub impl[T : Debug] Debug for RwSignal[T] with to_repr(self) -> Repr {
 }
 
 ///|
-pub impl[T : Default] Default for RwSignal[T] with default() -> RwSignal[T] {
+pub impl[T : Default] Default for RwSignal[T] with fn default() -> RwSignal[T] {
   RwSignal::new(T::default())
 }
 
 ///|
 /// Implement `ReactiveNode` for RwSignal
-pub impl[T] ReactiveNode for RwSignal[T] with mark_stale(self) {
+pub impl[T] ReactiveNode for RwSignal[T] with fn mark_stale(self) {
   self.mark_all_pending()
 }
 
 ///|
 #inline
-pub impl[T] ReactiveNode for RwSignal[T] with mark_pending(_self) { }
+pub impl[T] ReactiveNode for RwSignal[T] with fn mark_pending(_self) {
+
+}
 
 ///|
-pub impl[T] ReactiveNode for RwSignal[T] with mark_all_pending(self) {
+pub impl[T] ReactiveNode for RwSignal[T] with fn mark_all_pending(self) {
   self.inner.val.subs.each(fn(sub) {
     match sub.sub {
       Some(node) => node.mark_stale()
@@ -354,80 +365,75 @@ pub impl[T] ReactiveNode for RwSignal[T] with mark_all_pending(self) {
 
 ///|
 #inline
-pub impl[T] ReactiveNode for RwSignal[T] with update_value(_self) { false }
+pub impl[T] ReactiveNode for RwSignal[T] with fn update_value(_self) {
+  false
+}
 
 ///|
 #inline
-pub impl[T] IsDisposed for RwSignal[T] with is_disposed(_self) -> Bool {
+pub impl[T] IsDisposed for RwSignal[T] with fn is_disposed(_self) -> Bool {
   false
 }
 
 ///|
 /// Implement `Notify` trait for WriteSignal
-pub impl[T] Notify for RwSignal[T] with notify(self) -> Unit {
+pub impl[T] Notify for RwSignal[T] with fn notify(self) -> Unit {
   self.mark_stale()
 }
 
 ///|
-pub impl[T] Source for RwSignal[T] with add_sub(self, sub: ASubscriber) {
+pub impl[T] Source for RwSignal[T] with fn add_sub(self, sub : ASubscriber) {
   self.inner.val.subs.add(sub)
 }
 
 ///|
-pub impl[T] Source for RwSignal[T] with remove_sub(self, sub: ASubscriber) {
+pub impl[T] Source for RwSignal[T] with fn remove_sub(self, sub : ASubscriber) {
   self.inner.val.subs.remove(sub)
 }
 
 ///|
-pub impl[T] Source for RwSignal[T] with clear_subs(self) {
+pub impl[T] Source for RwSignal[T] with fn clear_subs(self) {
   self.inner.val.subs.clear()
 }
 
 ///|
-pub impl[T] ToASource for RwSignal[T] with to_asource(self) {
-  {
-    id: self.inner.val.id,
-    src: Some(self as &Source)
-  }
+pub impl[T] ToASource for RwSignal[T] with fn to_asource(self) {
+  { id: self.inner.val.id, src: Some(self as &Source) }
 }
 
 ///|
-pub impl[T] Track for RwSignal[T] with track(self) -> Unit {
+pub impl[T] Track for RwSignal[T] with fn track(self) -> Unit {
   guard !self.is_disposed() else { return }
   match Observer::get() {
     Some(sub) => {
       sub.add_source(self.to_asource())
       self.add_sub(sub)
     }
-    None => { () }
+    None => ()
   }
 }
 
 ///|
 pub fn[T] RwSignal::new(value : T) -> RwSignal[T] {
-  RwSignal::{
-    inner: SignalInner::new(value)
-  }
+  RwSignal::{ inner: SignalInner::new(value) }
 }
 
 ///|
 #inline
 pub fn[T] RwSignal::read_only(self : RwSignal[T]) -> ReadSignal[T] {
-  ReadSignal::{
-    inner: self.inner
-  }
+  ReadSignal::{ inner: self.inner }
 }
 
 ///|
 #inline
 pub fn[T] RwSignal::write_only(self : RwSignal[T]) -> WriteSignal[T] {
-  WriteSignal::{
-    inner: self.inner
-  }
+  WriteSignal::{ inner: self.inner }
 }
 
 ///|
-pub fn[T] RwSignal::split(self : RwSignal[T]) -> (ReadSignal[T], WriteSignal[T]) {
+pub fn[T] RwSignal::split(
+  self : RwSignal[T],
+) -> (ReadSignal[T], WriteSignal[T]) {
   (self.read_only(), self.write_only())
 }
 
@@ -435,29 +441,27 @@ pub fn[T] RwSignal::split(self : RwSignal[T]) -> (ReadSignal[T], WriteSignal[T])
 pub fn[T] RwSignal::unite(
   read : ReadSignal[T],
   write : WriteSignal[T],
-) -> Option[RwSignal[T]] {
+) -> RwSignal[T]? {
   if read.inner.val.id == write.inner.val.id {
-    Some(RwSignal::{
-      inner: read.inner
-    })
+    Some(RwSignal::{ inner: read.inner })
   } else {
     None
   }
 }
 
 ///|
-pub fn[T, U] RwSignal::try_with(self : RwSignal[T], f: (T) -> U) -> Option[U] {
+pub fn[T, U] RwSignal::try_with(self : RwSignal[T], f : (T) -> U) -> U? {
   self.track()
   Some(f(self.inner.val.value))
 }
 
 ///|
-pub fn[T, U] RwSignal::with_val(self : RwSignal[T], f: (T) -> U) -> U {
+pub fn[T, U] RwSignal::with_val(self : RwSignal[T], f : (T) -> U) -> U {
   self.try_with(f).unwrap()
 }
 
 ///|
-pub fn[T] RwSignal::try_get(self : RwSignal[T]) -> Option[T] {
+pub fn[T] RwSignal::try_get(self : RwSignal[T]) -> T? {
   self.try_with(fn(v) { v })
 }
 
@@ -473,7 +477,7 @@ pub fn[T] RwSignal::get_untracked(self : RwSignal[T]) -> T {
 }
 
 ///|
-pub fn[T] RwSignal::try_update(self : RwSignal[T], f : (T) -> T) -> Option[Unit] {
+pub fn[T] RwSignal::try_update(self : RwSignal[T], f : (T) -> T) -> Unit? {
   let current_inner = self.inner.val
   let new_value = f(current_inner.value)
   self.inner.val = { ..current_inner, value: new_value }
@@ -487,9 +491,9 @@ pub fn[T] RwSignal::update(self : RwSignal[T], f : (T) -> T) -> Unit {
 }
 
 ///|
-pub fn[T] RwSignal::try_set(self : RwSignal[T], value : T) -> Option[T] {
+pub fn[T] RwSignal::try_set(self : RwSignal[T], value : T) -> T? {
   let current_inner = self.inner.val
-  self.inner.val = { ..current_inner, value: value }
+  self.inner.val = { ..current_inner, value, }
   self.mark_stale()
   None
 }
@@ -503,10 +507,11 @@ pub fn[T] RwSignal::set(self : RwSignal[T], value : T) -> Unit {
 #inline
 pub fn[T] RwSignal::set_untracked(self : RwSignal[T], value : T) -> Unit {
   let current_inner = self.inner.val
-  self.inner.val = { ..current_inner, value: value }
+  self.inner.val = { ..current_inner, value, }
 }
 
 // ----- Signal functions -----
+
 ///|
 pub fn[T] create_signal(value : T) -> (ReadSignal[T], WriteSignal[T]) {
   RwSignal::new(value).split()

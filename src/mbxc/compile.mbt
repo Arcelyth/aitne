@@ -1,9 +1,13 @@
 ///|
-pub fn from_file(path : String, show~ : Bool = false, to~ : Option[String] = None) -> Option[String] {
+pub fn from_file(
+  path : String,
+  show? : Bool = false,
+  to? : String? = None,
+) -> String? {
   let res = try? @fs.read_file_to_string(path)
   match res {
     Ok(content) => {
-      let lexer = Lexer::new(content) 
+      let lexer = Lexer::new(content)
       let tokens = try! lexer.tokenizer()
       if show {
         debug(tokens)
@@ -14,8 +18,8 @@ pub fn from_file(path : String, show~ : Bool = false, to~ : Option[String] = Non
       if show {
         debug(asts)
       }
-     
-      let codegen = CodeGen::new(asts) 
+
+      let codegen = CodeGen::new(asts)
       let gen = codegen.generate()
       match to {
         Some(target) => {
@@ -28,9 +32,7 @@ pub fn from_file(path : String, show~ : Bool = false, to~ : Option[String] = Non
             }
           }
         }
-        None => {
-          Some(gen)
-        }
+        None => Some(gen)
       }
     }
     Err(e) => {
@@ -39,5 +41,3 @@ pub fn from_file(path : String, show~ : Bool = false, to~ : Option[String] = Non
     }
   }
 }
-
-

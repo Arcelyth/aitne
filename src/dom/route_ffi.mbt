@@ -33,5 +33,3 @@ pub extern "js" fn on_popstate(cb : () -> Unit) -> () -> Unit =
 ///|
 pub extern "js" fn dom_clear_children(node : Node) -> Unit =
   #|(node) => { while (node.firstChild) node.removeChild(node.firstChild); }
-
-

@@ -81,7 +81,7 @@ fn join_suffix(segs : Array[String], start : Int) -> String {
 ///|
 pub fn[V] NestedRoute::match_nested(
   self : NestedRoute[V],
-  path : String
+  path : String,
 ) -> ((UInt, NestedMatch[V])?, String) {
   let route_segs = split_segments(self.path)
   let path_segs = split_segments(path)
@@ -129,25 +129,21 @@ pub fn[V] NestedRoute::match_nested(
     Some(child_route) => {
       let (inner, child_remaining) = child_route.match_nested(remaining)
       match inner {
-        Some((_, child)) => {
-          (Some(child), child_remaining)
-        }
-        None => {
+        Some((_, child)) => (Some(child), child_remaining)
+        None =>
           if remaining == "" || remaining == "/" {
             (None, remaining)
           } else {
             return (None, path)
           }
-        }
       }
     }
-    None => {
+    None =>
       if remaining == "" || remaining == "/" {
         (None, remaining)
       } else {
         return (None, path)
       }
-    }
   }
 
   let id = self.id

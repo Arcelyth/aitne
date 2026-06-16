@@ -18,4 +18,3 @@ pub impl View for DynTextNode
 ///|
 /// ForNode (dynamic list) implements View.
 pub impl[T, K : Hash + Eq] View for ForNode[T, K]
-

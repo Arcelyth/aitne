@@ -1,3 +1,4 @@
+///|
 /// Global memo id generator.
 let memo_id_counter : Ref[UInt] = @ref.new(0)
 
@@ -11,8 +12,8 @@ fn next_memo_id() -> UInt {
 ///|
 pub struct Memo[T] {
   id : UInt
-  mut value : Option[T]
-  mut state : ReactiveNodeState 
+  mut value : T?
+  mut state : ReactiveNodeState
   /// Upstream sources used by this memo.
   sources : HashSet[ASource]
   /// Downstream subscribers depending on this memo.
@@ -22,30 +23,33 @@ pub struct Memo[T] {
   /// Owner used to clean up temporary subscriptions while recomputing.
   owner : Owner
   /// Compute function. Previous value is passed in as None on first run.
-  compute : (Option[T]) -> T
+  compute : (T?) -> T
   /// Returns true when the value changed.
-  changed : (Option[T], Option[T]) -> Bool
+  changed : (T?, T?) -> Bool
 }
 
 ///|
 /// Source side of the reactive graph.
-pub impl[T] Source for Memo[T] with add_sub(self, subscriber : ASubscriber) -> Unit {
+pub impl[T] Source for Memo[T] with fn add_sub(self, subscriber : ASubscriber) -> Unit {
   self.subscribers.add(subscriber)
 }
 
 ///|
-pub impl[T] Source for Memo[T] with remove_sub(self, subscriber : ASubscriber) -> Unit {
+pub impl[T] Source for Memo[T] with fn remove_sub(
+  self,
+  subscriber : ASubscriber,
+) -> Unit {
   self.subscribers.remove(subscriber)
 }
 
 ///|
-pub impl[T] Source for Memo[T] with clear_subs(self) -> Unit {
+pub impl[T] Source for Memo[T] with fn clear_subs(self) -> Unit {
   self.subscribers.clear()
 }
 
 ///|
 /// Reactive node: mark dirty and propagate check to dependents.
-pub impl[T] ReactiveNode for Memo[T] with mark_stale(self) -> Unit {
+pub impl[T] ReactiveNode for Memo[T] with fn mark_stale(self) -> Unit {
   guard !self.disposed else { return }
 
   self.state = ReactiveNodeState::Stale
@@ -54,7 +58,7 @@ pub impl[T] ReactiveNode for Memo[T] with mark_stale(self) -> Unit {
 
 ///|
 /// Reactive node: mark this node as needing a check.
-pub impl[T] ReactiveNode for Memo[T] with mark_pending(self) -> Unit {
+pub impl[T] ReactiveNode for Memo[T] with fn mark_pending(self) -> Unit {
   guard !self.disposed else { return }
 
   if self.state != ReactiveNodeState::Stale {
@@ -65,7 +69,7 @@ pub impl[T] ReactiveNode for Memo[T] with mark_pending(self) -> Unit {
 
 ///|
 /// Reactive node: propagate check to downstream subscribers.
-pub impl[T] ReactiveNode for Memo[T] with mark_all_pending(self) -> Unit {
+pub impl[T] ReactiveNode for Memo[T] with fn mark_all_pending(self) -> Unit {
   guard !self.disposed else { return }
 
   let subs = self.subscribers.copy()
@@ -76,40 +80,37 @@ pub impl[T] ReactiveNode for Memo[T] with mark_all_pending(self) -> Unit {
 
 ///|
 /// Reactive node: ensure the memo is updated if needed.
-pub impl[T] ReactiveNode for Memo[T] with update_value(self) -> Bool {
+pub impl[T] ReactiveNode for Memo[T] with fn update_value(self) -> Bool {
   Memo::update_value(self)
 }
 
 ///|
 /// Subscriber side of the reactive graph.
-pub impl[T] Subscriber for Memo[T] with add_source(self, source : ASource) -> Unit {
+pub impl[T] Subscriber for Memo[T] with fn add_source(self, source : ASource) -> Unit {
   self.sources.add(source)
 }
 
 ///|
-pub impl[T] Subscriber for Memo[T] with clean_sources(self, subscriber : ASubscriber) -> Unit {
+pub impl[T] Subscriber for Memo[T] with fn clean_sources(
+  self,
+  subscriber : ASubscriber,
+) -> Unit {
   for source in self.sources {
     source.remove_sub(subscriber)
   }
   self.sources.clear()
 }
 
-
 ///|
 /// Notify is just mark_stale for memo.
-pub impl[T] Notify for Memo[T] with notify(self) -> Unit {
+pub impl[T] Notify for Memo[T] with fn notify(self) -> Unit {
   self.mark_stale()
 }
 
 ///|
 /// Create a memo with default equality comparison.
-pub fn[T : Eq] Memo::new(f : (Option[T]) -> T) -> Memo[T] {
-  Memo::new_with_compare(
-    f,
-    fn(old : Option[T], new : Option[T]) -> Bool {
-      old != new
-    },
-  )
+pub fn[T : Eq] Memo::new(f : (T?) -> T) -> Memo[T] {
+  Memo::new_with_compare(f, fn(old : T?, new : T?) -> Bool { old != new })
 }
 
 ///|
@@ -117,8 +118,8 @@ pub fn[T : Eq] Memo::new(f : (Option[T]) -> T) -> Memo[T] {
 ///
 /// `changed(old, new)` should return true when the value is different.
 pub fn[T] Memo::new_with_compare(
-  f : (Option[T]) -> T,
-  changed : (Option[T], Option[T]) -> Bool,
+  f : (T?) -> T,
+  changed : (T?, T?) -> Bool,
 ) -> Memo[T] {
   let memo = Memo::{
     id: next_memo_id(),
@@ -129,13 +130,11 @@ pub fn[T] Memo::new_with_compare(
     disposed: false,
     owner: Owner::new(),
     compute: f,
-    changed: changed,
+    changed,
   }
 
   // Auto-dispose with the current owner, if any.
-  on_cleanup(fn() {
-    memo.dispose()
-  })
+  on_cleanup(fn() { memo.dispose() })
 
   memo
 }
@@ -145,8 +144,8 @@ pub fn[T] Memo::new_with_compare(
 ///
 /// This is useful when moving/cloning the previous value is expensive.
 pub fn[T] Memo::new_owning(
-  f : (Option[T]) -> T,
-  changed : (Option[T], Option[T]) -> Bool,
+  f : (T?) -> T,
+  changed : (T?, T?) -> Bool,
 ) -> Memo[T] {
   Memo::new_with_compare(f, changed)
 }
@@ -173,18 +172,12 @@ pub fn[T] Memo::is_disposed(self : Memo[T]) -> Bool {
 
 ///|
 pub fn[T] Memo::to_asource(self : Memo[T]) -> ASource {
-  ASource::{
-    id: self.id,
-    src: Some(self as &Source),
-  }
+  ASource::{ id: self.id, src: Some(self as &Source) }
 }
 
 ///|
 pub fn[T] Memo::to_asubscriber(self : Memo[T]) -> ASubscriber {
-  {
-    id: self.id,
-    sub: Some(self as &Subscriber),
-  }
+  { id: self.id, sub: Some(self as &Subscriber) }
 }
 
 ///|
@@ -210,21 +203,18 @@ pub fn[T] Memo::update_value(self : Memo[T]) -> Bool {
 
   // Fast path.
   match self.state {
-    ReactiveNodeState::Clean => {
-      return false
-    }
-    ReactiveNodeState::Stale => {
+    ReactiveNodeState::Clean => return false
+    ReactiveNodeState::Stale =>
       // Recompute immediately.
       ()
-    }
     ReactiveNodeState::Pending => {
       let sources = self.sources.copy()
       let mut any_dirty = false
-      
+
       for source in sources {
         if source.update_value() || self.state == ReactiveNodeState::Stale {
           any_dirty = true
-          break 
+          break
         }
       }
 
@@ -240,9 +230,7 @@ pub fn[T] Memo::update_value(self : Memo[T]) -> Bool {
   self.clean_sources(sub)
 
   let new_value = self.owner.with_cleanup(fn() {
-    Observer::with_replace(Some(sub), fn() {
-      (self.compute)(prev)
-    })
+    Observer::with_replace(Some(sub), fn() { (self.compute)(prev) })
   })
 
   let new_opt = Some(new_value)

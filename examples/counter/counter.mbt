@@ -14,13 +14,13 @@ pub fn counter() -> &View {
       })
     ]),
 
-//    button()
-//      .children([
-//        text("+1")
-//      ])
-//      .on(Click, fn(_e) {
-//        set_count.update(fn(v) { v + 1 })
-//      }),
+    button()
+      .children([
+        text("+1")
+      ])
+      .on(Click, fn(_e) {
+        set_count.update(fn(v) { v + 1 })
+      }),
 
     button()
       .children([

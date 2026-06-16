@@ -31,7 +31,10 @@ pub type Comment
 ///|
 pub type EventHandle
 
-// --- Js Upcast ---
+///|
+pub type JsArray
+
+// --- cast ---
 
 ///|
 pub extern "js" fn el_as_node(el : Element) -> Node =
@@ -44,6 +47,10 @@ pub extern "js" fn text_as_node(t : Text) -> Node =
 ///|
 pub extern "js" fn comment_as_node(c : Comment) -> Node =
   #|(c) => c
+
+///|
+pub extern "js" fn node_as_element(node : Node) -> Element =
+  #|(node) => node
 
 // -----
 
@@ -70,6 +77,14 @@ pub extern "js" fn dom_set_attr(
 ///|
 pub extern "js" fn dom_remove_attr(el : Element, key : String) -> Unit =
   #|(el, key) => { el.removeAttribute(key); }
+
+///|
+pub extern "js" fn dom_remove_self(node : Node) -> Unit =
+  #|(node) => {
+  #|  if (node && node.parentNode) {
+  #|    node.parentNode.removeChild(node);
+  #|  }
+  #|}
 
 ///|
 pub extern "js" fn dom_append(parent : Node, child : Node) -> Unit =
@@ -102,6 +117,15 @@ pub extern "js" fn set_property(
   value : String,
 ) -> Unit =
   #|(el, prop_name, value) => { el[prop_name] = value; }
+
+pub extern "js" fn get_bool_property(
+  el : Element,
+  key : String
+) -> Bool =
+  #|(el, key) => {
+  #|  const v = el[key];
+  #|  return typeof v === "boolean" ? v : false;
+  #|}
 
 ///|
 pub extern "js" fn remove_property(el : Element, prop_name : String) -> Unit =
@@ -286,3 +310,59 @@ pub extern "js" fn prim_add_event_listener_capture(
 ///|
 pub extern "js" fn prim_call_event_handle(handle : EventHandle) -> Unit =
   #|(handle) => { handle(); }
+
+// ----- Event FFI 
+///|
+pub extern "js" fn event_default_prevented(ev : Event) -> Bool =
+  #|(ev) => ev.defaultPrevented
+
+///|
+pub extern "js" fn event_button(ev : Event) -> Int =
+  #|(ev) => ev.button
+
+///|
+pub extern "js" fn event_meta_key(ev : Event) -> Bool =
+  #|(ev) => ev.metaKey
+
+///|
+pub extern "js" fn event_alt_key(ev : Event) -> Bool =
+  #|(ev) => ev.altKey
+
+///|
+pub extern "js" fn event_ctrl_key(ev : Event) -> Bool =
+  #|(ev) => ev.ctrlKey
+
+///|
+pub extern "js" fn event_shift_key(ev : Event) -> Bool =
+  #|(ev) => ev.shiftKey
+
+///|
+pub extern "js" fn event_prevent_default(ev : Event) -> Unit =
+  #|(ev) => ev.preventDefault()
+
+pub extern "js" fn event_composed_path(ev : Event) -> JsArray =
+  #|(ev) => ev.composedPath()
+
+pub extern "js" fn js_array_length(arr : JsArray) -> Int =
+  #|(arr) => arr.length
+
+pub extern "js" fn js_array_get(arr : JsArray, idx : Int) -> Node =
+  #|(arr, idx) => arr[idx]
+
+/// -----
+
+///|
+pub extern "js" fn node_is_anchor(node : Node) -> Bool =
+  #|(node) => node instanceof HTMLAnchorElement
+
+pub extern "js" fn anchor_href(el : Element) -> String =
+  #|(el) => el.href
+
+pub extern "js" fn anchor_target(el : Element) -> String =
+  #|(el) => el.target
+
+pub extern "js" fn anchor_has_attr(el : Element, name : String) -> Bool =
+  #|(el, name) => el.hasAttribute(name)
+
+pub extern "js" fn anchor_get_attr(el : Element, name : String) -> String =
+  #|(el, name) => el.getAttribute(name) ?? ""

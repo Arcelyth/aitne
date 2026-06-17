@@ -5,6 +5,9 @@ using @hashmap {type HashMap}
 using @hashset {type HashSet}
 
 ///|
+using @any {type Any}
+
+///|
 pub struct Owner {
   id : Int
 }
@@ -15,6 +18,7 @@ pub struct OwnerState {
   parent : Int?
   mut cleanups : Array[() -> Unit]
   mut children : HashSet[Int]
+  contexts : HashMap[String, Any]
   mut disposed : Bool
 }
 
@@ -73,6 +77,7 @@ fn create_owner(parent : Int?) -> Owner {
     parent,
     cleanups: [],
     children: HashSet([]),
+    contexts: HashMap([]),
     disposed: false,
   })
 
@@ -247,5 +252,169 @@ pub fn Owner::cleanup(self : Owner) -> Unit {
       }
     }
     None => ()
+  }
+}
+
+///|
+pub fn[T : TypeName] Owner::provide_context(self : Owner, value : T) -> Unit {
+  match owner_state_of(self.id) {
+    Some(state) => {
+      let any = @any.of(value)
+      state.val.contexts.set(T::get_ty(), any)
+    }
+    None => ()
+  }
+}
+
+///|
+pub fn[T : TypeName, R] Owner::with_context(
+  self : Owner,
+  callback : (T) -> R,
+) -> R? {
+  let ty = T::get_ty()
+  let mut current_id = Some(self.id)
+
+  while !(current_id is None) {
+    let id = current_id.unwrap()
+    match owner_state_of(id) {
+      Some(state) =>
+        if !state.val.disposed {
+          match state.val.contexts.get(ty) {
+            Some(any_val) =>
+              match any_val.try_to() {
+                Some(val) => return Some(callback(val))
+                None => current_id = state.val.parent
+              }
+            None => current_id = state.val.parent
+          }
+        } else {
+          break
+        }
+      None => break
+    }
+  }
+
+  None
+}
+
+///|
+pub fn[T : TypeName] Owner::use_context(self : Owner) -> T? {
+  self.with_context(fn(val : T) { val })
+}
+
+///|
+pub fn[T : TypeName] Owner::take_context(self : Owner) -> T? {
+  let ty = T::get_ty()
+  let mut current_id = Some(self.id)
+
+  while !(current_id is None) {
+    let id = current_id.unwrap()
+    match owner_state_of(id) {
+      Some(state) =>
+        if !state.val.disposed {
+          match state.val.contexts.get(ty) {
+            Some(any_val) =>
+              match any_val.try_to() {
+                Some(val) => {
+                  state.val.contexts.remove(ty)
+                  return Some(val)
+                }
+                None => current_id = state.val.parent
+              }
+            None => current_id = state.val.parent
+          }
+        } else {
+          break
+        }
+      None => break
+    }
+  }
+
+  None
+}
+
+///|
+pub fn[T : TypeName, R] Owner::update_context(
+  self : Owner,
+  cb : (T) -> R,
+) -> R? {
+  let ty = T::get_ty()
+  let mut current_id = Some(self.id)
+
+  while !(current_id is None) {
+    let id = current_id.unwrap()
+    match owner_state_of(id) {
+      Some(state) =>
+        if !state.val.disposed {
+          match state.val.contexts.get(ty) {
+            Some(any_val) =>
+              match any_val.try_to() {
+                Some(val) => {
+                  let result = cb(val)
+                  state.val.contexts.set(ty, @any.of(val))
+                  return Some(result)
+                }
+                None => current_id = state.val.parent
+              }
+            None => current_id = state.val.parent
+          }
+        } else {
+          break
+        }
+      None => break
+    }
+  }
+
+  None
+}
+
+///|
+pub fn[T : TypeName] Owner::use_context_bidirectional(self : Owner) -> T? {
+  match self.use_context() {
+    Some(val) => Some(val)
+    None => self.find_context_in_children()
+  }
+}
+
+///|
+fn[T : TypeName] Owner::find_context_in_children(self : Owner) -> T? {
+  let ty = T::get_ty()
+
+  match owner_state_of(self.id) {
+    Some(state) => {
+      let to_search = []
+
+      for child_id in state.val.children {
+        to_search.push(child_id)
+      }
+
+      let mut i = 0
+      while i < to_search.length() {
+        let next_id = to_search[i]
+        i = i + 1
+
+        match owner_state_of(next_id) {
+          Some(child_state) =>
+            if !child_state.val.disposed {
+              match child_state.val.contexts.get(ty) {
+                Some(any_val) =>
+                  match any_val.try_to() {
+                    Some(val) => return Some(val)
+                    None => ()
+                  }
+                None => ()
+              }
+
+              for grandchild_id in child_state.val.children {
+                to_search.push(grandchild_id)
+              }
+            }
+          None => ()
+        }
+      }
+
+      None
+    }
+    None => None
   }
 }

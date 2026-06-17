@@ -24,6 +24,15 @@ pub fn Url::current() -> Url {
 }
 
 ///|
+pub fn Url::to_full_path(self : Url) -> String {
+  if self.search == "" {
+    self.path + self.hash
+  } else {
+    self.path + "?" + self.search + self.hash
+  }
+}
+
+///|
 /// Reactive browser location state.
 pub(all) struct Location {
   pathname : Memo[String]
@@ -152,4 +161,17 @@ pub fn handle_anchor_click(
       None => ()
     }
   }
+}
+
+///|
+pub(all) struct BrowserUrl {
+  url : RwSignal[Url]
+}
+
+///|
+pub fn new() -> BrowserUrl {
+  let current_url = Url::current()
+  let url = RwSignal::new(current_url)
+
+  BrowserUrl::{ url, }
 }

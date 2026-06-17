@@ -1,6 +1,7 @@
 import {
-  "moonbitlang/core/hashset" @hashset,
-  "moonbitlang/core/hashmap" @hashmap,
-  "moonbitlang/core/debug" @debug,
-  "moonbitlang/core/ref" @ref,
+  "moonbitlang/core/hashset",
+  "moonbitlang/core/hashmap",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/ref",
+  "tonyfettes/any",
 }

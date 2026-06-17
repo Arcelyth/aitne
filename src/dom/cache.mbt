@@ -1,8 +1,8 @@
 ///|
 /// This a DOM cache for reducing ffi.
 pub struct DomCache {
-  mut window : Option[Window]
-  mut document : Option[Document]
+  mut window : Window?
+  mut document : Document?
 }
 
 ///|
@@ -31,5 +31,3 @@ pub fn document() -> Document {
     }
   }
 }
-
-

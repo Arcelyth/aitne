@@ -1,7 +1,0 @@
-import {
-  "Arcelyth/aitne/src/dom" @dom,
-}
-
-options(
-  "is-main": true,
-)

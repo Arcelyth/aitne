@@ -25,7 +25,9 @@ pub fn schedule_effect(effect : Ref[Effect]) -> Unit {
   scheduler.val.queued.add(effect.val.id)
   scheduler.val.pending.push(effect)
 
-  guard scheduler.val.batch_depth == 0 && !scheduler.val.flushing else { return }
+  guard scheduler.val.batch_depth == 0 && !scheduler.val.flushing else {
+    return
+  }
   flush_scheduler()
 }
 
@@ -37,8 +39,8 @@ pub fn flush_scheduler() -> Unit {
   guard !scheduler.val.flushing else { return }
 
   scheduler.val.flushing = true
-  
-  let mut flush_count = 0 
+
+  let mut flush_count = 0
 
   while scheduler.val.pending.length() > 0 {
     if flush_count > 1000 {
@@ -52,10 +54,10 @@ pub fn flush_scheduler() -> Unit {
     let mut i = 0
     while i < current_pending.length() {
       let effect = current_pending[i]
-      
+
       scheduler.val.queued.remove(effect.val.id)
       Effect::run(effect)
-      
+
       i = i + 1
     }
   }

@@ -2,7 +2,9 @@
   "name": "Arcelyth/aitne",
   "version": "0.2.2",
   "deps": {
-    "moonbitlang/x": "0.4.45"
+    "moonbitlang/x": "0.4.45",
+    "Arcelyth/html_escape": "0.3.1",
+    "tonyfettes/any": "0.1.5"
   },
   "readme": "README.mbt.md",
   "repository": "https://github.com/Arcelyth/aitne",

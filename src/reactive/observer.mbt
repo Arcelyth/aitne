@@ -6,14 +6,14 @@
 /// flag that temporarily disables tracking.
 pub struct ObserverState {
   subscriber : ASubscriber
-  untracked  : Bool
+  untracked : Bool
 }
 
 ///|
 /// Global observer context.
 ///
 /// Holds the subscriber currently collecting dependencies.
-let observer_context : @ref.Ref[Option[ObserverState]] = @ref.new(None)
+let observer_context : @ref.Ref[ObserverState?] = @ref.new(None)
 
 ///|
 /// Reactive observer utilities.
@@ -28,15 +28,9 @@ pub(all) struct Observer {}
 ///
 /// If tracking is disabled (`untracked == true`) or there
 /// is no active observer, returns `None`.
-pub fn Observer::get() -> Option[ASubscriber] {
+pub fn Observer::get() -> ASubscriber? {
   match observer_context.val {
-    Some(state) => {
-      if state.untracked {
-        None
-      } else {
-        Some(state.subscriber)
-      }
-    }
+    Some(state) => if state.untracked { None } else { Some(state.subscriber) }
     None => None
   }
 }
@@ -54,7 +48,7 @@ pub fn Observer::tobe(observer : ASubscriber) -> Bool {
 /// Sets the current observer.
 ///
 /// Passing `None` clears the observer context.
-pub fn Observer::set(observer : Option[ASubscriber]) -> Unit {
+pub fn Observer::set(observer : ASubscriber?) -> Unit {
   observer_context.val = match observer {
     Some(sub) => Some({ subscriber: sub, untracked: false })
     None => None
@@ -69,9 +63,9 @@ pub fn Observer::set(observer : Option[ASubscriber]) -> Unit {
 pub fn[T] Observer::with_take(f : () -> T) -> T {
   let prev = observer_context.val
   observer_context.val = None
-  
+
   let result = f()
-  
+
   observer_context.val = prev
   result
 }
@@ -81,16 +75,16 @@ pub fn[T] Observer::with_take(f : () -> T) -> T {
 ///
 /// The previous observer context is restored after execution,
 /// even if another observer was previously active.
-pub fn[T] Observer::with_replace(observer : Option[ASubscriber], f : () -> T) -> T {
+pub fn[T] Observer::with_replace(observer : ASubscriber?, f : () -> T) -> T {
   let prev = observer_context.val
-  
+
   observer_context.val = match observer {
     Some(sub) => Some({ subscriber: sub, untracked: false })
     None => None
   }
-  
+
   let result = f()
-  
+
   observer_context.val = prev
   result
 }
@@ -106,16 +100,14 @@ pub fn[T] Observer::with_replace(observer : Option[ASubscriber], f : () -> T) ->
 /// `untrack()`.
 pub fn[T] Observer::with_untracked(f : () -> T) -> T {
   let prev = observer_context.val
-  
+
   match prev {
-    Some(state) => {
-      observer_context.val = Some({ ..state, untracked: true })
-    }
+    Some(state) => observer_context.val = Some({ ..state, untracked: true })
     None => ()
   }
-  
+
   let result = f()
-  
+
   observer_context.val = prev
   result
 }

@@ -31,17 +31,5 @@ pub extern "js" fn on_popstate(cb : () -> Unit) -> () -> Unit =
   #|}
 
 ///|
-pub extern "js" fn event_prevent_default(ev : Event) -> Unit =
-  #|(ev) => { ev.preventDefault(); }
-
-///|
 pub extern "js" fn dom_clear_children(node : Node) -> Unit =
   #|(node) => { while (node.firstChild) node.removeChild(node.firstChild); }
-
-///|
-pub extern "js" fn dom_remove_self(node : Node) -> Unit =
-  #|(node) => {
-  #|  if (node && node.parentNode) {
-  #|    node.parentNode.removeChild(node);
-  #|  }
-  #|}

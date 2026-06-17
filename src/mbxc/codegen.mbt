@@ -9,7 +9,7 @@ pub(all) struct CodeGen {
 ///|
 ///
 pub fn CodeGen::new(ast : Array[MbxAST]) -> CodeGen {
-  CodeGen::{ ast }
+  CodeGen::{ ast, }
 }
 
 ///|
@@ -19,7 +19,9 @@ fn path_to_str(path : Array[Int]) -> String {
   let len = path.length()
   for i = 0; i < len; i = i + 1 {
     s += path[i].to_string()
-    if i < len - 1 { s += ", " }
+    if i < len - 1 {
+      s += ", "
+    }
   }
   s += "]"
   s
@@ -27,7 +29,7 @@ fn path_to_str(path : Array[Int]) -> String {
 
 ///|
 fn escape_html(s : String) -> String {
-  let mut res = "" 
+  let mut res = ""
   for c in s.iter() {
     match c {
       '<' => res += "&lt;"
@@ -81,28 +83,29 @@ fn CodeGen::compile_island(_self : CodeGen, nodes : Array[MbxAST]) -> String {
       MbxAST::ElementNode(tag, attrs, children) => {
         let tag_str = tag.to_owned()
         html += "<" + tag_str
-        
+
         for attr in attrs {
           let attr_name = attr.name.to_owned()
           match attr.value {
-            AttrVal::Static(v) => {
+            AttrVal::Static(v) =>
               html += " " + attr_name + "=\"" + escape_html(v.to_owned()) + "\""
-            }
             AttrVal::Dynamic(code_view) => {
               let code = code_view.to_owned()
               let path_str = path_to_str(path)
               match attr.scope {
-                Some(ns) if ns.to_owned() == "on" => {
-                  bindings.push("  @Arcelyth/aitne/src/dom.on(_root, \{path_str}, \"\{attr_name}\", \{code})")
-                }
-                _ => {
-                  bindings.push("  @Arcelyth/aitne/src/dom.set_attr(_root, \{path_str}, \"\{attr_name}\", \{code})")
-                }
+                Some(ns) if ns.to_owned() == "on" =>
+                  bindings.push(
+                    "  @Arcelyth/aitne/src/dom.on(_root, \{path_str}, \"\{attr_name}\", \{code})",
+                  )
+                _ =>
+                  bindings.push(
+                    "  @Arcelyth/aitne/src/dom.set_attr(_root, \{path_str}, \"\{attr_name}\", \{code})",
+                  )
               }
             }
           }
         }
-        
+
         if children.length() == 0 {
           html += "></" + tag_str + ">"
         } else {
@@ -110,25 +113,27 @@ fn CodeGen::compile_island(_self : CodeGen, nodes : Array[MbxAST]) -> String {
           let mut i = 0
           for child in children {
             let new_path = []
-            for p in path { new_path.push(p) }
+            for p in path {
+              new_path.push(p)
+            }
             new_path.push(i)
-            
+
             walk(child, new_path)
             i += 1
           }
           html += "</" + tag_str + ">"
         }
       }
-      MbxAST::TextNode(t) => {
-        html += escape_html(t.to_owned())
-      }
+      MbxAST::TextNode(t) => html += escape_html(t.to_owned())
       MbxAST::DynamicNode(code_view) => {
-        html += "" 
+        html += ""
         let code = code_view.to_owned()
         let path_str = path_to_str(path)
-        bindings.push("    @Arcelyth/aitne/src/dom.insert_dynamic(_root, \{path_str}, \{code})")
+        bindings.push(
+          "    @Arcelyth/aitne/src/dom.insert_dynamic(_root, \{path_str}, \{code})",
+        )
       }
-      MbxAST::PureCode(_) => () 
+      MbxAST::PureCode(_) => ()
     }
   }
 
@@ -142,11 +147,11 @@ fn CodeGen::compile_island(_self : CodeGen, nodes : Array[MbxAST]) -> String {
   let mut block = "\n  {\n"
   block += "    let _tpl = @Arcelyth/aitne/src/dom.create_template(\"\{safe_html}\")\n"
   block += "    let _root = @Arcelyth/aitne/src/dom.clone_node(_tpl)\n"
-  
+
   for bind in bindings {
     block += "  " + bind + "\n"
   }
-  
+
   block += "   @Arcelyth/aitne/src/dom.Html::RawNode(_root)\n  }\n"
   return block
 }
@@ -182,14 +187,10 @@ pub fn CodeGen::generate(self : CodeGen) -> String {
         flush_island()
         final_code += code.to_owned()
       }
-      _ => {
-        current_island.push(node)
-      }
+      _ => current_island.push(node)
     }
   }
-  
+
   flush_island()
   final_code
 }
-
-

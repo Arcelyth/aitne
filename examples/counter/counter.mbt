@@ -1,6 +1,6 @@
-using @dom {type Html, div, h1, p, button, text, text_dyn}
+using @dom {trait View, div, h1, p, button, text, text_dyn}
 
-pub fn counter() -> Html {
+pub fn counter() -> &View {
   let (count, set_count) = @reactive.create_signal(0)
 
   div().children([

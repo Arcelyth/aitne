@@ -372,3 +372,13 @@ pub extern "js" fn anchor_has_attr(el : Element, name : String) -> Bool =
 ///|
 pub extern "js" fn anchor_get_attr(el : Element, name : String) -> String =
   #|(el, name) => el.getAttribute(name) ?? ""
+
+///|
+pub extern "js" fn window_event_listener(
+  event : String,
+  callback : (Event) -> Unit,
+) -> EventHandle =
+  #|(event, callback) => {
+  #|  window.addEventListener(event, callback);
+  #|  return () => window.removeEventListener(event, callback);
+  #|}

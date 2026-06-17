@@ -44,7 +44,7 @@ fn next_id() -> Int {
 }
 
 ///|
-fn owner_state_of(id : Int) -> @ref.Ref[OwnerState]? {
+pub fn owner_state_of(id : Int) -> @ref.Ref[OwnerState]? {
   owner_registry.val.get(id)
 }
 

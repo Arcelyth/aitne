@@ -33,3 +33,25 @@ pub extern "js" fn on_popstate(cb : () -> Unit) -> () -> Unit =
 ///|
 pub extern "js" fn dom_clear_children(node : Node) -> Unit =
   #|(node) => { while (node.firstChild) node.removeChild(node.firstChild); }
+
+///|
+pub extern "js" fn url_can_parse(href : String, base : String) -> Bool =
+  #|(href, base) => {
+  #|  try { new URL(href, base); return true; } catch (e) { return false; }
+  #|}
+
+///|
+pub extern "js" fn url_origin_from_base(href : String, base : String) -> String =
+  #|(href, base) => new URL(href, base).origin
+
+///|
+pub extern "js" fn url_path_from_base(href : String, base : String) -> String =
+  #|(href, base) => new URL(href, base).pathname
+
+///|
+pub extern "js" fn url_search_from_base(href : String, base : String) -> String =
+  #|(href, base) => new URL(href, base).search
+
+///|
+pub extern "js" fn url_hash_from_base(href : String, base : String) -> String =
+  #|(href, base) => new URL(href, base).hash

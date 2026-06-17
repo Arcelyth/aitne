@@ -256,6 +256,18 @@ pub fn Owner::cleanup(self : Owner) -> Unit {
 }
 
 ///|
+/// Stores a context value on this owner.
+///
+/// The value is associated with its type name (`T::get_ty()`),
+/// allowing descendants of this owner to retrieve it later using
+/// `use_context`, `with_context`, `take_context`, or
+/// `update_context`.
+///
+/// If a context with the same type already exists on this owner,
+/// it will be replaced.
+///
+/// Context lookup follows the owner hierarchy upward,
+/// so values provided by parent owners are visible to children.
 pub fn[T : TypeName] Owner::provide_context(self : Owner, value : T) -> Unit {
   match owner_state_of(self.id) {
     Some(state) => {
@@ -267,6 +279,17 @@ pub fn[T : TypeName] Owner::provide_context(self : Owner, value : T) -> Unit {
 }
 
 ///|
+/// Searches for a context value of type `T` on this owner and its
+/// ancestors, then invokes `callback` with the retrieved value.
+///
+/// Lookup starts from the current owner and walks upward through
+/// parent owners until a matching context is found.
+///
+/// Returns:
+///
+/// * `Some(result)` if a matching context exists.
+/// * `None` if no matching context can be found.
+///
 pub fn[T : TypeName, R] Owner::with_context(
   self : Owner,
   callback : (T) -> R,
@@ -298,11 +321,42 @@ pub fn[T : TypeName, R] Owner::with_context(
 }
 
 ///|
+/// Retrieves a context value of type `T`.
+///
+/// Lookup starts from this owner and continues through all ancestors.
+///
+/// Returns:
+///
+/// * `Some(value)` if a matching context exists.
+/// * `None` otherwise.
+///
+/// This is equivalent to:
+///
+/// ```
+/// owner.with_context(fn(v : T) { v })
+/// ```
 pub fn[T : TypeName] Owner::use_context(self : Owner) -> T? {
   self.with_context(fn(val : T) { val })
 }
 
 ///|
+/// Removes and returns a context value of type `T`.
+///
+/// Lookup starts from this owner and continues upward through
+/// all ancestor owners.
+///
+/// Once a matching context is found:
+///
+/// * The value is removed from the owner that contains it.
+/// * The removed value is returned.
+///
+/// Returns:
+///
+/// * `Some(value)` if a matching context exists.
+/// * `None` otherwise.
+///
+/// Unlike `use_context`, the context will no longer be available
+/// after a successful call.
 pub fn[T : TypeName] Owner::take_context(self : Owner) -> T? {
   let ty = T::get_ty()
   let mut current_id = Some(self.id)
@@ -334,6 +388,16 @@ pub fn[T : TypeName] Owner::take_context(self : Owner) -> T? {
 }
 
 ///|
+/// Retrieves a context value of type `T`, applies `cb`,
+/// and stores the updated value back into the owner.
+///
+/// Lookup starts from this owner and walks upward through
+/// ancestor owners.
+///
+/// Returns:
+///
+/// * `Some(result)` if the context exists.
+/// * `None` otherwise.
 pub fn[T : TypeName, R] Owner::update_context(
   self : Owner,
   cb : (T) -> R,
@@ -369,6 +433,24 @@ pub fn[T : TypeName, R] Owner::update_context(
 }
 
 ///|
+/// Searches for a context value in both directions.
+///
+/// The search order is:
+///
+/// 1. Current owner.
+/// 2. Parent owners.
+/// 3. Descendant owners (breadth-first).
+///
+/// This is useful for special framework-level services where
+/// ownership direction is not important.
+///
+/// Returns:
+///
+/// * `Some(value)` if a matching context is found.
+/// * `None` otherwise.
+///
+/// Normal application code should generally prefer
+/// `use_context`, which only searches ancestors.
 pub fn[T : TypeName] Owner::use_context_bidirectional(self : Owner) -> T? {
   match self.use_context() {
     Some(val) => Some(val)
@@ -377,6 +459,13 @@ pub fn[T : TypeName] Owner::use_context_bidirectional(self : Owner) -> T? {
 }
 
 ///|
+/// Searches descendant owners for a context value of type `T`.
+///
+/// The search uses breadth-first traversal (BFS),
+/// visiting immediate children before deeper descendants.
+///
+/// This function is used internally by
+/// `use_context_bidirectional`.
 fn[T : TypeName] Owner::find_context_in_children(self : Owner) -> T? {
   let ty = T::get_ty()
 

@@ -382,3 +382,7 @@ pub extern "js" fn window_event_listener(
   #|  window.addEventListener(event, callback);
   #|  return () => window.removeEventListener(event, callback);
   #|}
+
+///|
+pub extern "js" fn set_window_href(href : String) -> Unit =
+  #|(href) => { window.location.href = href; }

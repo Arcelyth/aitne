@@ -1,5 +1,5 @@
 ///|
-using @reactive {type Memo, type WriteSignal, type RwSignal}
+using @reactive {type Memo, type RwSignal, trait TypeName, provide_context}
 
 ///|
 pub(all) struct Url {
@@ -38,36 +38,29 @@ pub(all) struct Location {
   pathname : Memo[String]
   search : Memo[String]
   hash : Memo[String]
-  set_pathname : WriteSignal[String]
-  set_search : WriteSignal[String]
-  set_hash : WriteSignal[String]
 }
 
 ///|
 /// Create a reactive Location instance from the current browser URL.
-pub fn Location::new() -> Location {
-  let (pathname_src, set_pathname_src) = @reactive.create_signal(
-    current_pathname(),
-  )
-  let (search_src, set_search_src) = @reactive.create_signal(current_search())
-  let (hash_src, set_hash_src) = @reactive.create_signal(current_hash())
+pub fn Location::current() -> Location {
+  let (pathname_src, _) = @reactive.create_signal(current_pathname())
+  let (search_src, _) = @reactive.create_signal(current_search())
+  let (hash_src, _) = @reactive.create_signal(current_hash())
 
   Location::{
     pathname: Memo::new(fn(_) { pathname_src.get() }),
     search: Memo::new(fn(_) { search_src.get() }),
     hash: Memo::new(fn(_) { hash_src.get() }),
-    set_pathname: set_pathname_src,
-    set_search: set_search_src,
-    set_hash: set_hash_src,
   }
 }
 
 ///|
-/// Synchronize the location state with the browser URL.
-pub fn Location::sync(self : Location) -> Unit {
-  self.set_pathname.set(current_pathname())
-  self.set_search.set(current_search())
-  self.set_hash.set(current_hash())
+pub fn Location::new(url : RwSignal[Url]) -> Location {
+  Location::{
+    pathname: Memo::new(fn(_) { url.with_val(url => url.path) }),
+    search: Memo::new(fn(_) { url.with_val(url => url.search) }),
+    hash: Memo::new(fn(_) { url.with_val(url => url.hash) }),
+  }
 }
 
 ///|
@@ -283,10 +276,42 @@ pub fn BrowserUrl::init(self : BrowserUrl, base : String?) -> Unit {
 }
 
 ///|
+pub fn BrowserUrl::redirect(self : BrowserUrl, loc : String) -> Unit {
+  let current_orig = current_origin()
+
+  let url = match parse_url_with_base(loc, current_orig) {
+    Ok(u) => u
+    Err(_) => return
+  }
+
+  if url.origin == current_orig {
+    let full_path = url.to_full_path()
+    let change = LocationChange::{
+      value: full_path,
+      replace: true,
+      scroll: true,
+    }
+
+    let _ = request_animation_frame(fn() {
+      self.url.set(url)
+      self.complete_navigation(change)
+    })
+  } else {
+    let absolute_url = url.origin + url.to_full_path()
+    set_window_href(absolute_url)
+  }
+}
+
+///|
 fn strip_leading_qmark(str : String) -> String {
   if str.has_prefix("?") {
     str[1:].to_owned()
   } else {
     str
   }
+}
+
+///|
+pub impl TypeName for BrowserUrl with fn get_ty() -> String {
+  "BrowserUrl"
 }

@@ -9,6 +9,14 @@ pub(all) struct RouterContext {
   set_is_routing : ((Bool) -> Unit)?
 }
 
+pub fn RouterContext::resolve_path(self : RouterContext, path: String, from : String?) -> String {
+  let base = match self.base {
+    Some(b) => b
+    _ => ""
+  }
+  resolve_path(base, path, from)
+}
+
 ///|
 let global_router_context : Ref[RouterContext?] = @ref.new(None)
 

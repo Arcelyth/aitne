@@ -27,6 +27,21 @@ test "parent cannot access child context" {
 }
 
 ///|
+test "context in closure" {
+  let root = Owner::new()
+  let child = root.child()
+
+  let f = () => {
+    assert_eq(child.use_context(), Some("child"))
+  }
+
+  root.provide_context("child")
+
+  assert_eq(root.use_context(), Some("child"))
+  f()
+}
+
+///|
 test "nearest context wins" {
   let root = Owner::new()
   let child = root.child()
@@ -35,6 +50,7 @@ test "nearest context wins" {
   child.provide_context("child")
 
   assert_eq(child.use_context(), Some("child"))
+  assert_eq(root.use_context(), Some("root"))
 }
 
 ///|

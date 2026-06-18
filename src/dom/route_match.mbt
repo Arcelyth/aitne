@@ -157,3 +157,195 @@ pub fn[V] NestedRoute::match_nested(
 
   (Some((id, matched_route)), final_remaining)
 }
+
+///|
+pub fn begins_with_query_or_hash(text : String) -> Bool {
+  if text.length() == 0 {
+    false
+  } else {
+    let c = text[0]
+    c == '#' || c == '?'
+  }
+}
+
+///|
+pub fn has_scheme(path : String) -> Bool {
+  if path.has_prefix("//") ||
+    path.has_prefix("tel:") ||
+    path.has_prefix("mailto:") {
+    true
+  } else {
+    match path.find("://") {
+      None => false
+      Some(idx) => {
+        let prefix = path[0:idx]
+        if prefix.length() == 0 {
+          return false
+        }
+        let mut all_alnum = true
+        let mut i = 0
+        while i < prefix.length() {
+          let c = prefix[i]
+          let is_alnum = (c >= 'a' && c <= 'z') ||
+            (c >= 'A' && c <= 'Z') ||
+            (c >= '0' && c <= '9')
+          if !is_alnum {
+            all_alnum = false
+            break
+          }
+          i = i + 1
+        }
+        all_alnum
+      }
+    }
+  }
+}
+
+///|
+pub fn normalize(path : String, omit_slash : Bool) -> String {
+  let mut start = 0
+  while start < path.length() && path[start] == '/' {
+    start = start + 1
+  }
+  let s = path[start:].to_owned()
+
+  let mut end = s.length()
+  let mut trailing_count = 0
+  while end > 0 && s[end - 1] == '/' {
+    trailing_count = trailing_count + 1
+    end = end - 1
+  }
+
+  let s = if trailing_count > 0 { s[:end + 1].to_owned() } else { s }
+
+  if s == "" || omit_slash || begins_with_query_or_hash(s) {
+    s
+  } else {
+    "/" + s
+  }
+}
+
+///|
+pub fn resolve_path(base : String, path : String, from : String?) -> String {
+  if has_scheme(path) {
+    path
+  } else {
+    let base_path = normalize(base, false)
+    let from_path = from.map(fn(f) { normalize(f, false) })
+
+    let result = match from_path {
+      Some(from_path) =>
+        if path.has_prefix("/") {
+          base_path
+        } else if !from_path.has_prefix(base_path) {
+          base_path + from_path
+        } else {
+          from_path
+        }
+      None => base_path
+    }
+
+    let result_empty = result == ""
+    let prefix = if result_empty { "/" } else { result }
+    prefix + normalize(path, result_empty)
+  }
+}
+
+///|
+pub fn use_resolved_path(path : String) -> Memo[String] {
+  let rctx : RouterContext? = use_context()
+  let ctx = match rctx {
+    Some(c) => c
+    None => {
+      println("[Error] call use_resolved_path outside the range of router")
+      panic()
+    }
+  }
+
+  let mctx : Matched? = use_context()
+  let matched_signal = match mctx {
+    Some(m) => Some(m.0)
+    None => None
+  }
+
+  Memo::new(fn(_) {
+    if path.has_prefix("/") {
+      path
+    } else {
+      let from = match matched_signal {
+        Some(sig) => Some(sig.get())
+        None => None
+      }
+
+      ctx.resolve_path(path, from)
+    }
+  })
+}
+
+///|
+pub fn normalize_path(path : String) -> String {
+  if path == "" {
+    return ""
+  }
+
+  let q_idx = path.find("?")
+  let h_idx = path.find("#")
+
+  let end_idx = match (q_idx, h_idx) {
+    (Some(q), Some(h)) => if q < h { q } else { h }
+    (Some(q), None) => q
+    (None, Some(h)) => h
+    (None, None) => path.length()
+  }
+
+  let pathname = path[0:end_idx].to_owned()
+
+  let segments = []
+
+  let mut start = 0
+  let mut i = 0
+
+  while i < pathname.length() {
+    if pathname[i] == '/' {
+      segments.push(pathname[start:i].to_owned())
+      start = i + 1
+    }
+    i = i + 1
+  }
+
+  let tail = pathname[start:]
+  segments.push(tail.to_owned())
+
+  let segments = segments.rev()
+
+  let init = if segments.length() > 0 && segments[0] == ".." { "/" } else { "" }
+
+  let mut del = 0
+  let mut res = init
+
+  for seg in segments {
+    if seg == ".." {
+      del = del + 1
+    } else if seg == "." {
+      ()
+    } else if del > 0 {
+      del = del - 1
+    } else {
+      res = seg + "/" + res
+    }
+  }
+
+  if res.length() > 0 {
+    res = res[:res.length() - 1].to_owned()
+  }
+
+  if !res.has_prefix("/") {
+    res = "/" + res
+  }
+
+  while res.length() > 1 && res.has_suffix("/") {
+    res = res[:res.length() - 1].to_owned()
+  }
+
+  res
+}

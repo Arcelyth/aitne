@@ -1,5 +1,5 @@
 ///|
-using @reactive {type Memo, type WriteSignal, type RwSignal}
+using @reactive {type Memo, type RwSignal, trait TypeName, provide_context}
 
 ///|
 pub(all) struct Url {
@@ -8,7 +8,7 @@ pub(all) struct Url {
   search : String
   search_params : Params
   hash : String
-}
+} derive(Eq)
 
 ///|
 /// Read the current browser URL.
@@ -38,36 +38,29 @@ pub(all) struct Location {
   pathname : Memo[String]
   search : Memo[String]
   hash : Memo[String]
-  set_pathname : WriteSignal[String]
-  set_search : WriteSignal[String]
-  set_hash : WriteSignal[String]
 }
 
 ///|
 /// Create a reactive Location instance from the current browser URL.
-pub fn Location::new() -> Location {
-  let (pathname_src, set_pathname_src) = @reactive.create_signal(
-    current_pathname(),
-  )
-  let (search_src, set_search_src) = @reactive.create_signal(current_search())
-  let (hash_src, set_hash_src) = @reactive.create_signal(current_hash())
+pub fn Location::current() -> Location {
+  let (pathname_src, _) = @reactive.create_signal(current_pathname())
+  let (search_src, _) = @reactive.create_signal(current_search())
+  let (hash_src, _) = @reactive.create_signal(current_hash())
 
   Location::{
     pathname: Memo::new(fn(_) { pathname_src.get() }),
     search: Memo::new(fn(_) { search_src.get() }),
     hash: Memo::new(fn(_) { hash_src.get() }),
-    set_pathname: set_pathname_src,
-    set_search: set_search_src,
-    set_hash: set_hash_src,
   }
 }
 
 ///|
-/// Synchronize the location state with the browser URL.
-pub fn Location::sync(self : Location) -> Unit {
-  self.set_pathname.set(current_pathname())
-  self.set_search.set(current_search())
-  self.set_hash.set(current_hash())
+pub fn Location::new(url : RwSignal[Url]) -> Location {
+  Location::{
+    pathname: Memo::new(fn(_) { url.with_val(url => url.path) }),
+    search: Memo::new(fn(_) { url.with_val(url => url.search) }),
+    hash: Memo::new(fn(_) { url.with_val(url => url.hash) }),
+  }
 }
 
 ///|
@@ -164,14 +157,161 @@ pub fn handle_anchor_click(
 }
 
 ///|
+/// Browser URL provider that keeps the current URL synchronized
+/// with the browser history and navigation events.
 pub(all) struct BrowserUrl {
   url : RwSignal[Url]
+  path_stack : Array[Url]
+  is_back : RwSignal[Bool]
 }
 
 ///|
-pub fn new() -> BrowserUrl {
-  let current_url = Url::current()
-  let url = RwSignal::new(current_url)
+pub fn BrowserUrl::current() -> Url {
+  Url::current()
+}
 
-  BrowserUrl::{ url, }
+///|
+/// Creates a new browser URL provider initialized from the
+/// current browser location.
+pub fn BrowserUrl::new() -> BrowserUrl {
+  BrowserUrl::{
+    url: RwSignal::new(Url::current()),
+    path_stack: [],
+    is_back: RwSignal::new(false),
+  }
+}
+
+///|
+/// Completes a navigation operation by updating the browser history,
+/// recording the navigation stack.
+pub fn BrowserUrl::complete_navigation(
+  self : BrowserUrl,
+  change : LocationChange,
+) -> Unit {
+  let add_to_stack = match self.path_stack.last() {
+    Some(p) => p.to_full_path() != change.value
+    None => true
+  }
+
+  if change.replace {
+    history_replace_state(change.value)
+  } else {
+    history_push_state(change.value)
+  }
+
+  let cur_url = BrowserUrl::current()
+  if add_to_stack {
+    self.path_stack.push(cur_url)
+  }
+  self.is_back.set(false)
+
+  if change.scroll {
+    // TODO:
+  }
+}
+
+///|
+/// Parses a URL using a base URL and converts it into a reactive
+/// router URL representation.
+///
+/// Returns an error if the URL cannot be parsed.
+pub fn parse_url_with_base(href : String, base : String) -> Result[Url, String] {
+  if !url_can_parse(href, base) {
+    return Err("invalid url")
+  }
+
+  let search = strip_leading_qmark(url_search_from_base(href, base))
+  Ok(Url::{
+    origin: url_origin_from_base(href, base),
+    path: url_path_from_base(href, base),
+    search,
+    search_params: Params::from_search(search),
+    hash: url_hash_from_base(href, base),
+  })
+}
+
+///|
+/// Initializes browser navigation handling.
+///
+/// This registers:
+/// - click interception for client-side routing
+/// - popstate handling for browser back/forward navigation
+/// - automatic cleanup when the current reactive owner is disposed
+pub fn BrowserUrl::init(self : BrowserUrl, base : String?) -> Unit {
+  let base = match base {
+    Some(v) => v
+    None => ""
+  }
+
+  fn navigate(new_url : Url, change : LocationChange) -> Unit {
+    self.url.set(new_url)
+    self.complete_navigation(change)
+  }
+
+  let click_cb = handle_anchor_click(base, parse_url_with_base, navigate)
+
+  let click_handle = window_event_listener("click", click_cb)
+
+  fn popstate_cb(_) -> Unit {
+    let new_url = BrowserUrl::current()
+    let is_nav_back = self.path_stack.length() == 1 ||
+      (
+        self.path_stack.length() >= 2 &&
+        self.path_stack.get(self.path_stack.length() - 2) == Some(new_url)
+      )
+    if is_nav_back {
+      let _ = self.path_stack.pop()
+    }
+
+    self.is_back.set(is_nav_back)
+    self.url.set(new_url)
+  }
+
+  let popstate_handle = window_event_listener("popstate", popstate_cb)
+
+  @reactive.on_cleanup(() => {
+    prim_call_event_handle(click_handle)
+    prim_call_event_handle(popstate_handle)
+  })
+}
+
+///|
+pub fn BrowserUrl::redirect(self : BrowserUrl, loc : String) -> Unit {
+  let current_orig = current_origin()
+
+  let url = match parse_url_with_base(loc, current_orig) {
+    Ok(u) => u
+    Err(_) => return
+  }
+
+  if url.origin == current_orig {
+    let full_path = url.to_full_path()
+    let change = LocationChange::{
+      value: full_path,
+      replace: true,
+      scroll: true,
+    }
+
+    let _ = request_animation_frame(fn() {
+      self.url.set(url)
+      self.complete_navigation(change)
+    })
+  } else {
+    let absolute_url = url.origin + url.to_full_path()
+    set_window_href(absolute_url)
+  }
+}
+
+///|
+fn strip_leading_qmark(str : String) -> String {
+  if str.has_prefix("?") {
+    str[1:].to_owned()
+  } else {
+    str
+  }
+}
+
+///|
+pub impl TypeName for BrowserUrl with fn get_ty() -> String {
+  "BrowserUrl"
 }

@@ -15,7 +15,7 @@ pub fn[T : TypeName] use_context() -> T? {
 }
 
 ///|
-pub trait TypeName {
+pub(open) trait TypeName {
   fn get_ty() -> String
 }
 

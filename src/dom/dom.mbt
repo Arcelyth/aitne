@@ -1,20 +1,26 @@
 ///|
 /// Mount a `View` into the document body.
-pub fn mount_to_body(app : &View) -> RenderState {
-  let body_node = dom_get_body()
-  let state = app.build()
-  state.mount(body_node, dom_null_node())
-  state
+pub fn mount_to_body(app : () -> &View) -> RenderState {
+  let owner = Owner::new()
+  owner.with_(() => {
+    let body_node = dom_get_body()
+    let state = app().build()
+    state.mount(body_node, dom_null_node())
+    state
+  })
 }
 
 ///|
 /// Mount a `View` into an element by id.
-pub fn mount_to_id(id : String, app : &View) -> RenderState? {
+pub fn mount_to_id(id : String, app : () -> &View) -> RenderState? {
   match dom_get_element_by_id(id) {
     Some(parent) => {
-      let state = app.build()
-      state.mount(parent, dom_null_node())
-      Some(state)
+      let owner = Owner::new()
+      owner.with_(() => {
+        let state = app().build()
+        state.mount(parent, dom_null_node())
+        Some(state)
+      })
     }
     None => None
   }

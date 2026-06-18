@@ -55,6 +55,7 @@ pub enum RenderState {
   Text(TextState)
   Fragment(FragmentState)
   MultiBlock(MultiBlockState)
+  Router(RouterState)
 }
 
 ///|
@@ -113,6 +114,14 @@ pub fn MultiBlockState::set_cleanup(
   { ..self, cleanup: Some(f) }
 }
 
+///|
+pub struct RouterState {
+  start_anchor : Node
+  end_anchor : Node
+  mut path : String
+  mut rendered : RenderState?
+}
+
 // ----- Mountable implementations -----
 
 ///|
@@ -132,6 +141,15 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
       }
       // Remove everything between (and including) the anchors
       clear_between_anchors(s.start_anchor, s.end_anchor)
+      dom_remove(s.start_anchor)
+      dom_remove(s.end_anchor)
+    }
+    Router(s) => {
+      match s.rendered {
+        Some(view) => view.unmount()
+        None => ()
+      }
+
       dom_remove(s.start_anchor)
       dom_remove(s.end_anchor)
     }
@@ -173,6 +191,20 @@ pub impl Mountable for RenderState with fn mount(
       // Run the init callback (initial render for ForNode / Router).
       match s.init {
         Some(f) => f(parent)
+        None => ()
+      }
+    }
+    Router(s) => {
+      if dom_is_null(marker) {
+        dom_append(parent, s.start_anchor)
+        dom_append(parent, s.end_anchor)
+      } else {
+        dom_insert_before(parent, s.start_anchor, marker)
+        dom_insert_before(parent, s.end_anchor, marker)
+      }
+
+      match s.rendered {
+        Some(view) => view.mount(parent, s.end_anchor)
         None => ()
       }
     }
@@ -245,6 +277,17 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[Node] {
           None => break
         }
       }
+      nodes
+    }
+    Router(s) => {
+      let nodes : Array[Node] = [s.start_anchor]
+
+      match s.rendered {
+        Some(view) => nodes.push_iter(view.elements().iter())
+        None => ()
+      }
+
+      nodes.push(s.end_anchor)
       nodes
     }
     None => []

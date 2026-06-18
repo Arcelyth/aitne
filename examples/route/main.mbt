@@ -3,12 +3,12 @@ using @dom {router, routes, route, parent_route}
 pub fn app() -> &View {
   router(
     routes(
-      fn() { not_found_page() },
-      route("/", home_page()).child(
+      () => not_found_page(),
+      route("/", () => home_page()).child(
         parent_route(
           "/users",
-          users_page(),
-          route("/:id", user_detail_page()),
+          () => users_page(),
+          route("/:id", () => user_detail_page()),
         ),
       ),
     ),

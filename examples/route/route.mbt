@@ -121,12 +121,12 @@ pub fn home_page() -> &View {
       div()
       .style("display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;")
       .children([
-        quick_link("/", "Home"),
-        quick_link("/users", "Users"),
-        quick_link("/users/1", "User #1"),
-        quick_link("/users/2", "User #2"),
-        quick_link("/about", "404 Demo"),
-        quick_link("/xyz", "Also 404"),
+        anchor("/", [text("Home")]),
+        anchor("/users", [text("Users")]),
+        anchor("/users/1", [text("User #1")]),
+        anchor("/users/2", [text("User #2")]),
+        anchor("/about", [text("404 Demo")]),
+        anchor("/xyz", [text("Also 404")]),
       ]),
     ]),
   )

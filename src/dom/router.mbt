@@ -67,23 +67,23 @@ pub fn[Ch : View] router(
 }
 
 ///|
-pub fn[V] route(path : String, view : V) -> NestedRoute[V] {
+pub fn[V] route(path : String, view : () -> V) -> NestedRoute[() -> V] {
   NestedRoute::new(path, view)
 }
 
 ///|
 pub fn[V] parent_route(
   path : String,
-  view : V,
-  children : NestedRoute[V],
-) -> NestedRoute[V] {
+  view : () -> V,
+  children : NestedRoute[() -> V],
+) -> NestedRoute[() -> V] {
   NestedRoute::new(path, view).child(children)
 }
 
 ///|
 pub fn[V : View] routes(
   fallback : () -> V,
-  children : NestedRoute[V],
+  children : NestedRoute[() -> V],
 ) -> RouterChildren[&View] {
   () => {
     println("[Debug] routes")
@@ -122,7 +122,7 @@ pub fn[V : View] routes(
 ///|
 pub(all) struct NestedRouteView[V] {
   location : Location
-  routes : NestedRoute[V]
+  routes : NestedRoute[() -> V]
   outer_owner : Owner
   current_url : RwSignal[Url]
   base : String?
@@ -151,8 +151,8 @@ pub impl[V : View] Render for NestedRouteView[V] with fn build(self) -> RenderSt
   let rendered = match match_result {
     None => Some((self.fallback)().build())
     Some((_, matched)) => {
-      let view = deepest_match(matched).view_fn
-
+      let view_fn = deepest_match(matched).view_fn
+      let view = view_fn()
       Some(view.build())
     }
   }
@@ -186,7 +186,10 @@ pub impl[V : View] Render for NestedRouteView[V] with fn rebuild(
 
       let new_view = match match_result {
         None => (self.fallback)()
-        Some((_, matched)) => deepest_match(matched).view_fn
+        Some((_, matched)) => {
+          let view_fn = deepest_match(matched).view_fn
+          view_fn()
+        }
       }
 
       let parent = dom_parent(router.start_anchor)

@@ -217,7 +217,9 @@ pub impl[V : View] RenderHtml for NestedRouteView[V] with fn to_html_with_buf(
 }
 
 ///|
-pub impl[V : View] View for NestedRouteView[V]
+pub impl[V : View] View for NestedRouteView[V] with fn style(self, _s) -> &View {
+  self
+}
 
 ///|
 pub impl TypeName for RouterContext with fn get_ty() -> String {

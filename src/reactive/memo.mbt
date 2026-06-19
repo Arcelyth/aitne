@@ -26,7 +26,7 @@ pub struct Memo[T] {
   compute : (T?) -> T
   /// Returns true when the value changed.
   changed : (T?, T?) -> Bool
-}
+} derive(Debug)
 
 ///|
 /// Source side of the reactive graph.

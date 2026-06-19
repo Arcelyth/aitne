@@ -10,7 +10,7 @@ using @any {type Any}
 ///|
 pub struct Owner {
   id : Int
-}
+} derive(Debug)
 
 ///|
 /// Per-owner runtime state.

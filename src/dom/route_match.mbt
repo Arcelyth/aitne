@@ -17,7 +17,7 @@ pub(all) struct NestedRoute[V] {
   path : String
   child : NestedRoute[V]?
   view : V
-}
+} derive(Debug, Show)
 
 ///|
 pub fn[V] NestedRoute::new(path : String, view : V) -> NestedRoute[V] {
@@ -39,7 +39,7 @@ pub(all) struct NestedMatch[V] {
   params : Array[(String, String)]
   child : NestedMatch[V]?
   view_fn : V
-}
+} derive(Show, Debug)
 
 ///|
 pub fn[V] NestedMatch::build(
@@ -50,6 +50,7 @@ pub fn[V] NestedMatch::build(
   outlets : Ref[Array[RouteContext]],
   outer_owner : Owner,
 ) -> Unit {
+  println("[Debug] nested_match build")
   let params : RwSignal[Params] = RwSignal::new(to_params(self.params))
   let url_sig = RwSignal::new(url)
   let matched = RwSignal::new(self.matched)
@@ -172,6 +173,71 @@ fn join_suffix(segs : Array[String], start : Int) -> String {
     i = i + 1
   }
   out
+}
+
+///|
+pub struct RouteDefs[Ch] {
+  base : String?
+  children : Ch
+}
+
+///|
+pub fn[Ch : MatchNestedRoutes] RouteDefs::match_route(
+  self : RouteDefs[Ch],
+  path : String,
+) -> NestedMatch[&View]? {
+  let path = match self.base {
+    Some(base) => {
+      let (trim_base, trim_path) = if base.has_prefix("/") {
+        (base[0:], path[0:])
+      } else {
+        (base, path)
+      }
+      match trim_path.strip_prefix(trim_base) {
+        Some(p) => p.to_owned()
+        None => return None
+      }
+    }
+    None => path
+  }
+  let (matched, remaining) = self.children.match_nested(path)
+  let matched = match matched {
+    Some(m) => m
+    None => return None
+  }
+
+  if !(remaining == "" || remaining == "/") {
+    None
+  } else {
+    Some(matched.1)
+  }
+}
+
+///|
+pub trait MatchNestedRoutes {
+  fn match_nested(Self, String) -> ((UInt, NestedMatch[&View])?, String)
+}
+
+///|
+pub impl[T : MatchNestedRoutes] MatchNestedRoutes for Array[T] with fn match_nested(
+  self,
+  path : String,
+) -> ((UInt, NestedMatch[&View])?, String) {
+  for i in self {
+    match i.match_nested(path) {
+      (Some((id, m)), remain) => return (Some((id, m)), remain)
+      _ => ()
+    }
+  }
+  (None, path)
+}
+
+///|
+pub impl[V] MatchNestedRoutes for NestedRoute[() -> V] with fn match_nested(
+  _self,
+  path : String,
+) -> ((UInt, NestedMatch[&View])?, String) {
+  (None, path)
 }
 
 ///|

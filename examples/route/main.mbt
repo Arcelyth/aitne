@@ -12,8 +12,7 @@ pub fn app() -> &View {
         ),
       ),
     ),
-    Some(""),
-    None,
+    base=Some(""),
   )
 }
 

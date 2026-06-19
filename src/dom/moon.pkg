@@ -4,4 +4,5 @@ import {
   "moonbitlang/core/hashmap",
   "moonbitlang/core/hashset",
   "moonbitlang/core/ref",
+  "moonbitlang/async",
 }

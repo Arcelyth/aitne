@@ -12,7 +12,7 @@ fn next_trigger_id() -> UInt {
 pub struct Trigger {
   id : UInt
   subs : @hashset.HashSet[ASubscriber]
-}
+} derive(Debug)
 
 ///|
 pub fn Trigger::new() -> Trigger {

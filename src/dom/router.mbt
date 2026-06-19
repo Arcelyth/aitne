@@ -41,8 +41,8 @@ pub struct RouterChildren[Ch](() -> Ch)
 ///|
 pub fn[Ch : View] router(
   children : RouterChildren[Ch],
-  base : String?,
-  set_is_routing : ((Bool) -> Unit)?,
+  base? : String? = None,
+  set_is_routing? : ((Bool) -> Unit)? = None,
 ) -> &View {
   let location = BrowserUrl::new()
 
@@ -67,7 +67,6 @@ pub fn[Ch : View] router(
     set_is_routing,
   })
 
-  println("[Debug] router")
   children()
 }
 
@@ -91,7 +90,6 @@ pub fn[V : View] routes(
   children : NestedRoute[() -> V],
 ) -> RouterChildren[&View] {
   () => {
-    println("[Debug] routes")
     let _loc : BrowserUrl? = use_context()
     let rctx : RouterContext? = use_context()
     let ctx = match rctx {
@@ -112,9 +110,11 @@ pub fn[V : View] routes(
     ctx.current_url.track()
     let _ = outer_owner.with_(() => ctx.current_url.get_untracked())
 
+    let routes = RouteDefs::{ base: ctx.base, children }
+
     NestedRouteView::{
       location: ctx.location,
-      routes: children,
+      routes,
       outer_owner,
       current_url: ctx.current_url,
       base: ctx.base,
@@ -125,9 +125,9 @@ pub fn[V : View] routes(
 }
 
 ///|
-pub(all) struct NestedRouteView[V] {
+pub(all) struct NestedRouteView[V, D] {
   location : Location
-  routes : NestedRoute[() -> V]
+  routes : RouteDefs[D]
   outer_owner : Owner
   current_url : RwSignal[Url]
   base : String?
@@ -146,85 +146,93 @@ fn[V] deepest_match(matched : NestedMatch[V]) -> NestedMatch[V] {
 }
 
 ///|
-pub impl[V : View] Render for NestedRouteView[V] with fn build(self) -> RenderState {
+pub impl[V : View, D : MatchNestedRoutes] Render for NestedRouteView[V, D] with fn build(
+  self,
+) -> RenderState {
   let url = self.current_url.get_untracked()
 
+  println("[Debug] nested_route_view build")
+
   let path = url.path
+  println("current_path: \{path}")
 
-  let (match_result, _) = self.routes.match_nested(path)
+  let outlets = Ref([])
+  let loaders = Ref([])
+  let new_match = self.routes.match_route(url.path)
 
-  let rendered = match match_result {
-    None => Some((self.fallback)().build())
-    Some((_, matched)) => {
-      let view_fn = deepest_match(matched).view_fn
-      let view = view_fn()
-      Some(view.build())
+  let rendered = match new_match {
+    None => (self.fallback)().build()
+    Some(matched) => {
+      matched.build(url, self.base, loaders, outlets, self.outer_owner)
+      top_level_outlet(outlets, self.outer_owner)().build()
     }
   }
 
   RenderState::Router(RouterState::{
-    start_anchor: dom_create_comment("router-start"),
-    end_anchor: dom_create_comment("router-end"),
     path,
-    rendered,
+    current_url: self.current_url,
+    outlets: outlets.val,
+    view: rendered,
+    outer_owner: self.outer_owner,
   })
 }
 
 ///|
-pub impl[V : View] Render for NestedRouteView[V] with fn rebuild(
+pub impl[V : View, D : MatchNestedRoutes] Render for NestedRouteView[V, D] with fn rebuild(
   self,
   state : Ref[RenderState],
 ) -> Unit {
   match state.val {
-    RenderState::Router(router) => {
-      let url = self.current_url.get_untracked()
-
-      let new_path = url.path
-
-      if router.path == new_path {
-        return
-      }
-
-      router.path = new_path
-
-      let (match_result, _) = self.routes.match_nested(new_path)
-
-      let new_view = match match_result {
-        None => (self.fallback)()
-        Some((_, matched)) => {
-          let view_fn = deepest_match(matched).view_fn
-          view_fn()
-        }
-      }
-
-      let parent = dom_parent(router.start_anchor)
-
-      if dom_is_null(parent) {
-        return
-      }
-
-      match router.rendered {
-        Some(old) => old.unmount()
-        None => ()
-      }
-
-      let new_state = new_view.build()
-
-      new_state.mount(parent, router.end_anchor)
-
-      router.rendered = Some(new_state)
-    }
+    RenderState::Router(router) => ()
+    //      let url = self.current_url.get_untracked()
+    //
+    //      let new_path = url.path
+    //
+    //      if router.path == new_path {
+    //        return
+    //      }
+    //
+    //      router.path = new_path
+    //
+    //      let (match_result, _) = self.routes.match_nested(new_path)
+    //
+    //      let new_view = match match_result {
+    //        None => (self.fallback)()
+    //        Some((_, matched)) => {
+    //          let view_fn = deepest_match(matched).view_fn
+    //          view_fn()
+    //        }
+    //      }
+    //
+    //      let parent = dom_parent(router.start_anchor)
+    //
+    //      if dom_is_null(parent) {
+    //        return
+    //      }
+    //
+    //      match router.rendered {
+    //        Some(old) => old.unmount()
+    //        None => ()
+    //      }
+    //
+    //      let new_state = new_view.build()
+    //
+    //      new_state.mount(parent, router.end_anchor)
+    //
+    //      router.rendered = Some(new_state)
     _ => ()
   }
 }
 
 ///|
-pub impl[V : View] RenderHtml for NestedRouteView[V] with fn html_len(_self) -> Int {
+pub impl[V : View, D : MatchNestedRoutes] RenderHtml for NestedRouteView[V, D] with fn html_len(
+  _self,
+) -> Int {
   0
 }
 
 ///|
-pub impl[V : View] RenderHtml for NestedRouteView[V] with fn to_html_with_buf(
+pub impl[V : View, D : MatchNestedRoutes] RenderHtml for NestedRouteView[V, D] with fn to_html_with_buf(
   _self,
   _buf,
   _pos,
@@ -233,7 +241,10 @@ pub impl[V : View] RenderHtml for NestedRouteView[V] with fn to_html_with_buf(
 }
 
 ///|
-pub impl[V : View] View for NestedRouteView[V] with fn style(self, _s) -> &View {
+pub impl[V : View, D : MatchNestedRoutes] View for NestedRouteView[V, D] with fn style(
+  self,
+  _s,
+) -> &View {
   self
 }
 
@@ -253,10 +264,34 @@ pub(all) struct RouteContext {
   owner : Ref[Owner?]
   preload_owner : Owner
   mut child : RouteContext?
-  trigger: Trigger
+  trigger : Trigger
 }
 
 ///|
 pub impl TypeName for RouteContext with fn get_ty() -> String {
   "RouteContext"
+}
+
+///|
+fn top_level_outlet(
+  outlets : Ref[Array[RouteContext]],
+  outer_owner : Owner,
+) -> () -> &View {
+  println("[Debug] top_level_outlet")
+  let outlet = match outlets.val.get(0) {
+    Some(o) => o
+    None => {
+      println("[Error] Found 0 outlets")
+      panic()
+    }
+  }
+
+  outer_owner.with_(() => {
+    provide_context(outlet.child)
+    () => {
+      outlet.trigger.track()
+      let view_fn = outlet.view_fn.val
+      view_fn(outer_owner.child())
+    }
+  })
 }

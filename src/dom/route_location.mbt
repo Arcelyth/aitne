@@ -8,7 +8,7 @@ pub(all) struct Url {
   search : String
   search_params : Params
   hash : String
-} derive(Eq)
+} derive(Debug, Show, Eq)
 
 ///|
 /// Read the current browser URL.
@@ -43,7 +43,7 @@ pub(all) struct Location {
   pathname : Memo[String]
   search : Memo[String]
   hash : Memo[String]
-}
+} derive(Debug)
 
 ///|
 /// Create a reactive Location instance from the current browser URL.

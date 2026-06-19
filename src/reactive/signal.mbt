@@ -531,4 +531,3 @@ pub impl[T : TypeName] TypeName for WriteSignal[T] with fn get_ty() -> String {
 pub impl[T : TypeName] TypeName for ReadSignal[T] with fn get_ty() -> String {
   "ReadSignal_" + T::get_ty()
 }
-

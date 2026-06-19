@@ -38,3 +38,13 @@ pub impl TypeName for Bool with fn get_ty() -> String {
 pub impl TypeName for Unit with fn get_ty() -> String {
   "Unit"
 }
+
+///|
+pub impl[T : TypeName] TypeName for Array[T] with fn get_ty() -> String {
+  "Array_" + T::get_ty()
+}
+
+///|
+pub impl[A : TypeName, B : TypeName] TypeName for (A, B) with fn get_ty() -> String {
+  "Tuple_" + A::get_ty() + "_" + B::get_ty()
+}

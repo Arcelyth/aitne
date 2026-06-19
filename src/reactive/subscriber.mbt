@@ -84,3 +84,56 @@ pub impl Subscriber for ASubscriber with fn clean_sources(
 pub impl Notify for ASubscriber with fn notify(self) -> Unit {
   self.mark_stale()
 }
+
+///|
+pub impl ReactiveNode for @hashset.HashSet[ASubscriber] with fn mark_stale(self) -> Unit {
+  self.each(s => {
+    match s.sub {
+      Some(sub) => sub.mark_stale()
+      None => ()
+    }
+  })
+}
+
+///|
+pub impl ReactiveNode for @hashset.HashSet[ASubscriber] with fn mark_pending(
+  self,
+) -> Unit {
+  self.each(s => {
+    match s.sub {
+      Some(sub) => sub.mark_pending()
+      None => ()
+    }
+  })
+}
+
+///|
+pub impl ReactiveNode for @hashset.HashSet[ASubscriber] with fn mark_all_pending(
+  self,
+) -> Unit {
+  self.each(s => {
+    match s.sub {
+      Some(sub) => sub.mark_all_pending()
+      None => ()
+    }
+  })
+}
+
+///|
+pub impl ReactiveNode for @hashset.HashSet[ASubscriber] with fn update_value(
+  self,
+) -> Bool {
+  let mut updated = false
+  self.each(s => {
+    match s.sub {
+      Some(sub) => if sub.update_value() { updated = true }
+      None => ()
+    }
+  })
+  updated
+}
+
+///|
+pub impl Notify for @hashset.HashSet[ASubscriber] with fn notify(self) -> Unit {
+  self.each(s => s.mark_stale())
+}

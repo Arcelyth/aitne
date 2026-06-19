@@ -516,3 +516,19 @@ pub fn[T] RwSignal::set_untracked(self : RwSignal[T], value : T) -> Unit {
 pub fn[T] create_signal(value : T) -> (ReadSignal[T], WriteSignal[T]) {
   RwSignal::new(value).split()
 }
+
+///|
+pub impl[T : TypeName] TypeName for RwSignal[T] with fn get_ty() -> String {
+  "RwSignal_" + T::get_ty()
+}
+
+///|
+pub impl[T : TypeName] TypeName for WriteSignal[T] with fn get_ty() -> String {
+  "WriteSignal_" + T::get_ty()
+}
+
+///|
+pub impl[T : TypeName] TypeName for ReadSignal[T] with fn get_ty() -> String {
+  "ReadSignal_" + T::get_ty()
+}
+

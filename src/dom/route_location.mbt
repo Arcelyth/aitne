@@ -33,6 +33,11 @@ pub fn Url::to_full_path(self : Url) -> String {
 }
 
 ///|
+pub impl TypeName for Url with fn get_ty() -> String {
+  "Url"
+}
+
+///|
 /// Reactive browser location state.
 pub(all) struct Location {
   pathname : Memo[String]

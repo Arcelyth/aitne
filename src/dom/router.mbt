@@ -9,7 +9,12 @@ pub(all) struct RouterContext {
   set_is_routing : ((Bool) -> Unit)?
 }
 
-pub fn RouterContext::resolve_path(self : RouterContext, path: String, from : String?) -> String {
+///|
+pub fn RouterContext::resolve_path(
+  self : RouterContext,
+  path : String,
+  from : String?,
+) -> String {
   let base = match self.base {
     Some(b) => b
     _ => ""
@@ -235,4 +240,17 @@ pub impl[V : View] View for NestedRouteView[V] with fn style(self, _s) -> &View 
 ///|
 pub impl TypeName for RouterContext with fn get_ty() -> String {
   "RouterContext"
+}
+
+///|
+pub(all) struct RouteContext {
+  id : Int
+  url : RwSignal[Url]
+  params : RwSignal[Params]
+  matched : RwSignal[String]
+  base : String?
+  view_fn : (Owner) -> &View
+  owner : Owner?
+  preload_owner : Owner
+  child : RouteContext?
 }

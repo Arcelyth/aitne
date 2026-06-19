@@ -39,6 +39,42 @@ pub(all) struct NestedMatch[V] {
 }
 
 ///|
+pub fn[V] NestedMatch::build(
+  self : NestedMatch[V],
+  url : Url,
+  base : String?,
+  outer_owner : Owner,
+) -> Unit {
+  let params = RwSignal::new(self.params)
+  let url_sig = RwSignal::new(url)
+  let matched = RwSignal::new(self.matched)
+
+  // TODO: handle outlets 
+  outer_owner.with_(() => {
+    provide_context(params)
+    provide_context(url_sig)
+    provide_context(matched)
+  })
+
+  match self.child {
+    Some(c) => c.build(url, base, outer_owner)
+    _ => ()
+  }
+}
+
+///|
+pub fn[V] NestedMatch::rebuild(
+  self : NestedMatch[V],
+  url : Url,
+  base : String?,
+  level : Int,
+  outer_owner : Owner,
+) -> Int {
+  self.build(url, base, outer_owner)
+  level
+}
+
+///|
 fn split_segments(path : String) -> Array[String] {
   let parts = path.split("/")
   let segs = []

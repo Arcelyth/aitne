@@ -40,6 +40,16 @@ pub impl TypeName for Unit with fn get_ty() -> String {
 }
 
 ///|
+pub impl TypeName for Char with fn get_ty() -> String {
+  "Char"
+}
+
+///|
+pub impl[T : TypeName] TypeName for T? with fn get_ty() -> String {
+  "Option_" + T::get_ty()
+}
+
+///|
 pub impl[T : TypeName] TypeName for Array[T] with fn get_ty() -> String {
   "Array_" + T::get_ty()
 }

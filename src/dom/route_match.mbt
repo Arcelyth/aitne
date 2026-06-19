@@ -1,4 +1,7 @@
 ///|
+using @reactive {type Trigger}
+
+///|
 let route_id : Ref[UInt] = @ref.new(0U)
 
 ///|
@@ -43,21 +46,79 @@ pub fn[V] NestedMatch::build(
   self : NestedMatch[V],
   url : Url,
   base : String?,
+  loaders : Ref[Array[() -> Trigger]],
+  outlets : Ref[Array[RouteContext]],
   outer_owner : Owner,
 ) -> Unit {
-  let params = RwSignal::new(self.params)
+  let params : RwSignal[Params] = RwSignal::new(to_params(self.params))
   let url_sig = RwSignal::new(url)
   let matched = RwSignal::new(self.matched)
 
   // TODO: handle outlets 
-  outer_owner.with_(() => {
-    provide_context(params)
-    provide_context(url_sig)
-    provide_context(matched)
+  let (parent_params, parent_matches) = outlets.val
+    .map(r => (r.params, r.matched))
+    .unzip()
+
+  let params_with_parents = Memo::new(_ => {
+    parent_params
+    .iter()
+    .flat_map(fn(p) { p.get().iter() })
+    .concat(params.get().iter())
+    .collect()
+  })
+  let matched_with_parents = Memo::new(_ => {
+    parent_matches
+    .iter()
+    .flat_map(fn(m) { m.get().iter() })
+    .concat(matched.get().iter())
+    .collect()
   })
 
+  let trigger = Trigger::new()
+
+  let outlet = RouteContext::{
+    id: self.id,
+    url: url_sig,
+    trigger,
+    params,
+    matched,
+    view_fn: Ref(_ => ()),
+    base,
+    child: None,
+    owner: Ref(None),
+    preload_owner: outer_owner.child(),
+  }
+
+  if outlets.val.length() > 0 {
+    outlets.val[outlets.val.length() - 1].child = Some(outlet)
+  }
+  outlets.val += [outlet]
+
+  loaders.val += [
+    {
+      provide_context(params_with_parents)
+      provide_context(url_sig)
+      provide_context(matched_with_parents)
+      outlet.preload_owner.with_(() => {
+        provide_context(params_with_parents)
+        provide_context(url_sig)
+        provide_context(matched_with_parents)
+      })
+      outlet.view_fn.val = used_owner => {
+        outlet.owner.val = Some(used_owner)
+        used_owner.with_(() => {
+          provide_context(outlet.child)
+          provide_context(params_with_parents)
+          provide_context(url_sig)
+          provide_context(matched_with_parents)
+        })
+      }
+      () => trigger
+    },
+  ]
+
   match self.child {
-    Some(c) => c.build(url, base, outer_owner)
+    Some(c) => c.build(url, base, loaders, outlets, outer_owner)
     _ => ()
   }
 }
@@ -70,7 +131,6 @@ pub fn[V] NestedMatch::rebuild(
   level : Int,
   outer_owner : Owner,
 ) -> Int {
-  self.build(url, base, outer_owner)
   level
 }
 

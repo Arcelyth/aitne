@@ -112,3 +112,40 @@ pub fn Params::from_search(search : String) -> Params {
 
   params
 }
+
+///|
+pub fn Params::iter(self : Params) -> Iter[(String, String)] {
+  self.0
+  .iter()
+  .flat_map(fn(pair) {
+    let (k, vs) = pair
+    vs.iter().map(fn(v) { (k, v) })
+  })
+}
+
+///|
+pub fn to_params(tp : Array[(String, String)]) -> Params {
+  let res : Array[(String, Array[String])] = []
+  
+  for pair in tp {
+    let (k, v) = pair
+    let mut found_idx = -1
+    
+    let mut i = 0
+    while i < res.length() {
+      if res[i].0 == k {
+        found_idx = i
+        break
+      }
+      i += 1
+    }
+    
+    if found_idx != -1 {
+      res[found_idx].1.push(v)
+    } else {
+      res.push((k, [v]))
+    }
+  }
+  
+  Params(res)
+}

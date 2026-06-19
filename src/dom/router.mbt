@@ -244,13 +244,19 @@ pub impl TypeName for RouterContext with fn get_ty() -> String {
 
 ///|
 pub(all) struct RouteContext {
-  id : Int
+  id : UInt
   url : RwSignal[Url]
   params : RwSignal[Params]
   matched : RwSignal[String]
   base : String?
-  view_fn : (Owner) -> &View
-  owner : Owner?
+  view_fn : Ref[(Owner) -> &View]
+  owner : Ref[Owner?]
   preload_owner : Owner
-  child : RouteContext?
+  mut child : RouteContext?
+  trigger: Trigger
+}
+
+///|
+pub impl TypeName for RouteContext with fn get_ty() -> String {
+  "RouteContext"
 }

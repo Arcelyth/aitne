@@ -6,9 +6,9 @@ A lightweight and high-performance web framework with fine-grained reactivity. I
 
 Todo list: 
 ```moonbit
-using @dom { type Html, div, h1, button, text, input, ul, li, event_target_value }
+using @dom { trait View, div, h1, button, text, input, ul, li, event_target_value, for_node, text_dyn}
 
-fn todo_app() -> Html {
+fn todo_app() -> &View {
   let (input_val, set_input_val) = @reactive.create_signal("")
   let (todo, set_todo) = @reactive.create_signal(["Example."])
 
@@ -27,11 +27,15 @@ fn todo_app() -> Html {
 
   div().children([
     h1().children([text("Todo List")]),
-    
+    div().children([
+      text_dyn(fn() {
+        todo.get().length().to_string()
+      })
+    ]),
     div().children([
       input()
         .attr("type", "text")
-        .value(() => { input_val.get() })
+        .value(input_val)
         .on(Input, (ev) => {
           set_input_val.set(event_target_value(ev))
         }),
@@ -41,7 +45,7 @@ fn todo_app() -> Html {
     ]),
 
     ul().children([
-      Html::For(
+      for_node(
         () => { todo.get() },
         (item) => { return item }, 
         (item) => {

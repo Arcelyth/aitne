@@ -10,7 +10,7 @@ using @any {type Any}
 ///|
 pub struct Owner {
   id : Int
-}
+} derive(Debug)
 
 ///|
 /// Per-owner runtime state.
@@ -151,6 +151,7 @@ pub fn Owner::unset(self : Owner) -> Unit {
 /// Runs `fun` under this owner, then restores the previous owner.
 pub fn[T] Owner::with_(self : Owner, fun : () -> T) -> T {
   let prev = current_owner.val
+  println("[Debug] with_: current owner's id: \{self.id} ")
   current_owner.val = Some(self.id)
 
   let result = fun()

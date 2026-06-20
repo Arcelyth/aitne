@@ -1,4 +1,7 @@
 ///|
+using @reactive {type Trigger}
+
+///|
 let route_id : Ref[UInt] = @ref.new(0U)
 
 ///|
@@ -9,33 +12,256 @@ fn next_route_id() -> UInt {
 }
 
 ///|
-pub(all) struct NestedRoute[V] {
+pub(all) struct NestedRoute {
   id : UInt
   path : String
-  child : NestedRoute[V]?
-  view : V
+  child : NestedRoute?
+  view : ViewFn
 }
 
 ///|
-pub fn[V] NestedRoute::new(path : String, view : V) -> NestedRoute[V] {
+pub impl Debug for NestedRoute with fn to_repr(self) -> Repr {
+  @debug.Repr::tuple([
+    @debug.Repr::string("id"),
+    to_repr(self.id),
+    @debug.Repr::string("path"),
+    to_repr(self.path),
+  ])
+}
+
+///|
+pub fn NestedRoute::new(path : String, view : ViewFn) -> NestedRoute {
   NestedRoute::{ id: next_route_id(), path, child: None, view }
 }
 
 ///|
-pub fn[V] NestedRoute::child(
-  self : NestedRoute[V],
-  child : NestedRoute[V],
-) -> NestedRoute[V] {
+pub fn NestedRoute::child(
+  self : NestedRoute,
+  child : NestedRoute,
+) -> NestedRoute {
   { ..self, child: Some(child) }
 }
 
 ///|
-pub(all) struct NestedMatch[V] {
+pub(all) struct NestedMatch {
   id : UInt
   matched : String
   params : Array[(String, String)]
-  child : NestedMatch[V]?
-  view_fn : V
+  child : NestedMatch?
+  view_fn : ViewFn
+}
+
+///|
+pub impl Debug for NestedMatch with fn to_repr(self) -> Repr {
+  @debug.Repr::tuple([
+    @debug.Repr::string("id"),
+    to_repr(self.id),
+    @debug.Repr::string("matched"),
+    to_repr(self.matched),
+    @debug.Repr::string("params"),
+    to_repr(self.params),
+  ])
+}
+
+///|
+pub fn NestedMatch::build(
+  self : NestedMatch,
+  url : Url,
+  base : String?,
+  loaders : Ref[Array[() -> Trigger]],
+  outlets : Ref[Array[RouteContext]],
+  outer_owner : Ref[Owner],
+) -> Unit {
+  println("[Debug] nested_match build")
+  let params : RwSignal[Params] = RwSignal::new(to_params(self.params))
+  let url_sig = RwSignal::new(url)
+  let matched = RwSignal::new(self.matched)
+
+  let (parent_params, parent_matches) = outlets.val
+    .map(r => (r.params, r.matched))
+    .unzip()
+
+  let params_with_parents = Memo::new(_ => {
+    parent_params
+    .iter()
+    .flat_map(fn(p) { p.get().iter() })
+    .concat(params.get().iter())
+    .collect()
+  })
+  let matched_with_parents = Memo::new(_ => {
+    parent_matches
+    .iter()
+    .flat_map(fn(m) { m.get().iter() })
+    .concat(matched.get().iter())
+    .collect()
+  })
+
+  let trigger = Trigger::new()
+
+  let outlet = RouteContext::{
+    id: self.id,
+    url: url_sig,
+    trigger,
+    params,
+    matched,
+    view_fn: Ref(_ => ()),
+    base,
+    child: None,
+    owner: Ref(None),
+    preload_owner: outer_owner.val.child(),
+  }
+
+  if outlets.val.length() > 0 {
+    outlets.val[outlets.val.length() - 1].child = Some(outlet)
+  }
+  outlets.val += [outlet]
+
+  loaders.val += [
+    {
+      provide_context(params_with_parents)
+      provide_context(url_sig)
+      provide_context(matched_with_parents)
+      outlet.preload_owner.with_(() => {
+        provide_context(params_with_parents)
+        provide_context(url_sig)
+        provide_context(matched_with_parents)
+      })
+      outlet.view_fn.val = used_owner => {
+        outlet.owner.val = Some(used_owner)
+        used_owner.with_(() => {
+          provide_context(outlet.child)
+          provide_context(params_with_parents)
+          provide_context(url_sig)
+          provide_context(matched_with_parents)
+          (self.view_fn)()
+        })
+      }
+      () => trigger
+    },
+  ]
+
+  match self.child {
+    Some(c) => c.build(url, base, loaders, outlets, outer_owner)
+    _ => ()
+  }
+}
+
+///|
+pub fn NestedMatch::rebuild(
+  self : NestedMatch,
+  url : Url,
+  base : String?,
+  level : Int,
+  outlets : Ref[Array[RouteContext]],
+  outer_owner : Ref[Owner],
+) -> Int {
+  // Collect parent params/matched signals from outlets above this level.
+  // These are used to build `*_with_parents` memos when the route ID changes.
+  let (parent_params, parent_matches) = {
+    let pp : Array[RwSignal[Params]] = []
+    let pm : Array[RwSignal[String]] = []
+    let mut i = 0
+    while i < level {
+      match outlets.val.get(i) {
+        Some(o) => {
+          pp.push(o.params)
+          pm.push(o.matched)
+        }
+        None => ()
+      }
+      i = i + 1
+    }
+    (pp, pm)
+  }
+
+  // Link the child pointer from the parent outlet to this level's outlet
+  if outlets.val.length() > level && level > 0 {
+    match (outlets.val.get(level - 1), outlets.val.get(level)) {
+      (Some(p), Some(c)) => p.child = Some(c)
+      _ => ()
+    }
+  }
+
+  match outlets.val.get(level) {
+    None => {
+      // No existing outlet at this depth the build from scratch
+      self.build(url, base, Ref([]), outlets, outer_owner)
+      level
+    }
+    Some(current) => {
+      let id = self.id
+
+      if id != current.id {
+        current.id = id
+        let new_params = to_params(self.params)
+        let new_match = self.matched
+        current.url.set(url)
+        current.params.set(new_params)
+        current.matched.set(new_match)
+        current.preload_owner = outer_owner.val.child()
+
+        // Build parent-including params/matched memos
+        let params_with_parents = Memo::new(_ => {
+          parent_params
+          .iter()
+          .flat_map(fn(p) { p.get().iter() })
+          .concat(current.params.get().iter())
+          .collect()
+        })
+        let matched_with_parents = Memo::new(_ => {
+          parent_matches
+          .iter()
+          .flat_map(fn(m) { m.get().iter() })
+          .concat(current.matched.get().iter())
+          .collect()
+        })
+
+        let (view_fn, child) = (self.view_fn, self.child)
+
+        // Replace the view_fn on the existing outlet.
+        current.view_fn.val = used_owner => {
+          current.owner.val = Some(used_owner)
+          used_owner.with_(() => {
+            provide_context(current.child)
+            provide_context(params_with_parents)
+            provide_context(current.url)
+            provide_context(matched_with_parents)
+            view_fn()
+          })
+        }
+
+        current.trigger.notify()
+
+        while outlets.val.length() > level + 1 {
+          let _ = outlets.val.pop()
+        }
+
+        match child {
+          Some(c) => c.build(url, base, Ref([]), outlets, outer_owner)
+          None =>
+            if outlets.val.length() > level {
+              outlets.val[level].child = None
+            }
+        }
+
+        level
+      } else {
+        current.matched.set(self.matched)
+        current.params.set(to_params(self.params))
+        current.url.set(url)
+
+        match self.child {
+          Some(c) => c.rebuild(url, base, level + 1, outlets, outer_owner)
+          None => {
+            if outlets.val.length() > level {
+              outlets.val[level].child = None
+            }
+            level
+          }
+        }
+      }
+    }
+  }
 }
 
 ///|
@@ -79,10 +305,82 @@ fn join_suffix(segs : Array[String], start : Int) -> String {
 }
 
 ///|
-pub fn[V] NestedRoute::match_nested(
-  self : NestedRoute[V],
+pub struct RouteDefs[Ch] {
+  base : String?
+  children : Ch
+}
+
+///|
+pub impl[Ch] Debug for RouteDefs[Ch] with fn to_repr(self) -> Repr {
+  @debug.Repr::tuple([@debug.Repr::string("base"), to_repr(self.base)])
+}
+
+///|
+pub fn[Ch : MatchNestedRoutes] RouteDefs::match_route(
+  self : RouteDefs[Ch],
   path : String,
-) -> ((UInt, NestedMatch[V])?, String) {
+) -> NestedMatch? {
+  println("[Debug] defs match_route:\{path}")
+  let path = match self.base {
+    Some(base) => {
+      let (trim_base, trim_path) = if base.has_prefix("/") {
+        (base[1:], path[1:])
+      } else {
+        (base, path)
+      }
+      match trim_path.strip_prefix(trim_base) {
+        Some(p) => p.to_owned()
+        None => return None
+      }
+    }
+    None => path
+  }
+  let (matched, remaining) = self.children.match_nested(path)
+  debug(matched)
+  let matched = match matched {
+    Some(m) => m
+    None => return None
+  }
+
+  if !(remaining == "" || remaining == "/") {
+    None
+  } else {
+    Some(matched.1)
+  }
+}
+
+///|
+pub trait MatchNestedRoutes {
+  fn match_nested(Self, String) -> ((UInt, NestedMatch)?, String)
+}
+
+///|
+pub impl[T : MatchNestedRoutes] MatchNestedRoutes for Array[T] with fn match_nested(
+  self,
+  path : String,
+) -> ((UInt, NestedMatch)?, String) {
+  for i in self {
+    match i.match_nested(path) {
+      (Some((id, m)), remain) => return (Some((id, m)), remain)
+      _ => ()
+    }
+  }
+  (None, path)
+}
+
+///|
+pub impl MatchNestedRoutes for NestedRoute with fn match_nested(
+  self,
+  path : String,
+) -> ((UInt, NestedMatch)?, String) {
+  self.match_nested(path)
+}
+
+///|
+pub fn NestedRoute::match_nested(
+  self : NestedRoute,
+  path : String,
+) -> ((UInt, NestedMatch)?, String) {
   let route_segs = split_segments(self.path)
   let path_segs = split_segments(path)
 
@@ -178,7 +476,7 @@ pub fn has_scheme(path : String) -> Bool {
     match path.find("://") {
       None => false
       Some(idx) => {
-        let prefix = path[0:idx]
+        let prefix = path[:idx]
         if prefix.length() == 0 {
           return false
         }
@@ -298,7 +596,7 @@ pub fn normalize_path(path : String) -> String {
     (None, None) => path.length()
   }
 
-  let pathname = path[0:end_idx].to_owned()
+  let pathname = path[:end_idx].to_owned()
 
   let segments = []
 

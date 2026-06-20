@@ -28,4 +28,16 @@ pub impl View for DynTextNode with fn style(self, _i) -> &View {
 
 ///|
 /// ForNode (dynamic list) implements View.
-pub impl[T, K : Hash + Eq] View for ForNode[T, K] with style(self, _s) -> &View {self}
+pub impl[T, K : Hash + Eq] View for ForNode[T, K] with fn style(self, _s) -> &View {
+  self
+}
+
+///|
+pub impl View for Unit with fn style(_self, _i) -> &View {
+  ()
+}
+
+/// String -> View
+pub impl View for String with fn style(self, _s : &IntoStyle) -> &View {
+  text(self)
+}

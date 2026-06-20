@@ -116,10 +116,11 @@ pub fn MultiBlockState::set_cleanup(
 
 ///|
 pub struct RouterState {
-  start_anchor : Node
-  end_anchor : Node
-  mut path : String
-  mut rendered : RenderState?
+  path : Ref[String]
+  current_url : RwSignal[Url]
+  outlets : Ref[Array[RouteContext]]
+  view : Ref[RenderState]
+  outer_owner : Ref[Owner]
 }
 
 // ----- Mountable implementations -----
@@ -145,13 +146,8 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
       dom_remove(s.end_anchor)
     }
     Router(s) => {
-      match s.rendered {
-        Some(view) => view.unmount()
-        None => ()
-      }
-
-      dom_remove(s.start_anchor)
-      dom_remove(s.end_anchor)
+      println("[Debug] router unmount")
+      s.view.val.unmount()
     }
     None => ()
   }
@@ -195,18 +191,8 @@ pub impl Mountable for RenderState with fn mount(
       }
     }
     Router(s) => {
-      if dom_is_null(marker) {
-        dom_append(parent, s.start_anchor)
-        dom_append(parent, s.end_anchor)
-      } else {
-        dom_insert_before(parent, s.start_anchor, marker)
-        dom_insert_before(parent, s.end_anchor, marker)
-      }
-
-      match s.rendered {
-        Some(view) => view.mount(parent, s.end_anchor)
-        None => ()
-      }
+      println("[Debug] router mount")
+      s.view.val.mount(parent, marker)
     }
     None => ()
   }
@@ -245,6 +231,7 @@ pub impl Mountable for RenderState with fn insert_before(
         true
       }
     }
+    Router(s) => s.view.val.insert_before(child)
     _ => false
   }
 }
@@ -280,15 +267,8 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[Node] {
       nodes
     }
     Router(s) => {
-      let nodes : Array[Node] = [s.start_anchor]
-
-      match s.rendered {
-        Some(view) => nodes.push_iter(view.elements().iter())
-        None => ()
-      }
-
-      nodes.push(s.end_anchor)
-      nodes
+      println("[Debug] router elements")
+      s.view.val.elements()
     }
     None => []
   }

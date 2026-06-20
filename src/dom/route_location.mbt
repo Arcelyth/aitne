@@ -8,7 +8,7 @@ pub(all) struct Url {
   search : String
   search_params : Params
   hash : String
-} derive(Eq)
+} derive(Debug, Eq)
 
 ///|
 /// Read the current browser URL.
@@ -33,12 +33,17 @@ pub fn Url::to_full_path(self : Url) -> String {
 }
 
 ///|
+pub impl TypeName for Url with fn get_ty() -> String {
+  "Url"
+}
+
+///|
 /// Reactive browser location state.
 pub(all) struct Location {
   pathname : Memo[String]
   search : Memo[String]
   hash : Memo[String]
-}
+} derive(Debug)
 
 ///|
 /// Create a reactive Location instance from the current browser URL.

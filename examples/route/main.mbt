@@ -16,6 +16,7 @@ pub fn app() -> &View {
   )
 }
 
+
 fn main {
   let _ = @dom.mount_to_body(() => app())
 }

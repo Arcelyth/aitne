@@ -5,4 +5,5 @@ import {
   "moonbitlang/core/hashset",
   "moonbitlang/core/ref",
   "moonbitlang/async",
+  "moonbitlang/core/debug",
 }

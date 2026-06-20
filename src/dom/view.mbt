@@ -36,3 +36,8 @@ pub impl[T, K : Hash + Eq] View for ForNode[T, K] with fn style(self, _s) -> &Vi
 pub impl View for Unit with fn style(_self, _i) -> &View {
   ()
 }
+
+/// String -> View
+pub impl View for String with fn style(self, _s : &IntoStyle) -> &View {
+  text(self)
+}

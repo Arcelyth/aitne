@@ -36,11 +36,11 @@ pub fn use_router_context() -> RouterContext? {
 }
 
 ///|
-pub struct RouterChildren[Ch](() -> Ch)
+pub struct RouterChildren(ViewFn)
 
 ///|
-pub fn[Ch : View] router(
-  children : RouterChildren[Ch],
+pub fn router(
+  children : RouterChildren,
   base? : String? = None,
   set_is_routing? : ((Bool) -> Unit)? = None,
 ) -> &View {
@@ -71,25 +71,27 @@ pub fn[Ch : View] router(
 }
 
 ///|
-pub fn[V] route(path : String, view : () -> V) -> NestedRoute[() -> V] {
+pub fn route(path : String, view : ViewFn) -> NestedRoute {
   NestedRoute::new(path, view)
 }
 
+type ViewFn = () -> &View
+
 ///|
-pub fn[V] parent_route(
+pub fn parent_route(
   path : String,
-  view : () -> V,
-  children : NestedRoute[() -> V],
-) -> NestedRoute[() -> V] {
+  view : () -> &View,
+  children : NestedRoute,
+) -> NestedRoute {
   NestedRoute::new(path, view).child(children)
 }
 
 ///|
-pub fn[V : View] routes(
-  fallback : () -> V,
-  children : NestedRoute[() -> V],
-) -> RouterChildren[&View] {
-  () => {
+pub fn routes(
+  fallback : ViewFn,
+  children : NestedRoute,
+) -> RouterChildren {
+  RouterChildren(() => {
     let _loc : BrowserUrl? = use_context()
     let rctx : RouterContext? = use_context()
     let ctx = match rctx {
@@ -111,7 +113,7 @@ pub fn[V : View] routes(
     let _ = outer_owner.with_(() => ctx.current_url.get_untracked())
 
     let routes = RouteDefs::{ base: ctx.base, children }
-
+    debug(routes)
     NestedRouteView::{
       location: ctx.location,
       routes,
@@ -121,24 +123,37 @@ pub fn[V : View] routes(
       fallback,
       set_is_routing: ctx.set_is_routing,
     }
-  }
+  })
 }
 
 ///|
-pub(all) struct NestedRouteView[V, D] {
+pub(all) struct NestedRouteView[D] {
   location : Location
   routes : RouteDefs[D]
   outer_owner : Owner
   current_url : RwSignal[Url]
   base : String?
-  fallback : () -> V
+  fallback : ViewFn
   set_is_routing : ((Bool) -> Unit)?
 }
 
 ///|
+pub impl[D] Debug for NestedRouteView[D] with fn to_repr(self) -> Repr {
+  @debug.Repr::tuple([
+    @debug.Repr::string("location"),
+    to_repr(self.location),
+    @debug.Repr::string("outer_owner"),
+    to_repr(self.outer_owner),
+    @debug.Repr::string("base"),
+    to_repr(self.base),
+  ])
+}
+
+
+///|
 /// Walk the match chain to find the deepest (most specific) matching route.
 /// The deepest match corresponds to the most specific route view.
-fn[V] deepest_match(matched : NestedMatch[V]) -> NestedMatch[V] {
+fn deepest_match(matched : NestedMatch) -> NestedMatch {
   match matched.child {
     Some(child) => deepest_match(child)
     None => matched
@@ -146,7 +161,7 @@ fn[V] deepest_match(matched : NestedMatch[V]) -> NestedMatch[V] {
 }
 
 ///|
-pub impl[V : View, D : MatchNestedRoutes] Render for NestedRouteView[V, D] with fn build(
+pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn build(
   self,
 ) -> RenderState {
   let url = self.current_url.get_untracked()
@@ -154,15 +169,18 @@ pub impl[V : View, D : MatchNestedRoutes] Render for NestedRouteView[V, D] with 
   println("[Debug] nested_route_view build")
 
   let path = url.path
-  println("current_path: \{path}")
+  debug(self)
 
   let outlets = Ref([])
   let loaders = Ref([])
   let new_match = self.routes.match_route(url.path)
-
+  
+  debug(new_match)
   let rendered = match new_match {
     None => (self.fallback)().build()
     Some(matched) => {
+
+      println("[Debug] new_match build")
       matched.build(url, self.base, loaders, outlets, self.outer_owner)
       top_level_outlet(outlets, self.outer_owner)().build()
     }
@@ -178,7 +196,7 @@ pub impl[V : View, D : MatchNestedRoutes] Render for NestedRouteView[V, D] with 
 }
 
 ///|
-pub impl[V : View, D : MatchNestedRoutes] Render for NestedRouteView[V, D] with fn rebuild(
+pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn rebuild(
   self,
   state : Ref[RenderState],
 ) -> Unit {
@@ -225,14 +243,14 @@ pub impl[V : View, D : MatchNestedRoutes] Render for NestedRouteView[V, D] with 
 }
 
 ///|
-pub impl[V : View, D : MatchNestedRoutes] RenderHtml for NestedRouteView[V, D] with fn html_len(
+pub impl[D : MatchNestedRoutes] RenderHtml for NestedRouteView[D] with fn html_len(
   _self,
 ) -> Int {
   0
 }
 
 ///|
-pub impl[V : View, D : MatchNestedRoutes] RenderHtml for NestedRouteView[V, D] with fn to_html_with_buf(
+pub impl[D : MatchNestedRoutes] RenderHtml for NestedRouteView[D] with fn to_html_with_buf(
   _self,
   _buf,
   _pos,
@@ -241,7 +259,7 @@ pub impl[V : View, D : MatchNestedRoutes] RenderHtml for NestedRouteView[V, D] w
 }
 
 ///|
-pub impl[V : View, D : MatchNestedRoutes] View for NestedRouteView[V, D] with fn style(
+pub impl[D : MatchNestedRoutes] View for NestedRouteView[D] with fn style(
   self,
   _s,
 ) -> &View {
@@ -255,14 +273,14 @@ pub impl TypeName for RouterContext with fn get_ty() -> String {
 
 ///|
 pub(all) struct RouteContext {
-  id : UInt
+  mut id : UInt
   url : RwSignal[Url]
   params : RwSignal[Params]
   matched : RwSignal[String]
   base : String?
   view_fn : Ref[(Owner) -> &View]
   owner : Ref[Owner?]
-  preload_owner : Owner
+  mut preload_owner : Owner
   mut child : RouteContext?
   trigger : Trigger
 }

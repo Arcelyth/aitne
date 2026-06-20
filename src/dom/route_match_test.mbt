@@ -1,7 +1,7 @@
 ///|
 test "match /users/123" {
-  let route = NestedRoute::new("/users", "users").child(
-    NestedRoute::new("/:id", "profile"),
+  let route = NestedRoute::new("/users", () => "users").child(
+    NestedRoute::new("/:id", () => "profile"),
   )
   let (res, remain) = route.match_nested("/users/123")
 
@@ -30,7 +30,7 @@ test "match /users/123" {
 
 ///|
 test "match static route" {
-  let route = NestedRoute::new("/about", "about")
+  let route = NestedRoute::new("/about", () => "about")
 
   let (res, remain) = route.match_nested("/about")
 
@@ -47,7 +47,7 @@ test "match static route" {
 
 ///|
 test "not match" {
-  let route = NestedRoute::new("/users", "users")
+  let route = NestedRoute::new("/users", () => "users")
 
   let (res, remain) = route.match_nested("/posts")
 
@@ -61,9 +61,9 @@ test "not match" {
 
 ///|
 test "nested route" {
-  let route = NestedRoute::new("/users", "users").child(
-    NestedRoute::new("/:id", "profile").child(
-      NestedRoute::new("/messages", "messages"),
+  let route = NestedRoute::new("/users", () => "users").child(
+    NestedRoute::new("/:id", () => "profile").child(
+      NestedRoute::new("/messages", () => "messages"),
     ),
   )
 
@@ -93,7 +93,7 @@ test "nested route" {
 
 ///|
 test "params" {
-  let route = NestedRoute::new("/users/:id/posts/:post", "page")
+  let route = NestedRoute::new("/users/:id/posts/:post", () => "page")
 
   let (res, _) = route.match_nested("/users/123/posts/456")
 

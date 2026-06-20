@@ -145,7 +145,10 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
       dom_remove(s.start_anchor)
       dom_remove(s.end_anchor)
     }
-    Router(s) => s.view.unmount()
+    Router(s) => {
+      println("[Debug] router unmount")
+      s.view.unmount()
+    }
     None => ()
   }
 }
@@ -188,6 +191,7 @@ pub impl Mountable for RenderState with fn mount(
       }
     }
     Router(s) => {
+      println("[Debug] router mount")
       s.view.mount(parent, marker)
     }
     None => ()
@@ -265,6 +269,7 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[Node] {
       nodes
     }
     Router(s) => {
+      println("[Debug] router elements")
       s.view.elements()
     }
     None => []

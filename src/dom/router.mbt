@@ -75,6 +75,7 @@ pub fn route(path : String, view : ViewFn) -> NestedRoute {
   NestedRoute::new(path, view)
 }
 
+///|
 type ViewFn = () -> &View
 
 ///|
@@ -87,10 +88,7 @@ pub fn parent_route(
 }
 
 ///|
-pub fn routes(
-  fallback : ViewFn,
-  children : NestedRoute,
-) -> RouterChildren {
+pub fn routes(fallback : ViewFn, children : Array[NestedRoute]) -> RouterChildren {
   RouterChildren(() => {
     let _loc : BrowserUrl? = use_context()
     let rctx : RouterContext? = use_context()
@@ -117,7 +115,7 @@ pub fn routes(
     NestedRouteView::{
       location: ctx.location,
       routes,
-      outer_owner,
+      outer_owner: Ref(outer_owner),
       current_url: ctx.current_url,
       base: ctx.base,
       fallback,
@@ -130,7 +128,7 @@ pub fn routes(
 pub(all) struct NestedRouteView[D] {
   location : Location
   routes : RouteDefs[D]
-  outer_owner : Owner
+  outer_owner : Ref[Owner]
   current_url : RwSignal[Url]
   base : String?
   fallback : ViewFn
@@ -149,50 +147,103 @@ pub impl[D] Debug for NestedRouteView[D] with fn to_repr(self) -> Repr {
   ])
 }
 
-
-///|
-/// Walk the match chain to find the deepest (most specific) matching route.
-/// The deepest match corresponds to the most specific route view.
-fn deepest_match(matched : NestedMatch) -> NestedMatch {
-  match matched.child {
-    Some(child) => deepest_match(child)
-    None => matched
-  }
-}
-
 ///|
 pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn build(
   self,
 ) -> RenderState {
-  let url = self.current_url.get_untracked()
+  let current_url = self.current_url
+  let routes = self.routes
+  let base = self.base
+  let fallback = self.fallback
+  let outer_owner = self.outer_owner
 
-  println("[Debug] nested_route_view build")
-
+  let url = current_url.get_untracked()
   let path = url.path
-  debug(self)
 
   let outlets = Ref([])
   let loaders = Ref([])
-  let new_match = self.routes.match_route(url.path)
-  
-  debug(new_match)
-  let rendered = match new_match {
-    None => (self.fallback)().build()
-    Some(matched) => {
+  let new_match = routes.match_route(path)
 
-      println("[Debug] new_match build")
-      matched.build(url, self.base, loaders, outlets, self.outer_owner)
-      top_level_outlet(outlets, self.outer_owner)().build()
+  let rendered = match new_match {
+    None => fallback().build()
+    Some(matched) => {
+      matched.build(url, base, loaders, outlets, outer_owner)
+      top_level_outlet(outlets, outer_owner.val)().build()
     }
   }
 
-  RenderState::Router(RouterState::{
-    path,
-    current_url: self.current_url,
-    outlets: outlets.val,
-    view: rendered,
-    outer_owner: self.outer_owner,
+  let state_ref : Ref[RenderState] = Ref(
+    RenderState::Router(RouterState::{
+      path: Ref(path),
+      current_url,
+      outlets,
+      view: Ref(rendered),
+      outer_owner,
+    }),
+  )
+
+  @reactive.create_effect(fn() {
+    current_url.track()
+    let url = current_url.get_untracked()
+    let new_path = url.path
+
+    match state_ref.val {
+      RenderState::Router(router) => {
+        if router.path.val == new_path {
+          for outlet in router.outlets.val {
+            outlet.url.set(url)
+          }
+          return
+        }
+
+        // Path changed
+        router.path.val = new_path
+
+        let dom_pos : (Node, Node?)? = match router.view.val.elements().get(0) {
+          Some(first_el) => {
+            let parent = dom_parent(first_el)
+            if dom_is_null(parent) {
+              Option::None
+            } else {
+              Some((parent, dom_next_sibling(first_el)))
+            }
+          }
+          None => Option::None
+        }
+
+        let new_match = routes.match_route(new_path)
+
+        let new_view = match new_match {
+          None => fallback().build()
+          Some(matched) => {
+            let _ = matched.rebuild(url, base, 0, router.outlets, outer_owner)
+
+            // Rebuild the top-level outlet view
+            top_level_outlet(router.outlets, outer_owner.val)().build()
+          }
+        }
+
+        // Swap old view with new in the DOM
+        router.view.val.unmount()
+        match dom_pos {
+          Some((parent, next)) =>
+            match next {
+              Some(ref_node) => new_view.mount(parent, ref_node)
+              None => new_view.mount(parent, dom_null_node())
+            }
+          None => ()
+        }
+
+        router.view.val = new_view
+        if new_match is None {
+          router.outlets.val = []
+        }
+      }
+      _ => ()
+    }
   })
+
+  state_ref.val
 }
 
 ///|
@@ -200,44 +251,64 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn rebuild(
   self,
   state : Ref[RenderState],
 ) -> Unit {
+  println("[Debug] nested_route_view build")
   match state.val {
-    RenderState::Router(router) => ()
-    //      let url = self.current_url.get_untracked()
-    //
-    //      let new_path = url.path
-    //
-    //      if router.path == new_path {
-    //        return
-    //      }
-    //
-    //      router.path = new_path
-    //
-    //      let (match_result, _) = self.routes.match_nested(new_path)
-    //
-    //      let new_view = match match_result {
-    //        None => (self.fallback)()
-    //        Some((_, matched)) => {
-    //          let view_fn = deepest_match(matched).view_fn
-    //          view_fn()
-    //        }
-    //      }
-    //
-    //      let parent = dom_parent(router.start_anchor)
-    //
-    //      if dom_is_null(parent) {
-    //        return
-    //      }
-    //
-    //      match router.rendered {
-    //        Some(old) => old.unmount()
-    //        None => ()
-    //      }
-    //
-    //      let new_state = new_view.build()
-    //
-    //      new_state.mount(parent, router.end_anchor)
-    //
-    //      router.rendered = Some(new_state)
+    RenderState::Router(router) => {
+      let url = self.current_url.get_untracked()
+
+      if url.path == router.path.val {
+        for outlet in router.outlets.val {
+          outlet.url.set(url)
+        }
+        return
+      }
+
+      router.path.val = url.path
+
+      let dom_pos : (Node, Node?)? = match router.view.val.elements().get(0) {
+        Some(first_el) => {
+          let parent = dom_parent(first_el)
+          if dom_is_null(parent) {
+            Option::None
+          } else {
+            Some((parent, dom_next_sibling(first_el)))
+          }
+        }
+        None => Option::None
+      }
+
+      let new_match = self.routes.match_route(url.path)
+
+      let new_view = match new_match {
+        None => (self.fallback)().build()
+        Some(matched) => {
+          let _ = matched.rebuild(
+            url,
+            self.base,
+            0,
+            router.outlets,
+            self.outer_owner,
+          )
+
+          top_level_outlet(router.outlets, self.outer_owner.val)().build()
+        }
+      }
+
+      router.view.val.unmount()
+      match dom_pos {
+        Some((parent, next)) =>
+          match next {
+            Some(ref_node) => new_view.mount(parent, ref_node)
+            None => new_view.mount(parent, dom_null_node())
+          }
+        None => ()
+      }
+
+      router.view.val = new_view
+      if new_match is None {
+        router.outlets.val = []
+      }
+    }
     _ => ()
   }
 }

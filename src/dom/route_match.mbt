@@ -70,7 +70,7 @@ pub fn NestedMatch::build(
   base : String?,
   loaders : Ref[Array[() -> Trigger]],
   outlets : Ref[Array[RouteContext]],
-  outer_owner : Owner,
+  outer_owner : Ref[Owner],
 ) -> Unit {
   println("[Debug] nested_match build")
   let params : RwSignal[Params] = RwSignal::new(to_params(self.params))
@@ -108,7 +108,7 @@ pub fn NestedMatch::build(
     base,
     child: None,
     owner: Ref(None),
-    preload_owner: outer_owner.child(),
+    preload_owner: outer_owner.val.child(),
   }
 
   if outlets.val.length() > 0 {
@@ -153,7 +153,7 @@ pub fn NestedMatch::rebuild(
   base : String?,
   level : Int,
   outlets : Ref[Array[RouteContext]],
-  outer_owner : Owner,
+  outer_owner : Ref[Owner],
 ) -> Int {
   // Collect parent params/matched signals from outlets above this level.
   // These are used to build `*_with_parents` memos when the route ID changes.
@@ -198,7 +198,7 @@ pub fn NestedMatch::rebuild(
         current.url.set(url)
         current.params.set(new_params)
         current.matched.set(new_match)
-        current.preload_owner = outer_owner.child()
+        current.preload_owner = outer_owner.val.child()
 
         // Build parent-including params/matched memos
         let params_with_parents = Memo::new(_ => {

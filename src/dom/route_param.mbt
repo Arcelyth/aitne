@@ -1,7 +1,7 @@
 ///|
 /// Route parameters container.
 /// Support path parameters (e.g. :id) and query parameters (?a=1&b=2).
-pub struct Params(Array[(String, Array[String])]) derive(Debug, Show, Eq)
+pub struct Params(Array[(String, Array[String])]) derive(Debug, Eq)
 
 ///|
 /// Creates an empty parameter collection.

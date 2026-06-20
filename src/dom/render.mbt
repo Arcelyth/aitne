@@ -116,11 +116,11 @@ pub fn MultiBlockState::set_cleanup(
 
 ///|
 pub struct RouterState {
-  mut path : String
+  path : Ref[String]
   current_url : RwSignal[Url]
-  outlets : Array[RouteContext]
-  view : RenderState 
-  outer_owner : Owner
+  outlets : Ref[Array[RouteContext]]
+  view : Ref[RenderState]
+  outer_owner : Ref[Owner]
 }
 
 // ----- Mountable implementations -----
@@ -147,7 +147,7 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
     }
     Router(s) => {
       println("[Debug] router unmount")
-      s.view.unmount()
+      s.view.val.unmount()
     }
     None => ()
   }
@@ -192,7 +192,7 @@ pub impl Mountable for RenderState with fn mount(
     }
     Router(s) => {
       println("[Debug] router mount")
-      s.view.mount(parent, marker)
+      s.view.val.mount(parent, marker)
     }
     None => ()
   }
@@ -231,9 +231,7 @@ pub impl Mountable for RenderState with fn insert_before(
         true
       }
     }
-    Router(s) => {
-      s.view.insert_before(child)
-    }
+    Router(s) => s.view.val.insert_before(child)
     _ => false
   }
 }
@@ -270,7 +268,7 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[Node] {
     }
     Router(s) => {
       println("[Debug] router elements")
-      s.view.elements()
+      s.view.val.elements()
     }
     None => []
   }

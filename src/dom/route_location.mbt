@@ -8,7 +8,7 @@ pub(all) struct Url {
   search : String
   search_params : Params
   hash : String
-} derive(Debug, Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 /// Read the current browser URL.

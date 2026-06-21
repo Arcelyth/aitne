@@ -13,6 +13,7 @@ using @dom {
   routes,
   route,
   parent_route,
+  outlet,
 }
 
 ///|

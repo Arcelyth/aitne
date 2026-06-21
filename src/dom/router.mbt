@@ -88,7 +88,10 @@ pub fn[Ch] parent_route(
 }
 
 ///|
-pub fn[Ch : MatchNestedRoutes] routes(fallback : ViewFn, children : Ch) -> RouterChildren {
+pub fn[Ch : MatchNestedRoutes] routes(
+  fallback : ViewFn,
+  children : Ch,
+) -> RouterChildren {
   RouterChildren(() => {
     let _loc : BrowserUrl? = use_context()
     let rctx : RouterContext? = use_context()
@@ -383,4 +386,73 @@ fn top_level_outlet(
       view_fn(outer_owner.child())
     }
   })
+}
+
+///|
+pub struct OutletView {
+  child : RouteContext?
+  outer_owner : Owner
+}
+
+///|
+pub impl View for OutletView with fn style(self, _i) -> &View {
+  self
+}
+
+///|
+pub impl Render for OutletView with fn build(self) -> RenderState {
+  match self.child {
+    Some(c) => {
+      c.trigger.track()
+      let view_fn = c.view_fn.val
+      view_fn(self.outer_owner.child()).build()
+    }
+    None => RenderState::None
+  }
+}
+
+///|
+pub impl Render for OutletView with fn rebuild(self, state : Ref[RenderState]) -> Unit {
+  match self.child {
+    Some(c) => {
+      c.trigger.track()
+      let view_fn = c.view_fn.val
+      let new_view = view_fn(self.outer_owner.child())
+
+      new_view.rebuild(state)
+    }
+    None => ()
+  }
+}
+
+///|
+pub impl RenderHtml for OutletView with fn html_len(_self) -> Int {
+  0
+}
+
+///|
+pub impl RenderHtml for OutletView with fn to_html_with_buf(_self, _buf, _pos) -> Unit {
+  // Router is client-side only now; no SSR output
+}
+
+///|
+pub fn outlet() -> &View {
+  let cctx : RouteContext?? = use_context()
+  let child = match cctx {
+    Some(c) => c
+    _ => {
+      println("[Error] Used without provided RouteContext.")
+      panic()
+    }
+  }
+  let oo = Owner::current()
+  let outer_owner = match oo {
+    Some(o) => o
+    None => {
+      println("[Error] Cannot find owner.")
+      panic()
+    }
+  }
+
+  OutletView::{ child, outer_owner }
 }

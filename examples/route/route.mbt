@@ -36,6 +36,7 @@ pub fn users_page() -> &View {
       li().children([anchor("/users/2", [text("User #2 (Bob)")])]),
       li().children([anchor("/users/3", [text("User #3 (Charlie)")])]),
     ]),
+    outlet()
   ])
   .style("padding: 1rem; border: 1px solid #eee; margin-top: 1rem;")
 }

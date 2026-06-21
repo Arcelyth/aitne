@@ -32,7 +32,7 @@ pub impl[P : IntoProperty] Attribute for Property[P] with fn to_html(
 ///|
 pub impl[P : IntoProperty] Attribute for Property[P] with fn build(
   self,
-  el : Element,
+  el : @ffi.Element,
 ) -> AttrState {
   self.value.build(el, self.key)
 }
@@ -68,7 +68,7 @@ pub trait IntoProperty {
     style : StringBuilder,
     inner_html : StringBuilder,
   ) -> Unit
-  fn build(Self, el : Element, key : String) -> AttrState
+  fn build(Self, el : @ffi.Element, key : String) -> AttrState
   fn rebuild(Self, state : Ref[AttrState], key : String) -> Unit
   fn dry_resolve(Self) -> Unit
 }
@@ -93,14 +93,14 @@ pub impl IntoProperty for String with fn to_html(
 
 ///|
 pub impl IntoProperty for String with fn build(self, el, key) -> AttrState {
-  dom_set_prop(el_as_node(el), key, self)
+  @ffi.dom_set_prop(@ffi.el_as_node(el), key, self)
   AttrState::Element(el)
 }
 
 ///|
 pub impl IntoProperty for String with fn rebuild(self, state, key) -> Unit {
   match state.val {
-    AttrState::Element(el) => dom_set_prop(el_as_node(el), key, self)
+    AttrState::Element(el) => @ffi.dom_set_prop(@ffi.el_as_node(el), key, self)
     _ => ()
   }
 }
@@ -132,7 +132,7 @@ pub impl[S : Show] IntoProperty for ReadSignal[S] with fn to_html(
 pub impl[S : Show] IntoProperty for ReadSignal[S] with fn build(self, el, key) -> AttrState {
   create_effect(fn() {
     let val = self.get()
-    dom_set_prop(el_as_node(el), key, val.to_string())
+    @ffi.dom_set_prop(@ffi.el_as_node(el), key, val.to_string())
   })
   AttrState::None
 }

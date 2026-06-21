@@ -1,9 +1,9 @@
 import {
   "Arcelyth/aitne/src/reactive",
+  "Arcelyth/aitne/src/ffi",
   "Arcelyth/html_escape" @escape,
   "moonbitlang/core/hashmap",
   "moonbitlang/core/hashset",
   "moonbitlang/core/ref",
-  "moonbitlang/async",
   "moonbitlang/core/debug",
 }

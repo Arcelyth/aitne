@@ -5,7 +5,7 @@ pub enum AttrState {
   None
   Str(String)
   Bool(Bool)
-  Element(Element)
+  Element(@ffi.Element)
   Pair(AttrState, AttrState)
   EventBound(RemoveEventHandler)
 }
@@ -21,7 +21,7 @@ pub trait AttributeKey {
 pub trait AttributeValue {
   fn html_len(Self) -> Int
   fn to_html(Self, key : String, buf : StringBuilder) -> Unit
-  fn build(Self, key : String, el : Element) -> AttrState
+  fn build(Self, key : String, el : @ffi.Element) -> AttrState
   fn rebuild(Self, key : String, state : Ref[AttrState]) -> Unit
   fn dry_resolve(Self) -> Unit
 }
@@ -37,7 +37,7 @@ pub trait Attribute {
     style : StringBuilder,
     inner_html : StringBuilder,
   ) -> Unit
-  fn build(Self, el : Element) -> AttrState
+  fn build(Self, el : @ffi.Element) -> AttrState
   fn rebuild(Self, state : Ref[AttrState]) -> Unit
   fn dry_resolve(Self) -> Unit
   fn add_attr(Self, attr : &Attribute) -> &Attribute
@@ -129,9 +129,9 @@ pub impl AttributeValue for Bool with fn to_html(
 }
 
 ///|
-pub impl AttributeValue for Bool with fn build(self, key : String, el : Element) -> AttrState {
+pub impl AttributeValue for Bool with fn build(self, key : String, el : @ffi.Element) -> AttrState {
   if self {
-    dom_set_attr(el, key, "")
+    @ffi.dom_set_attr(el, key, "")
   }
   AttrState::Pair(AttrState::Element(el), AttrState::Bool(self))
 }
@@ -146,9 +146,9 @@ pub impl AttributeValue for Bool with fn rebuild(
     AttrState::Pair(Element(el), AttrState::Bool(pre_v)) =>
       if self != pre_v {
         if self {
-          dom_set_attr(el, key, "")
+          @ffi.dom_set_attr(el, key, "")
         } else {
-          dom_remove_attr(el, key)
+          @ffi.dom_remove_attr(el, key)
         }
         state.val = AttrState::Pair(
           AttrState::Element(el),
@@ -188,9 +188,9 @@ pub impl AttributeValue for String with fn to_html(
 pub impl AttributeValue for String with fn build(
   self,
   key : String,
-  el : Element,
+  el : @ffi.Element,
 ) -> AttrState {
-  dom_set_attr(el, key, self)
+  @ffi.dom_set_attr(el, key, self)
   AttrState::Pair(AttrState::Element(el), AttrState::Str(self))
 }
 
@@ -203,7 +203,7 @@ pub impl AttributeValue for String with fn rebuild(
   match state.val {
     AttrState::Pair(Element(el), AttrState::Str(pre_v)) =>
       if self != pre_v {
-        dom_set_attr(el, key, self)
+        @ffi.dom_set_attr(el, key, self)
         state.val = AttrState::Pair(
           AttrState::Element(el),
           AttrState::Str(self),

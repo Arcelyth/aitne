@@ -202,10 +202,10 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn build(
         // Path changed
         router.path.val = new_path
 
-        let dom_pos : (Node, Node?)? = match router.view.val.elements().get(0) {
+        let dom_pos : (@ffi.Node, @ffi.Node?)? = match router.view.val.elements().get(0) {
           Some(first_el) => {
-            let parent = dom_parent(first_el)
-            if dom_is_null(parent) {
+            let parent = @ffi.dom_parent(first_el)
+            if @ffi.dom_is_null(parent) {
               Option::None
             } else {
               Some((parent, dom_next_sibling(first_el)))
@@ -232,7 +232,7 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn build(
           Some((parent, next)) =>
             match next {
               Some(ref_node) => new_view.mount(parent, ref_node)
-              None => new_view.mount(parent, dom_null_node())
+              None => new_view.mount(parent, @ffi.dom_null_node())
             }
           None => ()
         }
@@ -268,10 +268,10 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn rebuild(
 
       router.path.val = url.path
 
-      let dom_pos : (Node, Node?)? = match router.view.val.elements().get(0) {
+      let dom_pos : (@ffi.Node, @ffi.Node?)? = match router.view.val.elements().get(0) {
         Some(first_el) => {
-          let parent = dom_parent(first_el)
-          if dom_is_null(parent) {
+          let parent = @ffi.dom_parent(first_el)
+          if @ffi.dom_is_null(parent) {
             Option::None
           } else {
             Some((parent, dom_next_sibling(first_el)))
@@ -302,7 +302,7 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn rebuild(
         Some((parent, next)) =>
           match next {
             Some(ref_node) => new_view.mount(parent, ref_node)
-            None => new_view.mount(parent, dom_null_node())
+            None => new_view.mount(parent, @ffi.dom_null_node())
           }
         None => ()
       }

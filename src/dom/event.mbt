@@ -6,19 +6,19 @@ using @reactive {type Owner}
 pub struct On {
   event : EventDesp
   owner : Owner
-  fun : (Event) -> Unit
+  fun : (@ffi.Event) -> Unit
 }
 
 ///|
 /// Create an event listener attribute.
-pub fn on(event : EventDesp, fun : (Event) -> Unit) -> On {
+pub fn on(event : EventDesp, fun : (@ffi.Event) -> Unit) -> On {
   On::{ event, owner: Owner::current_with_default(), fun }
 }
 
 ///|
 /// Attach this event listener to an element (no capture).
-fn On::attach(self : On, el : Element) -> RemoveEventHandler {
-  let wrapped_fun = fn(ev : Event) {
+fn On::attach(self : On, el : @ffi.Element) -> RemoveEventHandler {
+  let wrapped_fun = fn(ev : @ffi.Event) {
     Owner::with_(self.owner, fn() { (self.fun)(ev) })
   }
   add_event_listener(el, self.event.name, wrapped_fun)
@@ -26,8 +26,8 @@ fn On::attach(self : On, el : Element) -> RemoveEventHandler {
 
 ///|
 /// Attach this event listener with capture phase.
-fn On::attach_capture(self : On, el : Element) -> RemoveEventHandler {
-  let wrapped_fun = fn(ev : Event) {
+fn On::attach_capture(self : On, el : @ffi.Element) -> RemoveEventHandler {
+  let wrapped_fun = fn(ev : @ffi.Event) {
     Owner::with_(self.owner, fn() { (self.fun)(ev) })
   }
   add_event_listener_capture(el, self.event.name, wrapped_fun)
@@ -44,7 +44,7 @@ pub impl Attribute for On with fn to_html(_self, _b, _c, _s, _i) -> Unit {
 }
 
 ///|
-pub impl Attribute for On with fn build(self, el : Element) -> AttrState {
+pub impl Attribute for On with fn build(self, el : @ffi.Element) -> AttrState {
   let cleanup = if self.event.capture {
     self.attach_capture(el)
   } else {

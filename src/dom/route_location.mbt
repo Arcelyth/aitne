@@ -13,13 +13,13 @@ pub(all) struct Url {
 ///|
 /// Read the current browser URL.
 pub fn Url::current() -> Url {
-  let search = current_search()
+  let search = @ffi.current_search()
   Url::{
-    origin: current_origin(),
-    path: current_pathname(),
+    origin: @ffi.current_origin(),
+    path: @ffi.current_pathname(),
     search,
     search_params: Params::from_search(search),
-    hash: current_hash(),
+    hash: @ffi.current_hash(),
   }
 }
 
@@ -48,9 +48,9 @@ pub(all) struct Location {
 ///|
 /// Create a reactive Location instance from the current browser URL.
 pub fn Location::current() -> Location {
-  let (pathname_src, _) = @reactive.create_signal(current_pathname())
-  let (search_src, _) = @reactive.create_signal(current_search())
-  let (hash_src, _) = @reactive.create_signal(current_hash())
+  let (pathname_src, _) = @reactive.create_signal(@ffi.current_pathname())
+  let (search_src, _) = @reactive.create_signal(@ffi.current_search())
+  let (hash_src, _) = @reactive.create_signal(@ffi.current_hash())
 
   Location::{
     pathname: Memo::new(fn(_) { pathname_src.get() }),
@@ -82,36 +82,36 @@ pub fn handle_anchor_click(
   // TODO: maybe add error type in the future
   parse_with_base : (String, String) -> Result[Url, String],
   nav_fn : (Url, LocationChange) -> Unit,
-) -> (Event) -> Unit {
-  fn(ev : Event) {
-    if event_default_prevented(ev) {
+) -> (@ffi.Event) -> Unit {
+  fn(ev : @ffi.Event) {
+    if @ffi.event_default_prevented(ev) {
       return
     }
-    if event_button(ev) != 0 ||
-      event_meta_key(ev) ||
-      event_alt_key(ev) ||
-      event_ctrl_key(ev) ||
-      event_shift_key(ev) {
+    if @ffi.event_button(ev) != 0 ||
+      @ffi.event_meta_key(ev) ||
+      @ffi.event_alt_key(ev) ||
+      @ffi.event_ctrl_key(ev) ||
+      @ffi.event_shift_key(ev) {
       return
     }
 
-    let origin = current_origin()
-    let path = event_composed_path(ev)
+    let origin = @ffi.current_origin()
+    let path = @ffi.event_composed_path(ev)
 
-    let mut a : Element? = None
+    let mut a : @ffi.Element? = None
 
-    for i in 0..<js_array_length(path) {
-      let n = js_array_get(path, i)
+    for i in 0..<@ffi.js_array_length(path) {
+      let n = @ffi.js_array_get(path, i)
 
-      if node_is_anchor(n) {
-        a = Some(node_as_element(n))
+      if @ffi.node_is_anchor(n) {
+        a = Some(@ffi.node_as_element(n))
       }
     }
 
     match a {
       Some(anchor) => {
-        let href = anchor_href(anchor)
-        let target = anchor_target(anchor)
+        let href = @ffi.anchor_href(anchor)
+        let target = @ffi.anchor_target(anchor)
         if target != "" {
           return
         }
@@ -119,8 +119,8 @@ pub fn handle_anchor_click(
           return
         }
 
-        let rel = anchor_get_attr(anchor, "rel")
-        if anchor_has_attr(anchor, "download") || rel.contains("external") {
+        let rel = @ffi.anchor_get_attr(anchor, "rel")
+        if @ffi.anchor_has_attr(anchor, "download") || rel.contains("external") {
           return
         }
 
@@ -138,20 +138,20 @@ pub fn handle_anchor_click(
           return
         }
 
-        event_prevent_default(ev)
+        @ffi.event_prevent_default(ev)
 
         let to = path_name +
           (if url.search == "" { "" } else { "?" }) +
           url.search +
           url.hash
 
-        let replace = get_bool_property(anchor, "replace")
+        let replace = @ffi.get_bool_property(anchor, "replace")
 
         let change = LocationChange::{
           value: to,
           replace,
-          scroll: !anchor_has_attr(anchor, "noscroll") &&
-          !anchor_has_attr(anchor, "data-noscroll"),
+          scroll: !@ffi.anchor_has_attr(anchor, "noscroll") &&
+          !@ffi.anchor_has_attr(anchor, "data-noscroll"),
         }
 
         nav_fn(url, change)
@@ -199,9 +199,9 @@ pub fn BrowserUrl::complete_navigation(
   }
 
   if change.replace {
-    history_replace_state(change.value)
+    @ffi.history_replace_state(change.value)
   } else {
-    history_push_state(change.value)
+    @ffi.history_push_state(change.value)
   }
 
   let cur_url = BrowserUrl::current()
@@ -221,17 +221,17 @@ pub fn BrowserUrl::complete_navigation(
 ///
 /// Returns an error if the URL cannot be parsed.
 pub fn parse_url_with_base(href : String, base : String) -> Result[Url, String] {
-  if !url_can_parse(href, base) {
+  if !@ffi.url_can_parse(href, base) {
     return Err("invalid url")
   }
 
-  let search = strip_leading_qmark(url_search_from_base(href, base))
+  let search = strip_leading_qmark(@ffi.url_search_from_base(href, base))
   Ok(Url::{
-    origin: url_origin_from_base(href, base),
-    path: url_path_from_base(href, base),
+    origin: @ffi.url_origin_from_base(href, base),
+    path: @ffi.url_path_from_base(href, base),
     search,
     search_params: Params::from_search(search),
-    hash: url_hash_from_base(href, base),
+    hash: @ffi.url_hash_from_base(href, base),
   })
 }
 
@@ -255,7 +255,7 @@ pub fn BrowserUrl::init(self : BrowserUrl, base : String?) -> Unit {
 
   let click_cb = handle_anchor_click(base, parse_url_with_base, navigate)
 
-  let click_handle = window_event_listener("click", click_cb)
+  let click_handle = @ffi.window_event_listener("click", click_cb)
 
   fn popstate_cb(_) -> Unit {
     let new_url = BrowserUrl::current()
@@ -272,17 +272,17 @@ pub fn BrowserUrl::init(self : BrowserUrl, base : String?) -> Unit {
     self.url.set(new_url)
   }
 
-  let popstate_handle = window_event_listener("popstate", popstate_cb)
+  let popstate_handle = @ffi.window_event_listener("popstate", popstate_cb)
 
   @reactive.on_cleanup(() => {
-    prim_call_event_handle(click_handle)
-    prim_call_event_handle(popstate_handle)
+    @ffi.prim_call_event_handle(click_handle)
+    @ffi.prim_call_event_handle(popstate_handle)
   })
 }
 
 ///|
 pub fn BrowserUrl::redirect(self : BrowserUrl, loc : String) -> Unit {
-  let current_orig = current_origin()
+  let current_orig = @ffi.current_origin()
 
   let url = match parse_url_with_base(loc, current_orig) {
     Ok(u) => u
@@ -297,13 +297,13 @@ pub fn BrowserUrl::redirect(self : BrowserUrl, loc : String) -> Unit {
       scroll: true,
     }
 
-    let _ = request_animation_frame(fn() {
+    let _ = @ffi.request_animation_frame(fn() {
       self.url.set(url)
       self.complete_navigation(change)
     })
   } else {
     let absolute_url = url.origin + url.to_full_path()
-    set_window_href(absolute_url)
+    @ffi.set_window_href(absolute_url)
   }
 }
 

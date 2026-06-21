@@ -60,7 +60,7 @@ pub impl Attribute for AttrList with fn to_html(
 }
 
 ///|
-pub impl Attribute for AttrList with fn build(self, el : Element) -> AttrState {
+pub impl Attribute for AttrList with fn build(self, el : @ffi.Element) -> AttrState {
   let mut cur = AttrState::None
   for item in self.items {
     cur = AttrState::Pair(cur, item.build(el))
@@ -107,7 +107,7 @@ pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C] with fn build
   let el = dom_create_element(self.tag.tag())
   let attrs = self.attrs.build(el)
   let children = self.children.build()
-  children.mount(el_as_node(el), dom_null_node())
+  children.mount(@ffi.el_as_node(el), @ffi.dom_null_node())
   RenderState::Element(ElementState::{ el, attrs, children })
 }
 
@@ -243,7 +243,7 @@ pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::value(
 pub fn[T : ElementType, C : Render] HtmlElement::on(
   self : HtmlElement[T, C],
   ev : EventType,
-  fun : (Event) -> Unit,
+  fun : (@ffi.Event) -> Unit,
 ) -> HtmlElement[T, C] {
   let desp = EventDesp::{ name: ev.to_string(), bubbles: true, capture: false }
   self.add_attr(on(desp, fun))
@@ -315,7 +315,7 @@ pub fn text(s : String) -> TextNode {
 
 ///|
 pub impl Render for TextNode with fn build(self) -> RenderState {
-  let node = prim_create_text_node(document(), self.val)
+  let node = @ffi.prim_create_text_node(document(), self.val)
   RenderState::Text(TextState::{ node, })
 }
 
@@ -349,9 +349,9 @@ pub fn text_dyn(f : () -> String) -> DynTextNode {
 
 ///|
 pub impl Render for DynTextNode with fn build(self) -> RenderState {
-  let node = prim_create_text_node(document(), (self.getter)())
+  let node = @ffi.prim_create_text_node(document(), (self.getter)())
   @reactive.create_effect(fn() {
-    dom_set_text(text_as_node(node), (self.getter)())
+    @ffi.dom_set_text(@ffi.text_as_node(node), (self.getter)())
   })
   RenderState::Text(TextState::{ node, })
 }
@@ -393,4 +393,25 @@ pub fn EventType::to_string(self : EventType) -> String {
     Keydown => "keydown"
     Keyup => "keyup"
   }
+}
+
+///|
+/// HtmlElement implements View when its children implement both Render and RenderHtml.
+pub impl[T : ElementType, C : Render + RenderHtml] View for HtmlElement[T, C] with fn style(
+  self,
+  s : &IntoStyle,
+) -> &View {
+  self.style(s)
+}
+
+///|
+/// Text nodes implement View.
+pub impl View for TextNode with fn style(self, _i) -> &View {
+  self
+}
+
+///|
+/// Dynamic text nodes implement View.
+pub impl View for DynTextNode with fn style(self, _i) -> &View {
+  self
 }

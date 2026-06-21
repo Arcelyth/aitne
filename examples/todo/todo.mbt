@@ -1,4 +1,5 @@
-using @dom { trait View, div, h1, button, text, input, ul, li, event_target_value, for_node, text_dyn}
+using @dom { trait View, div, h1, button, text, input, ul, li, for_node, text_dyn}
+using @ffi {event_target_value}
 
 fn todo_app() -> &View {
   let (input_val, set_input_val) = @reactive.create_signal("")

@@ -31,8 +31,24 @@ pub extern "js" fn on_popstate(cb : () -> Unit) -> () -> Unit =
   #|}
 
 ///|
-pub extern "js" fn dom_clear_children(node : Node) -> Unit =
-  #|(node) => { while (node.firstChild) node.removeChild(node.firstChild); }
+pub extern "js" fn node_is_anchor(node : Node) -> Bool =
+  #|(node) => node instanceof HTMLAnchorElement
+
+///|
+pub extern "js" fn anchor_href(el : Element) -> String =
+  #|(el) => el.href
+
+///|
+pub extern "js" fn anchor_target(el : Element) -> String =
+  #|(el) => el.target
+
+///|
+pub extern "js" fn anchor_has_attr(el : Element, name : String) -> Bool =
+  #|(el, name) => el.hasAttribute(name)
+
+///|
+pub extern "js" fn anchor_get_attr(el : Element, name : String) -> String =
+  #|(el, name) => el.getAttribute(name) ?? ""
 
 ///|
 pub extern "js" fn url_can_parse(href : String, base : String) -> Bool =

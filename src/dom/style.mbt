@@ -26,7 +26,7 @@ pub impl[S : IntoStyle] Attribute for Style[S] with fn to_html(
 }
 
 ///|
-pub impl[S : IntoStyle] Attribute for Style[S] with fn build(self, el : Element) -> AttrState {
+pub impl[S : IntoStyle] Attribute for Style[S] with fn build(self, el : @ffi.Element) -> AttrState {
   self.0.build(el)
 }
 
@@ -55,7 +55,7 @@ pub impl[S : IntoStyle] Attribute for Style[S] with fn add_attr(
 pub trait IntoStyle {
   fn html_len(Self) -> Int
   fn to_html(Self, style : StringBuilder) -> Unit
-  fn build(Self, el : Element) -> AttrState
+  fn build(Self, el : @ffi.Element) -> AttrState
   fn rebuild(Self, state : Ref[AttrState]) -> Unit
   fn dry_resolve(Self) -> Unit
 }
@@ -71,8 +71,8 @@ pub impl IntoStyle for String with fn to_html(self, style : StringBuilder) -> Un
 }
 
 ///|
-pub impl IntoStyle for String with fn build(self, el : Element) -> AttrState {
-  dom_set_attr(el, "style", self)
+pub impl IntoStyle for String with fn build(self, el : @ffi.Element) -> AttrState {
+  @ffi.dom_set_attr(el, "style", self)
   AttrState::Pair(AttrState::Element(el), AttrState::Str(self))
 }
 
@@ -81,7 +81,7 @@ pub impl IntoStyle for String with fn rebuild(self, state : Ref[AttrState]) -> U
   match state.val {
     AttrState::Pair(AttrState::Element(el), AttrState::Str(old)) =>
       if self != old {
-        dom_set_attr(el, "style", self)
+        @ffi.dom_set_attr(el, "style", self)
         state.val = AttrState::Pair(
           AttrState::Element(el),
           AttrState::Str(self),

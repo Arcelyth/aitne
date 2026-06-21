@@ -1,5 +1,5 @@
 import {
-  "Arcelyth/aitne/src/dom" @dom,
+  "Arcelyth/aitne/src/dom",
 }
 
 options(

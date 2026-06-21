@@ -71,7 +71,7 @@ pub fn router(
 }
 
 ///|
-pub fn route(path : String, view : ViewFn) -> NestedRoute {
+pub fn[Ch] route(path : String, view : ViewFn) -> NestedRoute[Ch] {
   NestedRoute::new(path, view)
 }
 
@@ -79,16 +79,16 @@ pub fn route(path : String, view : ViewFn) -> NestedRoute {
 type ViewFn = () -> &View
 
 ///|
-pub fn parent_route(
+pub fn[Ch] parent_route(
   path : String,
   view : () -> &View,
-  children : NestedRoute,
-) -> NestedRoute {
+  children : Ch,
+) -> NestedRoute[Ch] {
   NestedRoute::new(path, view).child(children)
 }
 
 ///|
-pub fn routes(fallback : ViewFn, children : Array[NestedRoute]) -> RouterChildren {
+pub fn[Ch : MatchNestedRoutes] routes(fallback : ViewFn, children : Ch) -> RouterChildren {
   RouterChildren(() => {
     let _loc : BrowserUrl? = use_context()
     let rctx : RouterContext? = use_context()

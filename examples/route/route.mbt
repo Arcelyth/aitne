@@ -19,6 +19,8 @@ pub fn home() -> &View {
     anchor("/try", [text("TRY")]),
     anchor("/about", [text("404 Demo")]),
     anchor("/xyz", [text("Also 404")]),
+    anchor("/t/t1", [text("t1")]),
+    anchor("/t/t2", [text("t2")]),
   ])
   .style("display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;")
 }

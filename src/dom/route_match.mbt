@@ -12,15 +12,15 @@ fn next_route_id() -> UInt {
 }
 
 ///|
-pub(all) struct NestedRoute {
+pub(all) struct NestedRoute[Ch] {
   id : UInt
   path : String
-  child : NestedRoute?
+  child : Ch?
   view : ViewFn
 }
 
 ///|
-pub impl Debug for NestedRoute with fn to_repr(self) -> Repr {
+pub impl[Ch] Debug for NestedRoute[Ch] with fn to_repr(self) -> Repr {
   @debug.Repr::tuple([
     @debug.Repr::string("id"),
     to_repr(self.id),
@@ -30,15 +30,15 @@ pub impl Debug for NestedRoute with fn to_repr(self) -> Repr {
 }
 
 ///|
-pub fn NestedRoute::new(path : String, view : ViewFn) -> NestedRoute {
+pub fn[Ch] NestedRoute::new(path : String, view : ViewFn) -> NestedRoute[Ch] {
   NestedRoute::{ id: next_route_id(), path, child: None, view }
 }
 
 ///|
-pub fn NestedRoute::child(
-  self : NestedRoute,
-  child : NestedRoute,
-) -> NestedRoute {
+pub fn[Ch] NestedRoute::child(
+  self : NestedRoute[Ch],
+  child : Ch,
+) -> NestedRoute[Ch] {
   { ..self, child: Some(child) }
 }
 
@@ -369,7 +369,26 @@ pub impl[T : MatchNestedRoutes] MatchNestedRoutes for Array[T] with fn match_nes
 }
 
 ///|
-pub impl MatchNestedRoutes for NestedRoute with fn match_nested(
+pub impl[T : MatchNestedRoutes] MatchNestedRoutes for T? with fn match_nested(
+  self,
+  path : String,
+) -> ((UInt, NestedMatch)?, String) {
+  match self {
+    Some(t) => t.match_nested(path)
+    _ => (None, path)
+  }
+}
+
+///|
+pub impl MatchNestedRoutes for Unit with fn match_nested(_self, path : String) -> (
+  (UInt, NestedMatch)?,
+  String,
+) {
+  (None, path)
+}
+
+///|
+pub impl[Ch : MatchNestedRoutes] MatchNestedRoutes for NestedRoute[Ch] with fn match_nested(
   self,
   path : String,
 ) -> ((UInt, NestedMatch)?, String) {
@@ -377,8 +396,8 @@ pub impl MatchNestedRoutes for NestedRoute with fn match_nested(
 }
 
 ///|
-pub fn NestedRoute::match_nested(
-  self : NestedRoute,
+pub fn[Ch : MatchNestedRoutes] NestedRoute::match_nested(
+  self : NestedRoute[Ch],
   path : String,
 ) -> ((UInt, NestedMatch)?, String) {
   let route_segs = split_segments(self.path)

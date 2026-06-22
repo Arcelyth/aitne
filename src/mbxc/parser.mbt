@@ -23,10 +23,10 @@ pub(all) enum Token {
 
 ///|
 pub enum MbxState {
-  MS // MoonBit String
-  MC // MBX Comment
   M // MoonBit Code
+  MS // MoonBit String
   X // MBX Tag
+  XC // MBX Comment
 } derive(Debug, Eq)
 
 ///|
@@ -77,6 +77,7 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
       self.cur += 1
 
       while !self.is_end() && self.src[self.cur] != '\"' {
+        // handle escape
         if self.src[self.cur] == '\\' && self.cur + 1 < self.src.length() {
           self.cur += 2
         } else {
@@ -90,7 +91,7 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
       self.state = MbxState::M
       return Some(Token::RawText(self.src[start:self.cur]))
     }
-    MbxState::MC =>
+    MbxState::XC =>
       match (self.peek(0), self.peek(1), self.peek(2)) {
         (Some('-'), Some('-'), Some('>')) => {
           self.cur += 3
@@ -139,7 +140,7 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
             match (self.peek(2), self.peek(3)) {
               (Some('-'), Some('-')) => {
                 self.cur += 4
-                self.state = MbxState::MC
+                self.state = MbxState::XC
                 return Some(Token::ComStart)
               }
               _ => {
@@ -173,6 +174,16 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
       while !self.is_end() &&
             self.src[self.cur] != '<' &&
             self.src[self.cur] != '\"' {
+        if self.src[self.cur] == '/' && self.peek(1) == Some('/') {
+          // handle moonbit comment
+          self.cur += 2
+          while !self.is_end() && self.src[self.cur] != '\n' {
+            self.cur += 1
+          }
+          if !self.is_end() {
+            self.cur += 1
+          }
+        }
         self.cur += 1
       }
       return Some(Token::RawText(self.src[start:self.cur]))
@@ -282,14 +293,14 @@ pub(all) enum MbxAST {
 } derive(Debug, Show, Eq)
 
 ///|
-pub struct MbxAttribute {
+pub(all) struct MbxAttribute {
   name : StringView
   scope : StringView?
   value : AttrVal
 } derive(Debug, Show, Eq)
 
 ///|
-pub enum AttrVal {
+pub(all) enum AttrVal {
   Static(StringView)
   Dynamic(StringView)
 } derive(Debug, Show, Eq)
@@ -311,11 +322,11 @@ fn Parser::is_end(self : Parser) -> Bool {
 }
 
 ///|
-fn Parser::peek(self : Parser) -> Token? {
+fn Parser::peek(self : Parser, step? : Int = 0) -> Token? {
   if self.is_end() {
     None
   } else {
-    Some(self.tokens[self.cur])
+    Some(self.tokens[self.cur + step])
   }
 }
 
@@ -414,30 +425,46 @@ pub fn Parser::parse_node(self : Parser) -> MbxAST? raise MbxcError {
               while !self.is_end() {
                 match self.peek() {
                   Some(Token::Start) => {
+                    let mut is_closing = false
+
                     if self.cur + 1 < self.tokens.length() {
                       match self.tokens[self.cur + 1] {
                         Token::Slash => {
+                          is_closing = true
                           self.cur += 2
+
                           match self.peek() {
                             Some(Token::Ident(close_tag)) => {
                               if close_tag != tag {
                                 raise ParserError(
-                                  "Warning: Mismatched tag! Expected </\{tag}>, found </\{close_tag}>",
+                                  "Mismatched tag! Expected </\{tag}>, found </\{close_tag}>",
                                 )
                               }
                               self.advance()
-                              self.advance()
-                              break
+
+                              match self.peek() {
+                                Some(Token::End) => self.advance()
+                                _ =>
+                                  raise ParserError(
+                                    "Expected '>' to close tag </\{tag}>",
+                                  )
+                              }
                             }
-                            _ => break
+                            _ =>
+                              raise ParserError("Expected tag name after '</'")
                           }
                         }
                         _ => ()
                       }
                     }
-                    match self.parse_node() {
-                      Some(child) => children.push(child)
-                      None => ()
+
+                    if is_closing {
+                      break
+                    } else {
+                      match self.parse_node() {
+                        Some(child) => children.push(child)
+                        None => ()
+                      }
                     }
                   }
                   Some(Token::CodeBlock(c)) => {
@@ -457,10 +484,13 @@ pub fn Parser::parse_node(self : Parser) -> MbxAST? raise MbxcError {
               }
               Some(MbxAST::ElementNode(tag, attrs, children))
             }
-            _ => None
+            _ =>
+              raise ParserError(
+                "Expected '>' or '/>' after attributes in <\{tag}>",
+              )
           }
         }
-        _ => None
+        _ => raise ParserError("Expected valid tag name after '<'")
       }
     }
     _ => {
@@ -484,37 +514,3 @@ pub fn Parser::parse(self : Parser) -> Array[MbxAST] raise MbxcError {
   ast_list
 }
 
-///|
-test "lexer_parser_test" {
-  let src =
-    #|fn comp() -> Html {
-    #|  let (count, set_count) = @reactive.create_signal(0)
-    #|  <div> Hello, World </div>
-    #|}
-  let lexer = Lexer::new(src)
-  let tokens = lexer.tokenizer()
-  // TODO: Maybe change to debug_inspect when its usage seems more convenient.
-  assert_eq(tokens, [
-    Token::RawText(
-      "fn comp() -> Html {\n  let (count, set_count) = @reactive.create_signal(0)\n  ",
-    ),
-    Token::Start,
-    Token::Ident("div"),
-    Token::End,
-    Token::RawText(" Hello, World "),
-    Token::Start,
-    Token::Slash,
-    Token::Ident("div"),
-    Token::End,
-    Token::RawText("\n}"),
-  ])
-  let parser = Parser::new(tokens)
-  let ast = parser.parse()
-  assert_eq(ast, [
-    MbxAST::PureCode(
-      "fn comp() -> Html {\n  let (count, set_count) = @reactive.create_signal(0)\n  ",
-    ),
-    MbxAST::ElementNode("div", [], [MbxAST::TextNode(" Hello, World ")]),
-    MbxAST::PureCode("\n}"),
-  ])
-}

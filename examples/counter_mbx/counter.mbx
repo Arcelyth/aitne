@@ -1,4 +1,6 @@
-pub fn counter() -> @dom.Html {
+using @dom { trait View }
+
+pub fn counter() -> &View {
   let (count, set_count) = @reactive.create_signal(0)
 
   <div>

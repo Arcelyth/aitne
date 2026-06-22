@@ -25,5 +25,5 @@ exp_counter2:
 	./examples/counter_mbx/run.sh
 
 run: 
-	python3 -m http.server 8000
+	python3 ./scripts/spa_server.py
 	

@@ -18,11 +18,18 @@ exp_todo:
 	chmod +x ./examples/todo/run.sh
 	./examples/todo/run.sh
 	
+# use mbx format
 exp_counter2: 
 	moon run cmd/mbxc
 	moon build ./examples/counter_mbx
 	chmod +x ./examples/counter_mbx/run.sh
 	./examples/counter_mbx/run.sh
+
+exp_page2: 
+	moon build ./examples/page_mbx
+	chmod +x ./examples/page_mbx/run.sh
+	./examples/page_mbx/run.sh
+
 
 run: 
 	python3 ./scripts/spa_server.py

@@ -1,4 +1,5 @@
 import {
-  "moonbitlang/x/fs" @fs,
+  "moonbitlang/x/fs",
   "Arcelyth/html_escape" @escape,
+  "Arcelyth/aitne/src/dom",
 }

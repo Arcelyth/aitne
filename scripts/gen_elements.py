@@ -154,6 +154,12 @@ def emit(elements) -> str:
         out.append(f"pub impl ElementType for {ty} with is_self_closing(_self) {{ {sc} }}")
         out.append(f"pub fn {fn}() -> HtmlElement[{ty}, Unit] {{ {{ tag: {ty}::{{}}, attrs: AttrList::new(), children: () }} }}")
         out.append("")
+
+    out.append("pub let builtin_elements : HashSet[String] = HashSet::from_array([")
+    for item in elements:
+        out.append(f'  "{item["tag"]}",')
+    out.append("])")
+    out.append("")
     return "\n".join(out).rstrip() + "\n"
 
 

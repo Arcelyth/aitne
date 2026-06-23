@@ -54,7 +54,9 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
       self.buf.write(")")
     }
     MbxAST::ElementNode(tag, attrs, children) => {
-      self.buf.write("\{package_path}/dom.")
+      if @dom.builtin_elements.contains(tag.to_owned()) {
+        self.buf.write("\{package_path}/dom.")
+      } 
       self.buf.write(tag)
       self.buf.write("()")
 

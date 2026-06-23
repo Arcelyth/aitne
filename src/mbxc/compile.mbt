@@ -3,6 +3,7 @@ pub fn from_file(
   path : String,
   show? : Bool = false,
   to? : String? = None,
+  tmp? : Bool = false,
 ) -> String? {
   let res = try? @fs.read_file_to_string(path)
   match res {
@@ -19,8 +20,13 @@ pub fn from_file(
         debug(asts)
       }
 
-      let codegen = CodeGen::new(asts)
-      let gen = codegen.generate()
+      let gen = if tmp {
+        let codegen = CodeGenTmp::new(asts)
+        codegen.generate()
+      } else {
+        let codegen = CodeGen::new()
+        codegen.generate(asts)
+      }
       match to {
         Some(target) => {
           let res2 = try? @fs.write_string_to_file(target, gen)

@@ -1,15 +1,16 @@
+//|
 ///|
 /// Generates MoonBit source code from the parsed MBX AST.
 /// Each contiguous group of template nodes is compiled into a static
 /// DOM template plus runtime binding instructions.
-pub(all) struct CodeGen {
+pub(all) struct CodeGenTmp {
   ast : Array[MbxAST]
 }
 
 ///|
 ///
-pub fn CodeGen::new(ast : Array[MbxAST]) -> CodeGen {
-  CodeGen::{ ast, }
+pub fn CodeGenTmp::new(ast : Array[MbxAST]) -> CodeGenTmp {
+  CodeGenTmp::{ ast, }
 }
 
 ///|
@@ -25,23 +26,6 @@ fn path_to_str(path : Array[Int]) -> String {
   }
   s += "]"
   s
-}
-
-///|
-fn escape_html(s : String) -> String {
-  let mut res = ""
-  for c in s.iter() {
-    match c {
-      '<' => res += "&lt;"
-      '>' => res += "&gt;"
-      '&' => res += "&amp;"
-      '"' => res += "&quot;"
-      '\'' => res += "&#39;"
-      _ => res += c.to_string()
-    }
-  }
-
-  res
 }
 
 ///|
@@ -74,7 +58,10 @@ fn escape_moonbit_str(s : String) -> String {
 ///    - dynamic child nodes
 ///
 /// The generated block returns the cloned root DOM node.
-fn CodeGen::compile_island(_self : CodeGen, nodes : Array[MbxAST]) -> String {
+fn CodeGenTmp::compile_island(
+  _self : CodeGenTmp,
+  nodes : Array[MbxAST],
+) -> String {
   let mut html = ""
   let bindings : Array[String] = []
 
@@ -88,7 +75,11 @@ fn CodeGen::compile_island(_self : CodeGen, nodes : Array[MbxAST]) -> String {
           let attr_name = attr.name.to_owned()
           match attr.value {
             AttrVal::Static(v) =>
-              html += " " + attr_name + "=\"" + escape_html(v.to_owned()) + "\""
+              html += " " +
+                attr_name +
+                "=\"" +
+                @escape.escape_safe(v.to_owned()) +
+                "\""
             AttrVal::Dynamic(code_view) => {
               let code = code_view.to_owned()
               let path_str = path_to_str(path)
@@ -124,7 +115,7 @@ fn CodeGen::compile_island(_self : CodeGen, nodes : Array[MbxAST]) -> String {
           html += "</" + tag_str + ">"
         }
       }
-      MbxAST::TextNode(t) => html += escape_html(t.to_owned())
+      MbxAST::TextNode(t) => html += @escape.escape_safe(t.to_owned())
       MbxAST::DynamicNode(code_view) => {
         html += ""
         let code = code_view.to_owned()
@@ -170,7 +161,7 @@ fn CodeGen::compile_island(_self : CodeGen, nodes : Array[MbxAST]) -> String {
 ///
 /// This allows ordinary MoonBit code and MBX templates
 /// to coexist within the same source file.
-pub fn CodeGen::generate(self : CodeGen) -> String {
+pub fn CodeGenTmp::generate(self : CodeGenTmp) -> String {
   let mut final_code = ""
   let mut current_island : Array[MbxAST] = []
 

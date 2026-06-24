@@ -38,8 +38,8 @@ fn interactive_section() -> &View {
   .children([
     "Start"
   ])
-  .attr("style", "padding: 0.75rem 1.5rem; width: 100%; background-color: #2563eb; color: #ffffff; font-weight: 600; border-radius: 0.75rem; border: none; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); font-size: 1rem; transition: background-color 0.2s;")
   .on(Click, fn(_ev) { println("Clicked") })
+  .attr("style", "padding: 0.75rem 1.5rem; width: 100%; background-color: #2563eb; color: #ffffff; font-weight: 600; border-radius: 0.75rem; border: none; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); font-size: 1rem; transition: background-color 0.2s;")
   ])
   .attr("style", "display: flex; flex-direction: column; align-items: center;")
 }

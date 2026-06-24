@@ -65,11 +65,8 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
       }
     }
     MbxAST::ElementNode(tag, attrs, children) => {
-      if @dom.builtin_elements.contains(tag.to_owned()) {
-        self.buf.write("\{package_path}/dom.")
-      }
-      self.buf.write(tag)
-      self.buf.write("()")
+      let tag_name = tag.to_owned()
+      let is_builtin = @dom.builtin_elements.contains(tag_name)
 
       let valid_children = []
       for i = 0; i < children.length(); i = i + 1 {
@@ -87,18 +84,80 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
         }
       }
 
-      if valid_children.length() > 0 {
-        self.buf.write("\n  .children([\n    ")
-        for i = 0; i < valid_children.length(); i = i + 1 {
-          if i > 0 {
-            self.buf.write(",\n    ")
-          }
-          self.gen_node(valid_children[i])
-        }
-        self.buf.write("\n  ])")
-      }
+      if is_builtin {
+        self.buf.write("\{package_path}/dom.")
+        self.buf.write(tag)
+        self.buf.write("()")
 
-      attrs.each((attr, val) => self.gen_attr(attr, val))
+        if valid_children.length() > 0 {
+          self.buf.write("\n  .children([\n    ")
+          for i = 0; i < valid_children.length(); i = i + 1 {
+            if i > 0 {
+              self.buf.write(",\n    ")
+            }
+            self.gen_node(valid_children[i])
+          }
+          self.buf.write("\n  ])")
+        }
+
+        attrs.each((attr, val) => self.gen_attr(attr, val))
+      } else {
+        self.buf.write(tag)
+        self.buf.write("(")
+
+        let mut need_comma = false
+
+        attrs.each((attr, val) => {
+          if need_comma {
+            self.buf.write(", ")
+          }
+          need_comma = true
+
+          let name = attr.name.to_owned()
+          let scope = match attr.ns {
+            Some(s) => s.to_owned()
+            None => ""
+          }
+
+          if scope != "" {
+            self.buf.write(scope)
+            self.buf.write("_")
+          }
+          self.buf.write(name)
+          self.buf.write("=")
+
+          if scope == "on" || (scope == "" && name == "value") {
+            self.buf.write(val)
+          } else {
+            self.buf.write("\"")
+            self.buf.write(escape_moonbit_str(val.to_owned()))
+            self.buf.write("\"")
+          }
+        })
+
+        if valid_children.length() > 0 {
+          if need_comma {
+            self.buf.write(", ")
+          }
+          self.buf.write("children=[")
+          for i = 0; i < valid_children.length(); i = i + 1 {
+            if i > 0 {
+              self.buf.write(", ")
+            }
+            match valid_children[i] {
+              MbxAST::RawText(t) => {
+                self.buf.write("text(\"")
+                self.buf.write(escape_moonbit_str(t.trim().to_owned()))
+                self.buf.write("\")")
+              }
+              _ => self.gen_node(valid_children[i])
+            }
+          }
+          self.buf.write("]")
+        }
+
+        self.buf.write(")")
+      }
     }
   }
 }

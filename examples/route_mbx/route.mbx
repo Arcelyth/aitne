@@ -1,0 +1,48 @@
+///|
+pub fn not_found() -> &View {
+  <div>NOT FOUND !!!!!!</div>
+}
+
+///|
+pub fn try_page() -> &View {
+  <div>This is try page !!!!!!</div>
+}
+
+///|
+pub fn home() -> &View {
+  <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+    <anchor href="/">Home</anchor>
+    <anchor href="/users">Users</anchor>
+    <anchor href="/users/1">User #1</anchor>
+    <anchor href="/try">TRY</anchor>
+    <anchor href="/about">404 Demo</anchor>
+    <anchor href="/xyz">Also 404</anchor>
+    <anchor href="/t/t1">t1</anchor>
+    <anchor href="/t/t2">t2</anchor>
+  </div>
+}
+
+///|
+pub fn users_page() -> &View {
+  <div style="padding: 1rem; border: 1px solid #eee; margin-top: 1rem;">
+    <h2>Users Overview</h2>
+    <p>Please select a user to view details:</p>
+    <ul>
+      <li><anchor href="/users/1">User #1 (Alice)</anchor></li>
+      <li><anchor href="/users/2">User #2 (Bob)</anchor></li>
+      <li><anchor href="/users/3">User #3 (Charlie)</anchor></li>
+    </ul>
+    <outlet />
+  </div>
+}
+
+///|
+pub fn user_detail_page() -> &View {
+  <div style="padding: 1rem; background-color: #f9f9f9; border-radius: 4px; margin-top: 1rem;">
+    <h3>User Profile Detail</h3>
+    <p>Successfully loaded user data via context parameters.</p>
+    <div style="margin-top: 1rem;">
+      <anchor href="/users">← Back to Users List</anchor>
+    </div>
+  </div>
+}

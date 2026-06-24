@@ -35,6 +35,11 @@ exp_todo2:
 	chmod +x ./examples/todo_mbx/run.sh
 	./examples/todo_mbx/run.sh
 
+exp_route2: 
+	moon build ./examples/route_mbx
+	chmod +x ./examples/route_mbx/run.sh
+	./examples/route_mbx/run.sh
+
 
 run: 
 	python3 ./scripts/spa_server.py

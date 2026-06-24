@@ -19,11 +19,11 @@ pub fn counter() -> &View {
   .children([
     "+1"
   ])
-  .on(Click, fn(_e) { set_count.update(fn(v) { v + 1 }) }),
+  .on(Click, (_) => { set_count.update((v) => { v + 1 }) }),
     @Arcelyth/aitne/src/dom.button()
   .children([
     "-1"
   ])
-  .on(Click, fn(_e) { set_count.update(fn(v) { v - 1 }) })
+  .on(Click, (_) => { set_count.update((v) => { v - 1 }) })
   ])
 }

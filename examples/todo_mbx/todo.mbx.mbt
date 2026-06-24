@@ -45,8 +45,8 @@ fn todo_app() -> &View {
     @Arcelyth/aitne/src/dom.div()
   .children([
     @Arcelyth/aitne/src/dom.input()
-  .on(Input, ev => set_input_val.set(event_target_value(ev)))
   .attr("type", "text")
+  .on(Input, ev => set_input_val.set(event_target_value(ev)))
   .value(input_val),
     @Arcelyth/aitne/src/dom.button()
   .children([

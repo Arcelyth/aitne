@@ -7,22 +7,8 @@ suberror MbxcError {
 ///|
 pub(all) enum MbxAST {
   PureCode(StringView)
-  TextNode(StringView)
-  DynamicNode(StringView)
-  ElementNode(StringView, Array[MbxAttribute], Array[MbxAST])
-} derive(Debug, Show, Eq)
-
-///|
-pub(all) struct MbxAttribute {
-  name : StringView
-  scope : StringView?
-  value : AttrVal
-} derive(Debug, Show, Eq)
-
-///|
-pub(all) enum AttrVal {
-  Static(StringView)
-  Dynamic(StringView)
+  // name, attrs, children
+  ElementNode(StringView, HashMap[TokenAttr, StringView], Array[MbxAST])
 } derive(Debug, Show, Eq)
 
 ///|
@@ -56,69 +42,7 @@ fn Parser::advance(self : Parser) -> Unit {
 }
 
 ///|
-fn Parser::parse_attributes(self : Parser) -> Array[MbxAttribute] {
-  let attrs = []
-//  while !self.is_end() {
-//    match self.peek() {
-//      Some(Token::Ident(name)) => {
-//        self.advance()
-//        let mut ns = None
-//        let mut final_name = name
-//
-//        match self.peek() {
-//          Some(Token::Colon) => {
-//            self.advance()
-//            match self.peek() {
-//              Some(Token::Ident(sub_name)) => {
-//                self.advance()
-//                ns = Some(final_name)
-//                final_name = sub_name
-//              }
-//              _ => ()
-//            }
-//          }
-//          _ => ()
-//        }
-//
-//        match self.peek() {
-//          Some(Token::Equal) => {
-//            self.advance()
-//            match self.peek() {
-//              Some(Token::AttrValue(v)) => {
-//                self.advance()
-//                attrs.push({
-//                  name: final_name,
-//                  scope: ns,
-//                  value: AttrVal::Static(v),
-//                })
-//              }
-//              Some(Token::CodeBlock(c)) => {
-//                self.advance()
-//                attrs.push({
-//                  name: final_name,
-//                  scope: ns,
-//                  value: AttrVal::Dynamic(c),
-//                })
-//              }
-//              _ => ()
-//            }
-//          }
-//          _ =>
-//            attrs.push({
-//              name: final_name,
-//              scope: ns,
-//              value: AttrVal::Static(""),
-//            })
-//        }
-//      }
-//      _ => break
-//    }
-//  }
-  attrs
-}
-
-///|
-pub fn Parser::parse_node(self : Parser) -> MbxAST? raise MbxcError {
+fn Parser::parse_node(self : Parser) -> MbxAST? raise MbxcError {
   guard !self.is_end() else { return None }
 
   match self.peek().unwrap() {
@@ -126,89 +50,50 @@ pub fn Parser::parse_node(self : Parser) -> MbxAST? raise MbxcError {
       self.advance()
       Some(MbxAST::PureCode(code))
     }
-//    Token::Start => {
-//      self.advance()
-//      match self.peek() {
-//        Some(Token::Ident(tag)) => {
-//          self.advance()
-//          let attrs = self.parse_attributes()
-//
-//          match self.peek() {
-//            Some(Token::SlashEnd) => {
-//              self.advance()
-//              Some(MbxAST::ElementNode(tag, attrs, []))
-//            }
-//            Some(Token::End) => {
-//              self.advance()
-//              let children = []
-//
-//              while !self.is_end() {
-//                match self.peek() {
-//                  Some(Token::Start) => {
-//                    let mut is_closing = false
-//
-//                    if self.cur + 1 < self.tokens.length() {
-//                      match self.tokens[self.cur + 1] {
-//                        Token::Slash => {
-//                          is_closing = true
-//                          self.cur += 2
-//
-//                          match self.peek() {
-//                            Some(Token::Ident(close_tag)) => {
-//                              if close_tag != tag {
-//                                raise ParserError(
-//                                  "Mismatched tag! Expected </\{tag}>, found </\{close_tag}>",
-//                                )
-//                              }
-//                              self.advance()
-//
-//                              match self.peek() {
-//                                Some(Token::End) => self.advance()
-//                                _ =>
-//                                  raise ParserError(
-//                                    "Expected '>' to close tag </\{tag}>",
-//                                  )
-//                              }
-//                            }
-//                            _ =>
-//                              raise ParserError("Expected tag name after '</'")
-//                          }
-//                        }
-//                        _ => ()
-//                      }
-//                    }
-//
-//                    if is_closing {
-//                      break
-//                    } else {
-//                      match self.parse_node() {
-//                        Some(child) => children.push(child)
-//                        None => ()
-//                      }
-//                    }
-//                  }
-//                  Some(Token::RawText(t)) => {
-//                    self.advance()
-//                    children.push(MbxAST::PureCode(t))
-//                  }
-//                  _ =>
-//                    match self.parse_node() {
-//                      Some(child) => children.push(child)
-//                      None => ()
-//                    }
-//                }
-//              }
-//              Some(MbxAST::ElementNode(tag, attrs, children))
-//            }
-//            _ =>
-//              raise ParserError(
-//                "Expected '>' or '/>' after attributes in <\{tag}>",
-//              )
-//          }
-//        }
-//        _ => raise ParserError("Expected valid tag name after '<'")
-//      }
-//    }
+    Token::CodeBlock(code) => {
+      self.advance()
+      Some(MbxAST::PureCode(code))
+    }
+    Token::TagSelfClose(tag_self) => {
+      self.advance()
+      Some(MbxAST::ElementNode(tag_self.tag, tag_self.attrs, []))
+    }
+    Token::TagClose(tag_close) =>
+      raise ParserError("Unexpected closing tag: </\{tag_close.tag}>")
+    Token::TagOpen(tag_open) => {
+      let tag_name = tag_open.tag
+      let attrs = tag_open.attrs
+      self.advance()
+
+      let children = []
+      let mut closed = false
+
+      while !self.is_end() {
+        match self.peek().unwrap() {
+          Token::TagClose(tag_close) =>
+            if tag_close.tag == tag_name {
+              self.advance()
+              closed = true
+              break
+            } else {
+              raise ParserError(
+                "Mismatched closing tag: expected </\{tag_name}>, got </\{tag_close.tag}>",
+              )
+            }
+          _ =>
+            match self.parse_node() {
+              Some(child_ast) => children.push(child_ast)
+              None => ()
+            }
+        }
+      }
+
+      if !closed {
+        raise ParserError("Unclosed tag: <\{tag_name}>")
+      }
+
+      Some(MbxAST::ElementNode(tag_name, attrs, children))
+    }
     _ => {
       self.advance()
       None

@@ -2,27 +2,27 @@
 using @hashmap {type HashMap}
 
 ///|
-pub struct TokenAttr {
+pub(all) struct TokenAttr {
   ns : StringView?
   name : StringView
 } derive(Debug, Eq, Hash, Show)
 
 ///|
 /// <div style="">
-pub struct TagOpen {
+pub(all) struct TagOpen {
   tag : StringView
   attrs : HashMap[TokenAttr, StringView]
 } derive(Debug, Eq, Show)
 
 ///|
 /// </div>
-pub struct TagClose {
+pub(all) struct TagClose {
   tag : StringView
 } derive(Debug, Eq, Show)
 
 ///|
 /// <div />
-pub struct TagSelfClose {
+pub(all) struct TagSelfClose {
   tag : StringView
   attrs : HashMap[TokenAttr, StringView]
 } derive(Debug, Eq, Show)

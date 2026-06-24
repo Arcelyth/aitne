@@ -38,103 +38,91 @@ fn capitalize_event(s : String) -> String {
 
 ///|
 fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
-  match node {
-    MbxAST::PureCode(code) => self.buf.write(code)
-    MbxAST::TextNode(text) => {
-      let s = text.to_owned()
-      if s.trim().length() > 0 {
-        self.buf.write("\{package_path}/dom.text(\"")
-        self.buf.write(escape_moonbit_str(s.trim().to_owned()))
-        self.buf.write("\")")
-      }
-    }
-    MbxAST::DynamicNode(code) => {
-      self.buf.write("\{package_path}/dom.text_dyn(")
-      self.buf.write(code)
-      self.buf.write(")")
-    }
-    MbxAST::ElementNode(tag, attrs, children) => {
-      if @dom.builtin_elements.contains(tag.to_owned()) {
-        self.buf.write("\{package_path}/dom.")
-      }
-      self.buf.write(tag)
-      self.buf.write("()")
-
-      let valid_children = []
-      for i = 0; i < children.length(); i = i + 1 {
-        let child = children[i]
-        match child {
-          MbxAST::TextNode(t) =>
-            if t.to_owned().trim().length() > 0 {
-              valid_children.push(child)
-            }
-          _ => valid_children.push(child)
-        }
-      }
-
-      if valid_children.length() > 0 {
-        self.buf.write("\n  .children([\n    ")
-        for i = 0; i < valid_children.length(); i = i + 1 {
-          if i > 0 {
-            self.buf.write(",\n    ")
-          }
-          self.gen_node(valid_children[i])
-        }
-        self.buf.write("\n  ])")
-      }
-
-      for i = 0; i < attrs.length(); i = i + 1 {
-        self.gen_attr(attrs[i])
-      }
-    }
-  }
+//  match node {
+//    MbxAST::PureCode(code) => self.buf.write(code)
+//
+//    MbxAST::ElementNode(tag, attrs, children) => {
+//      if @dom.builtin_elements.contains(tag.to_owned()) {
+//        self.buf.write("\{package_path}/dom.")
+//      }
+//      self.buf.write(tag)
+//      self.buf.write("()")
+//
+//      let valid_children = []
+//      for i = 0; i < children.length(); i = i + 1 {
+//        let child = children[i]
+//        match child {
+//          MbxAST::TextNode(t) =>
+//            if t.to_owned().trim().length() > 0 {
+//              valid_children.push(child)
+//            }
+//          _ => valid_children.push(child)
+//        }
+//      }
+//
+//      if valid_children.length() > 0 {
+//        self.buf.write("\n  .children([\n    ")
+//        for i = 0; i < valid_children.length(); i = i + 1 {
+//          if i > 0 {
+//            self.buf.write(",\n    ")
+//          }
+//          self.gen_node(valid_children[i])
+//        }
+//        self.buf.write("\n  ])")
+//      }
+//
+//      for i = 0; i < attrs.length(); i = i + 1 {
+//        self.gen_attr(attrs[i])
+//      }
+//    }
+//  }
 }
 
 ///|
-fn CodeGen::gen_attr(self : CodeGen, attr : MbxAttribute) -> Unit {
-  let name = attr.name.to_owned()
-  let scope = match attr.scope {
-    Some(s) => s.to_owned()
-    None => ""
-  }
-
-  if scope == "on" {
-    self.buf.write("\n  .on(")
-    self.buf.write(capitalize_event(name))
-    self.buf.write(", ")
-    match attr.value {
-      AttrVal::Static(s) => self.buf.write(s)
-      AttrVal::Dynamic(c) => {
-        let code = c.to_owned().trim()
-        if is_simple_ident(code.to_owned()) {
-          self.buf.write(code)
-          self.buf.write("(_)")
-        } else {
-          self.buf.write(code)
-        }
-      }
-    }
-    self.buf.write(")")
-  } else {
-    self.buf.write("\n  .attr(\"")
-    if scope != "" {
-      self.buf.write(scope)
-      self.buf.write(":")
-    }
-    self.buf.write(name)
-    self.buf.write("\", ")
-
-    match attr.value {
-      AttrVal::Static(s) => {
-        self.buf.write("\"")
-        self.buf.write(escape_moonbit_str(s.to_owned()))
-        self.buf.write("\"")
-      }
-      AttrVal::Dynamic(c) => self.buf.write(c)
-    }
-    self.buf.write(")")
-  }
-}
+//fn CodeGen::gen_attr(self : CodeGen, attr : MbxAttribute) -> Unit {
+//  let name = attr.name.to_owned()
+//  let scope = match attr.scope {
+//    Some(s) => s.to_owned()
+//    None => ""
+//  }
+//
+//  if scope == "on" {
+//    self.buf.write("\n  .on(")
+//    self.buf.write(capitalize_event(name))
+//    self.buf.write(", ")
+//    match attr.value {
+//      AttrVal::Static(s) => self.buf.write(s)
+//      AttrVal::Dynamic(c) => {
+//        let code = c.to_owned().trim()
+//        if is_simple_ident(code.to_owned()) {
+//          self.buf.write(code)
+//          self.buf.write("(_)")
+//        } else {
+//          self.buf.write(code)
+//        }
+//      }
+//    }
+//    self.buf.write(")")
+//  } else {
+//    self.buf.write("\n  .attr(\"")
+//    if scope != "" {
+//      self.buf.write(scope)
+//      self.buf.write(":")
+//    }
+//    self.buf.write(name)
+//    self.buf.write("\", ")
+//
+//    match attr.value {
+//      AttrVal::Static(s) => {
+//        self.buf.write("\"")
+//        self.buf.write(escape_moonbit_str(s.to_owned()))
+//        self.buf.write("\"")
+//      }
+//      AttrVal::Dynamic(c) => self.buf.write(c)
+//    }
+//    self.buf.write(")")
+//  }
+//}
 
 ///|
 fn is_simple_ident(s : String) -> Bool {

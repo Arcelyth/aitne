@@ -1,50 +1,47 @@
-/////|
-//test "lexer_parser_test" {
-//  let src =
-//    #|fn comp() -> &View {
-//    #|  // create a signal <ohh>
-//    #|  let (count, set_count) = @reactive.create_signal(0)
-//    #|  <div 
-//    #|    max="10" 
-//    #|    style="background-color: red;" 
-//    #|    on:click={() => 1} >{() => #{<div />}#}</div>
-//    #|}
-//  let lexer = Lexer::new(src)
-//  let tokens = lexer.tokenizer()
-//
-//  inspect(
-//    tokens,
-//    content="[RawText(fn comp() -> &View {\n  // create a signal <ohh>\n  let (count, set_count) = @reactive.create_signal(0)\n  ), Start, Ident(div), Ident(max), Equal, AttrValue(\"10\"), Ident(style), Equal, AttrValue(\"background-color: red;\"), Ident(on), Colon, Ident(click), Equal, CodeBlock(() => 1), End, BraceOpen, RawText(() => ), HashBraceOpen, Start, Ident(div), SlashEnd, HashBraceClose, BraceClose, Start, Slash, Ident(div), End, RawText(\n})]",
-//  )
-//
-//  let parser = Parser::new(tokens)
-//  let ast = parser.parse()
-//
-//  assert_eq(ast, [
-//    MbxAST::PureCode(
-//      "fn comp() -> &View {\n  // create a signal <ohh>\n  let (count, set_count) = @reactive.create_signal(0)\n  ",
-//    ),
-//    MbxAST::ElementNode(
-//      "div",
-//      [
-//        MbxAttribute::{
-//          name: "max",
-//          scope: None,
-//          value: AttrVal::Static("\"10\""),
-//        },
-//        MbxAttribute::{
-//          name: "style",
-//          scope: None,
-//          value: AttrVal::Static("\"background-color: red;\""),
-//        },
-//        MbxAttribute::{
-//          name: "click",
-//          scope: Some("on"),
-//          value: AttrVal::Dynamic("() => 1"),
-//        },
-//      ],
-//      [MbxAST::TextNode(" \n    Hello, World \n  ")],
-//    ),
-//    MbxAST::PureCode("\n}"),
-//  ])
-//}
+///|
+test "parser_basic_and_nested" {
+  // <div>hello <img src="a.png"/></div>
+  let tokens = [
+    Token::TagOpen({ tag: "div", attrs: HashMap([]) }),
+    Token::RawText("hello "),
+    Token::TagSelfClose({
+      tag: "img",
+      attrs: HashMap([({ ns: None, name: "src" }, "a.png")]),
+    }),
+    Token::TagClose({ tag: "div" }),
+  ]
+
+  let parser = Parser::new(tokens)
+  let ast = parser.parse()
+
+  inspect(
+    ast,
+    content="[ElementNode(div, HashMap::from_array([]), [PureCode(hello ), ElementNode(img, HashMap::from_array([({ns: None, name: src}, a.png)]), [])])]",
+  )
+}
+
+///|
+test "parser_embedded_code_blocks" {
+  // let v = #{ <div>{ () => #{ <div /> }# }</div> }#
+  let tokens = [
+    Token::RawText("let v = "),
+    Token::HashBraceOpen,
+    Token::TagOpen({ tag: "div", attrs: HashMap([]) }),
+    Token::BraceOpen,
+    Token::RawText(" () => "),
+    Token::HashBraceOpen,
+    Token::TagSelfClose({ tag: "div", attrs: HashMap([]) }),
+    Token::HashBraceClose,
+    Token::BraceClose,
+    Token::TagClose({ tag: "div" }),
+    Token::HashBraceClose,
+  ]
+
+  let parser = Parser::new(tokens)
+  let ast = parser.parse()
+
+  inspect(
+    ast,
+    content="[PureCode(let v = ), ElementNode(div, HashMap::from_array([]), [PureCode( () => ), ElementNode(div, HashMap::from_array([]), [])])]",
+  )
+}

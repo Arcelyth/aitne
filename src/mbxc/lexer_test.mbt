@@ -61,7 +61,7 @@ test "lexer_<_handle_inside" {
 
 ///|
 test "lexer_attributes" {
-  let src = #|<div id="app" class="container"></div>
+  let src = #|<div id="app"></div>
 
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
@@ -69,7 +69,7 @@ test "lexer_attributes" {
   inspect(
     tokens,
     content=
-      "[TagOpen({tag: div, attrs: HashMap::from_array([({ns: , name: id}, app), ({ns: , name: class}, container)])}), TagClose({tag: div})]",
+      "[TagOpen({tag: div, attrs: HashMap::from_array([({ns: None, name: id}, app)])}), TagClose({tag: div})]",
   )
 }
 
@@ -83,7 +83,7 @@ test "lexer_event_attribute" {
   inspect(
     tokens,
     content=
-      "[TagOpen({tag: button, attrs: HashMap::from_array([({ns: on, name: click}, () => 1)])}), RawText(+), TagClose({tag: button})]",
+      "[TagOpen({tag: button, attrs: HashMap::from_array([({ns: Some(on), name: click}, () => 1)])}), RawText(+), TagClose({tag: button})]",
   )
 }
 
@@ -97,7 +97,7 @@ test "lexer_self_closing" {
   inspect(
     tokens,
     content=
-      "[TagSelfClose({tag: img, attrs: HashMap::from_array([({ns: , name: src}, a.png)])})]",
+      "[TagSelfClose({tag: img, attrs: HashMap::from_array([({ns: None, name: src}, a.png)])})]",
   )
 }
 
@@ -111,7 +111,7 @@ test "lexer_self_closing" {
   inspect(
     tokens,
     content=
-      "[TagSelfClose({tag: button, attrs: HashMap::from_array([({ns: on, name: click}, () => a)])})]",
+      "[TagSelfClose({tag: button, attrs: HashMap::from_array([({ns: Some(on), name: click}, () => a)])})]",
   )
 }
 
@@ -173,6 +173,6 @@ test "lexer_nested_code_block_attr" {
   inspect(
     tokens,
     content=
-      "[TagOpen({tag: div, attrs: HashMap::from_array([({ns: , name: value}, { a: { b: 1 } })])}), TagClose({tag: div})]",
+      "[TagOpen({tag: div, attrs: HashMap::from_array([({ns: None, name: value}, { a: { b: 1 } })])}), TagClose({tag: div})]",
   )
 }

@@ -3,27 +3,27 @@ using @hashmap {type HashMap}
 
 ///|
 pub struct TokenAttr {
-  ns : String
-  name : String
+  ns : StringView?
+  name : StringView
 } derive(Debug, Eq, Hash, Show)
 
 ///|
 /// <div style="">
 pub struct TagOpen {
-  tag : String
+  tag : StringView
   attrs : HashMap[TokenAttr, StringView]
 } derive(Debug, Eq, Show)
 
 ///|
 /// </div>
 pub struct TagClose {
-  tag : String
+  tag : StringView
 } derive(Debug, Eq, Show)
 
 ///|
 /// <div />
 pub struct TagSelfClose {
-  tag : String
+  tag : StringView
   attrs : HashMap[TokenAttr, StringView]
 } derive(Debug, Eq, Show)
 
@@ -46,15 +46,9 @@ pub(all) enum Token {
 } derive(Debug, Eq, Show)
 
 ///|
-pub(all) enum MbxState {
-  M // MoonBit Code
-} derive(Debug, Eq)
-
-///|
 pub(all) struct Lexer {
   src : String
   mut cur : Int
-  mut state : MbxState
   mut brace_depth : Int
   mut tag_depth : Int
   mut in_closing_tag : Bool
@@ -65,7 +59,6 @@ pub fn Lexer::new(src : String) -> Lexer {
   Lexer::{
     src,
     cur: 0,
-    state: MbxState::M,
     brace_depth: 0,
     tag_depth: 0,
     in_closing_tag: false,
@@ -225,204 +218,200 @@ pub fn Lexer::scan_string(self : Lexer) -> Unit raise MbxcError {
 pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
   guard !self.is_end() else { return None }
 
-  match self.state {
-    MbxState::M => {
-      let start = self.cur
-      match self.src[self.cur] {
-        // #{ 
-        '#' if self.peek(1) == Some('{') => {
+  let start = self.cur
+  match self.src[self.cur] {
+    // #{ 
+    '#' if self.peek(1) == Some('{') => {
+      self.cur += 2
+      while !self.is_end() && self.src[self.cur] != '<' {
+        self.cur += 1
+      }
+      if self.is_end() {
+        raise LexerError("Expected match tag in #{}#")
+      }
+      return Some(Token::HashBraceOpen)
+    }
+    '{' if self.tag_depth > 0 => {
+      self.cur += 1
+      self.brace_depth += 1
+      return Some(Token::BraceOpen)
+    }
+    // }# 
+    '}' if self.peek(1) == Some('#') => {
+      self.cur += 2
+      return Some(Token::HashBraceClose)
+    }
+    '}' if self.tag_depth > 0 => {
+      self.cur += 1
+      self.brace_depth -= 1
+      return Some(Token::BraceClose)
+    }
+    '<' =>
+      match self.peek(1) {
+        Some('!') => {
           self.cur += 2
-          while !self.is_end() && self.src[self.cur] != '<' {
+          while !self.is_end() && self.src[self.cur] != '>' {
             self.cur += 1
           }
-          if self.is_end() {
-            raise LexerError("Expected match tag in #{}#")
+          if !self.is_end() {
+            self.cur += 1
           }
-          return Some(Token::HashBraceOpen)
+          return Some(Token::DocTag(DocTag::{  }))
         }
-        '{' if self.tag_depth > 0 => {
-          self.cur += 1
-          self.brace_depth += 1
-          return Some(Token::BraceOpen)
-        }
-        // }# 
-        '}' if self.peek(1) == Some('#') => {
+        Some('/') => {
           self.cur += 2
-          return Some(Token::HashBraceClose)
-        }
-        '}' if self.tag_depth > 0 => {
-          self.cur += 1
-          self.brace_depth -= 1
-          return Some(Token::BraceClose)
-        }
-        '<' =>
-          match self.peek(1) {
-            Some('!') => {
-              self.cur += 2
-              while !self.is_end() && self.src[self.cur] != '>' {
-                self.cur += 1
-              }
-              if !self.is_end() {
-                self.cur += 1
-              }
-              return Some(Token::DocTag(DocTag::{  }))
-            }
-            Some('/') => {
-              self.cur += 2
-              while !self.is_end() && is_space(self.src[self.cur]) {
-                self.cur += 1
-              }
-              let tag_start = self.cur
-              while !self.is_end() && is_ident_char(self.src[self.cur]) {
-                self.cur += 1
-              }
-              let tag = self.src[tag_start:self.cur].to_owned()
-
-              while !self.is_end() && is_space(self.src[self.cur]) {
-                self.cur += 1
-              }
-              if self.is_end() || self.src[self.cur] != '>' {
-                raise LexerError("Expected '>' after closing tag")
-              }
-              self.cur += 1
-
-              if self.tag_depth > 0 {
-                self.tag_depth -= 1
-              }
-              return Some(Token::TagClose(TagClose::{ tag, }))
-            }
-            Some(next) if is_tag_start_char(next) => {
-              self.cur += 1
-              while !self.is_end() && is_space(self.src[self.cur]) {
-                self.cur += 1
-              }
-
-              let tag_start = self.cur
-              while !self.is_end() && is_ident_char(self.src[self.cur]) {
-                self.cur += 1
-              }
-              let tag = self.src[tag_start:self.cur].to_owned()
-
-              let attrs : HashMap[TokenAttr, StringView] = HashMap([])
-
-              while !self.is_end() {
-                while !self.is_end() && is_space(self.src[self.cur]) {
-                  self.cur += 1
-                }
-                if self.is_end() {
-                  break
-                }
-                let ch = self.src[self.cur]
-                if ch == '/' || ch == '>' {
-                  break
-                }
-
-                // Parse attribute name and optional namespace
-                let ns_start = self.cur
-                while !self.is_end() && is_ident_char(self.src[self.cur]) {
-                  self.cur += 1
-                }
-                let mut ns = ""
-                let mut name = self.src[ns_start:self.cur].to_owned()
-
-                if !self.is_end() && self.src[self.cur] == ':' {
-                  self.cur += 1
-                  ns = name
-                  let name_start = self.cur
-                  while !self.is_end() && is_ident_char(self.src[self.cur]) {
-                    self.cur += 1
-                  }
-                  name = self.src[name_start:self.cur].to_owned()
-                }
-
-                while !self.is_end() && is_space(self.src[self.cur]) {
-                  self.cur += 1
-                }
-                // Empty string view fallback
-                let mut val_sv = self.src[self.cur:self.cur]
-
-                if !self.is_end() && self.src[self.cur] == '=' {
-                  self.cur += 1
-                  while !self.is_end() && is_space(self.src[self.cur]) {
-                    self.cur += 1
-                  }
-
-                  if !self.is_end() {
-                    let quote_c = self.src[self.cur]
-                    if quote_c == '"' || quote_c == '\'' {
-                      let quote = quote_c
-                      self.cur += 1
-                      let val_start = self.cur
-                      while !self.is_end() && self.src[self.cur] != quote {
-                        if self.src[self.cur] == '\\' &&
-                          self.cur + 1 < self.src.length() {
-                          self.cur += 2
-                        } else {
-                          self.cur += 1
-                        }
-                      }
-                      if self.is_end() {
-                        raise LexerError("Unclosed attribute value")
-                      }
-                      val_sv = self.src[val_start:self.cur]
-                      self.cur += 1 // skip quote
-                    } else if quote_c == '{' {
-                      val_sv = self.read_code_block()
-                    } else {
-                      // unquoted attribute value
-                      let val_start = self.cur
-                      while !self.is_end() &&
-                            !is_space(self.src[self.cur]) &&
-                            self.src[self.cur] != '/' &&
-                            self.src[self.cur] != '>' {
-                        self.cur += 1
-                      }
-                      val_sv = self.src[val_start:self.cur]
-                    }
-                  }
-                }
-
-                attrs.set(TokenAttr::{ ns, name }, val_sv)
-              }
-
-              if !self.is_end() && self.src[self.cur] == '/' {
-                if self.peek(1) == Some('>') {
-                  self.cur += 2
-                  return Some(Token::TagSelfClose(TagSelfClose::{ tag, attrs }))
-                } else {
-                  raise LexerError("Expected '>' after '/'")
-                }
-              } else if !self.is_end() && self.src[self.cur] == '>' {
-                self.cur += 1
-                self.tag_depth += 1
-                return Some(Token::TagOpen(TagOpen::{ tag, attrs }))
-              } else {
-                raise LexerError("Unexpected character in tag")
-              }
-            }
-            _ => return None
+          while !self.is_end() && is_space(self.src[self.cur]) {
+            self.cur += 1
           }
-        _ => {
+          let tag_start = self.cur
+          while !self.is_end() && is_ident_char(self.src[self.cur]) {
+            self.cur += 1
+          }
+          let tag = self.src[tag_start:self.cur]
+
+          while !self.is_end() && is_space(self.src[self.cur]) {
+            self.cur += 1
+          }
+          if self.is_end() || self.src[self.cur] != '>' {
+            raise LexerError("Expected '>' after closing tag")
+          }
+          self.cur += 1
+
+          if self.tag_depth > 0 {
+            self.tag_depth -= 1
+          }
+          return Some(Token::TagClose(TagClose::{ tag, }))
+        }
+        Some(next) if is_tag_start_char(next) => {
+          self.cur += 1
+          while !self.is_end() && is_space(self.src[self.cur]) {
+            self.cur += 1
+          }
+
+          let tag_start = self.cur
+          while !self.is_end() && is_ident_char(self.src[self.cur]) {
+            self.cur += 1
+          }
+          let tag = self.src[tag_start:self.cur]
+
+          let attrs : HashMap[TokenAttr, StringView] = HashMap([])
+
           while !self.is_end() {
-            let next_c = self.src[self.cur]
-            if next_c == '"' {
+            while !self.is_end() && is_space(self.src[self.cur]) {
               self.cur += 1
-              try! self.scan_string()
-              continue
             }
-            if next_c == '/' && self.peek(1) == Some('/') {
-              self.cur += 2
-              try! self.scan_comment()
-              continue
-            }
-            if self.is_raw_boundary(next_c) {
+            if self.is_end() {
               break
             }
-            self.cur += 1
+            let ch = self.src[self.cur]
+            if ch == '/' || ch == '>' {
+              break
+            }
+
+            // Parse attribute name and optional namespace
+            let ns_start = self.cur
+            while !self.is_end() && is_ident_char(self.src[self.cur]) {
+              self.cur += 1
+            }
+            let mut ns = None
+            let mut name = self.src[ns_start:self.cur]
+
+            if !self.is_end() && self.src[self.cur] == ':' {
+              self.cur += 1
+              ns = Some(name)
+              let name_start = self.cur
+              while !self.is_end() && is_ident_char(self.src[self.cur]) {
+                self.cur += 1
+              }
+              name = self.src[name_start:self.cur]
+            }
+
+            while !self.is_end() && is_space(self.src[self.cur]) {
+              self.cur += 1
+            }
+            // Empty string view fallback
+            let mut val_sv = self.src[self.cur:self.cur]
+
+            if !self.is_end() && self.src[self.cur] == '=' {
+              self.cur += 1
+              while !self.is_end() && is_space(self.src[self.cur]) {
+                self.cur += 1
+              }
+
+              if !self.is_end() {
+                let quote_c = self.src[self.cur]
+                if quote_c == '"' || quote_c == '\'' {
+                  let quote = quote_c
+                  self.cur += 1
+                  let val_start = self.cur
+                  while !self.is_end() && self.src[self.cur] != quote {
+                    if self.src[self.cur] == '\\' &&
+                      self.cur + 1 < self.src.length() {
+                      self.cur += 2
+                    } else {
+                      self.cur += 1
+                    }
+                  }
+                  if self.is_end() {
+                    raise LexerError("Unclosed attribute value")
+                  }
+                  val_sv = self.src[val_start:self.cur]
+                  self.cur += 1 // skip quote
+                } else if quote_c == '{' {
+                  val_sv = self.read_code_block()
+                } else {
+                  // unquoted attribute value
+                  let val_start = self.cur
+                  while !self.is_end() &&
+                        !is_space(self.src[self.cur]) &&
+                        self.src[self.cur] != '/' &&
+                        self.src[self.cur] != '>' {
+                    self.cur += 1
+                  }
+                  val_sv = self.src[val_start:self.cur]
+                }
+              }
+            }
+
+            attrs.set(TokenAttr::{ ns, name }, val_sv)
           }
-          return Some(Token::RawText(self.src[start:self.cur]))
+
+          if !self.is_end() && self.src[self.cur] == '/' {
+            if self.peek(1) == Some('>') {
+              self.cur += 2
+              return Some(Token::TagSelfClose(TagSelfClose::{ tag, attrs }))
+            } else {
+              raise LexerError("Expected '>' after '/'")
+            }
+          } else if !self.is_end() && self.src[self.cur] == '>' {
+            self.cur += 1
+            self.tag_depth += 1
+            return Some(Token::TagOpen(TagOpen::{ tag, attrs }))
+          } else {
+            raise LexerError("Unexpected character in tag")
+          }
         }
+        _ => return None
       }
+    _ => {
+      while !self.is_end() {
+        let next_c = self.src[self.cur]
+        if next_c == '"' {
+          self.cur += 1
+          try! self.scan_string()
+          continue
+        }
+        if next_c == '/' && self.peek(1) == Some('/') {
+          self.cur += 2
+          try! self.scan_comment()
+          continue
+        }
+        if self.is_raw_boundary(next_c) {
+          break
+        }
+        self.cur += 1
+      }
+      return Some(Token::RawText(self.src[start:self.cur]))
     }
   }
 }

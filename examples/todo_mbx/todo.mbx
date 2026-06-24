@@ -31,7 +31,7 @@ fn todo_app() -> &View {
   }
 
   <div>
-    <h1> "Todo List" </h1>
+    <h1> Todo List </h1>
     <div>{() => todo.get().length().to_string() }</div>
     <div>
       <input 
@@ -39,15 +39,15 @@ fn todo_app() -> &View {
         value={input_val} 
         on:input={ev => set_input_val.set(event_target_value(ev))} 
       />
-      <button on:click={add_item}> "Add" </button>
+      <button on:click={add_item}> Add </button>
     </div>
     <ul>
-      for_node(() => todo.get(), item => item, (item) => {
+      {for_node(() => todo.get(), item => {return item }, (item) => {
         <li>
-          item
+          {() => item}
           <button on:click={_ => remove_item(item)}> "Delete" </button>
         </li>
-      })
+      })}
     </ul>
   </div>
 

@@ -126,6 +126,7 @@ fn CodeGenTmp::compile_island(
 //        )
 //      }
       MbxAST::PureCode(_) => ()
+      _ => ()
     }
   }
 

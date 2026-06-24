@@ -7,6 +7,8 @@ suberror MbxcError {
 ///|
 pub(all) enum MbxAST {
   PureCode(StringView)
+  RawText(StringView)
+  DynamicCode(Array[MbxAST])
   // name, attrs, children
   ElementNode(StringView, HashMap[TokenAttr, StringView], Array[MbxAST])
 } derive(Debug, Show, Eq)
@@ -80,6 +82,65 @@ fn Parser::parse_node(self : Parser) -> MbxAST? raise MbxcError {
                 "Mismatched closing tag: expected </\{tag_name}>, got </\{tag_close.tag}>",
               )
             }
+          Token::BraceOpen => {
+            self.advance()
+            let mut brace_depth = 1
+            let local_children = []
+            let code_buf = StringBuilder::new()
+
+            while brace_depth > 0 && !self.is_end() {
+              match self.peek().unwrap() {
+                Token::BraceOpen => {
+                  brace_depth += 1
+                  code_buf.write("{")
+                  self.advance()
+                }
+                Token::BraceClose => {
+                  brace_depth -= 1
+                  if brace_depth > 0 {
+                    code_buf.write("}")
+                  }
+                  self.advance()
+                }
+                Token::TagOpen(_) => {
+                  let code_str = code_buf.to_string()
+                  if code_str.length() > 0 {
+                    local_children.push(MbxAST::PureCode(code_str))
+                  }
+                  code_buf.reset()
+
+                  match self.parse_node() {
+                    Some(element_ast) => local_children.push(element_ast)
+                    None => ()
+                  }
+                }
+                Token::RawText(text) => {
+                  code_buf.write(text.to_owned())
+                  self.advance()
+                }
+                Token::CodeBlock(code) => {
+                  code_buf.write(code.to_owned())
+                  self.advance()
+                }
+                _ => self.advance()
+              }
+            }
+
+            let code_str = code_buf.to_string()
+            if code_str.length() > 0 {
+              local_children.push(MbxAST::PureCode(code_str))
+            }
+
+            if brace_depth > 0 {
+              raise ParserError("Unclosed '{'")
+            }
+
+            children.push(MbxAST::DynamicCode(local_children))
+          }
+          Token::RawText(text) => {
+            self.advance()
+            children.push(MbxAST::RawText(text))
+          }
           _ =>
             match self.parse_node() {
               Some(child_ast) => children.push(child_ast)

@@ -20,51 +20,63 @@ pub fn CodeGen::generate(self : CodeGen, ast_nodes : Array[MbxAST]) -> String {
 }
 
 ///|
-fn capitalize_event(s : String) -> String {
-  if s.length() == 0 {
-    return ""
+fn capitalize_event(event : String) -> String {
+  match event {
+    "click" => "Click"
+    "input" => "Input"
+    "change" => "Change"
+    "blur" => "Blur"
+    _ => event
   }
-  let c = s[0]
-  let upper = if c >= 'a' && c <= 'z' {
-    match Int::to_char(c.to_int() - 32) {
-      Some(a) => a.to_string()
-      _ => c.to_string()
-    }
-  } else {
-    c.to_string()
-  }
-  upper + s[1:].to_owned()
 }
 
 ///|
 fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
   match node {
     MbxAST::PureCode(code) => self.buf.write(code)
-    MbxAST::TextNode(text) => {
-      let s = text.to_owned()
-      if s.trim().length() > 0 {
-        self.buf.write("\{package_path}/dom.text(\"")
-        self.buf.write(@escape.escape_safe(s.trim().to_owned()))
-        self.buf.write("\")")
+    MbxAST::RawText(text) => {
+      let trim_t = text.trim()
+      self.buf.write("\"")
+      self.buf.write(escape_moonbit_str(trim_t.to_owned()))
+      self.buf.write("\"")
+    }
+    MbxAST::DynamicCode(local_children) => {
+      let mut contains_element = false
+      for child in local_children {
+        match child {
+          MbxAST::ElementNode(_) => {
+            contains_element = true
+            break
+          }
+          _ => ()
+        }
+      }
+
+      if contains_element {
+        for child in local_children {
+          self.gen_node(child)
+        }
+      } else {
+        self.buf.write("\{package_path}/dom.text_dyn(\n        ")
+        for child in local_children {
+          self.gen_node(child)
+        }
+        self.buf.write("\n      )")
       }
     }
-    MbxAST::DynamicNode(code) => {
-      self.buf.write("\{package_path}/dom.text_dyn(")
-      self.buf.write(code)
-      self.buf.write(")")
-    }
     MbxAST::ElementNode(tag, attrs, children) => {
-      if @dom.builtin_elements.contains(tag.to_owned()) {
-        self.buf.write("\{package_path}/dom.")
-      } 
-      self.buf.write(tag)
-      self.buf.write("()")
+      let tag_name = tag.to_owned()
+      let is_builtin = @dom.builtin_elements.contains(tag_name)
 
       let valid_children = []
       for i = 0; i < children.length(); i = i + 1 {
         let child = children[i]
         match child {
-          MbxAST::TextNode(t) =>
+          MbxAST::PureCode(t) =>
+            if t.to_owned().trim().length() > 0 {
+              valid_children.push(child)
+            }
+          MbxAST::RawText(t) =>
             if t.to_owned().trim().length() > 0 {
               valid_children.push(child)
             }
@@ -72,41 +84,105 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
         }
       }
 
-      if valid_children.length() > 0 {
-        self.buf.write("\n  .children([\n    ")
-        for i = 0; i < valid_children.length(); i = i + 1 {
-          if i > 0 {
-            self.buf.write(",\n    ")
-          }
-          self.gen_node(valid_children[i])
-        }
-        self.buf.write("\n  ])")
-      }
+      if is_builtin {
+        self.buf.write("\{package_path}/dom.")
+        self.buf.write(tag)
+        self.buf.write("()")
 
-      for i = 0; i < attrs.length(); i = i + 1 {
-        self.gen_attr(attrs[i])
+        if valid_children.length() > 0 {
+          self.buf.write("\n  .children([\n    ")
+          for i = 0; i < valid_children.length(); i = i + 1 {
+            if i > 0 {
+              self.buf.write(",\n    ")
+            }
+            self.gen_node(valid_children[i])
+          }
+          self.buf.write("\n  ])")
+        }
+
+        attrs.each((attr, val) => self.gen_attr(attr, val))
+      } else {
+        self.buf.write(tag)
+        self.buf.write("(")
+
+        let mut need_comma = false
+
+        attrs.each((attr, val) => {
+          if need_comma {
+            self.buf.write(", ")
+          }
+          need_comma = true
+
+          let name = attr.name.to_owned()
+          let scope = match attr.ns {
+            Some(s) => s.to_owned()
+            None => ""
+          }
+
+          if scope != "" {
+            self.buf.write(scope)
+            self.buf.write("_")
+          }
+          self.buf.write(name)
+          self.buf.write("=")
+
+          if scope == "on" || (scope == "" && name == "value") {
+            self.buf.write(val)
+          } else {
+            self.buf.write("\"")
+            self.buf.write(escape_moonbit_str(val.to_owned()))
+            self.buf.write("\"")
+          }
+        })
+
+        if valid_children.length() > 0 {
+          if need_comma {
+            self.buf.write(", ")
+          }
+          self.buf.write("children=[")
+          for i = 0; i < valid_children.length(); i = i + 1 {
+            if i > 0 {
+              self.buf.write(", ")
+            }
+            match valid_children[i] {
+              MbxAST::RawText(t) => {
+                self.buf.write("text(\"")
+                self.buf.write(escape_moonbit_str(t.trim().to_owned()))
+                self.buf.write("\")")
+              }
+              _ => self.gen_node(valid_children[i])
+            }
+          }
+          self.buf.write("]")
+        }
+
+        self.buf.write(")")
       }
     }
   }
 }
 
 ///|
-fn CodeGen::gen_attr(self : CodeGen, attr : MbxAttribute) -> Unit {
+fn CodeGen::gen_attr(
+  self : CodeGen,
+  attr : TokenAttr,
+  val : StringView,
+) -> Unit {
   let name = attr.name.to_owned()
-  let scope = match attr.scope {
+  let scope = match attr.ns {
     Some(s) => s.to_owned()
     None => ""
   }
 
   if scope == "on" {
-    // on:click -> .on(Click, fn(_e) { ... })
     self.buf.write("\n  .on(")
     self.buf.write(capitalize_event(name))
     self.buf.write(", ")
-    match attr.value {
-      AttrVal::Static(s) => self.buf.write(s)
-      AttrVal::Dynamic(c) => self.buf.write(c)
-    }
+    self.buf.write(val)
+    self.buf.write(")")
+  } else if scope == "" && name == "value" {
+    self.buf.write("\n  .value(")
+    self.buf.write(val)
     self.buf.write(")")
   } else {
     self.buf.write("\n  .attr(\"")
@@ -117,14 +193,9 @@ fn CodeGen::gen_attr(self : CodeGen, attr : MbxAttribute) -> Unit {
     self.buf.write(name)
     self.buf.write("\", ")
 
-    match attr.value {
-      AttrVal::Static(s) => {
-        self.buf.write("\"")
-        self.buf.write(@escape.escape_safe(s.to_owned()))
-        self.buf.write("\"")
-      }
-      AttrVal::Dynamic(c) => self.buf.write(c)
-    }
+    self.buf.write("\"")
+    self.buf.write(escape_moonbit_str(val.to_owned()))
+    self.buf.write("\"")
     self.buf.write(")")
   }
 }

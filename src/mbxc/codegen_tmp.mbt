@@ -33,7 +33,7 @@ fn escape_moonbit_str(s : String) -> String {
   let mut res = ""
   for c in s.iter() {
     match c {
-      '\"' => res += "\\\""
+      '"' => res += "\\\""
       '\\' => res += "\\\\"
       '\n' => res += "\\n"
       '\r' => res += "\\r"
@@ -43,6 +43,7 @@ fn escape_moonbit_str(s : String) -> String {
   }
   res
 }
+
 
 ///|
 /// Compiles a single template island into generated MoonBit code.
@@ -71,32 +72,32 @@ fn CodeGenTmp::compile_island(
         let tag_str = tag.to_owned()
         html += "<" + tag_str
 
-        for attr in attrs {
-          let attr_name = attr.name.to_owned()
-          match attr.value {
-            AttrVal::Static(v) =>
-              html += " " +
-                attr_name +
-                "=\"" +
-                @escape.escape_safe(v.to_owned()) +
-                "\""
-            AttrVal::Dynamic(code_view) => {
-              let code = code_view.to_owned()
-              let path_str = path_to_str(path)
-              match attr.scope {
-                Some(ns) if ns.to_owned() == "on" =>
-                  bindings.push(
-                    "  @Arcelyth/aitne/src/dom.on(_root, \{path_str}, \"\{attr_name}\", \{code})",
-                  )
-                _ =>
-                  bindings.push(
-                    "  @Arcelyth/aitne/src/dom.set_attr(_root, \{path_str}, \"\{attr_name}\", \{code})",
-                  )
-              }
-            }
-          }
-        }
-
+//        for attr in attrs {
+//          let attr_name = attr.name.to_owned()
+//          match attr.value {
+//            AttrVal::Static(v) =>
+//              html += " " +
+//                attr_name +
+//                "=\"" +
+//                @escape.escape_safe(v.to_owned()) +
+//                "\""
+//            AttrVal::Dynamic(code_view) => {
+//              let code = code_view.to_owned()
+//              let path_str = path_to_str(path)
+//              match attr.scope {
+//                Some(ns) if ns.to_owned() == "on" =>
+//                  bindings.push(
+//                    "  @Arcelyth/aitne/src/dom.on(_root, \{path_str}, \"\{attr_name}\", \{code})",
+//                  )
+//                _ =>
+//                  bindings.push(
+//                    "  @Arcelyth/aitne/src/dom.set_attr(_root, \{path_str}, \"\{attr_name}\", \{code})",
+//                  )
+//              }
+//            }
+//          }
+//        }
+//
         if children.length() == 0 {
           html += "></" + tag_str + ">"
         } else {
@@ -115,16 +116,17 @@ fn CodeGenTmp::compile_island(
           html += "</" + tag_str + ">"
         }
       }
-      MbxAST::TextNode(t) => html += @escape.escape_safe(t.to_owned())
-      MbxAST::DynamicNode(code_view) => {
-        html += ""
-        let code = code_view.to_owned()
-        let path_str = path_to_str(path)
-        bindings.push(
-          "    @Arcelyth/aitne/src/dom.insert_dynamic(_root, \{path_str}, \{code})",
-        )
-      }
+//      MbxAST::TextNode(t) => html += @escape.escape_safe(t.to_owned())
+//      MbxAST::DynamicNode(code_view) => {
+//        html += ""
+//        let code = code_view.to_owned()
+//        let path_str = path_to_str(path)
+//        bindings.push(
+//          "    @Arcelyth/aitne/src/dom.insert_dynamic(_root, \{path_str}, \{code})",
+//        )
+//      }
       MbxAST::PureCode(_) => ()
+      _ => ()
     }
   }
 

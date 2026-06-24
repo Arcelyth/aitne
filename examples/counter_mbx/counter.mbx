@@ -5,14 +5,13 @@ pub fn counter() -> &View {
 
   <div>
     <h1>Counter</h1>
-    
     <p>{ () => count.get().to_string() }</p>
 
-    <button on:click={fn(_e) { set_count.update(fn(v) { v + 1 }) }}>
+    <button on:click={(_) => { set_count.update((v) => { v + 1 }) }}>
       +1
     </button>
 
-    <button on:click={fn(_e) { set_count.update(fn(v) { v - 1 }) }}>
+    <button on:click={(_) => { set_count.update((v) => { v - 1 }) }}>
       -1
     </button>
   </div>

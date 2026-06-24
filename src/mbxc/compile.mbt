@@ -9,7 +9,13 @@ pub fn from_file(
   match res {
     Ok(content) => {
       let lexer = Lexer::new(content)
-      let tokens = try! lexer.tokenizer()
+      let tokens = match (try? lexer.tokenizer()) {
+        Ok(ts) => ts
+        Err(e) => {
+          debug(e)
+          panic()
+        }
+      }
       if show {
         debug(tokens)
       }

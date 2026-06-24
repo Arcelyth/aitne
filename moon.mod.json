@@ -1,6 +1,6 @@
 {
   "name": "Arcelyth/aitne",
-  "version": "0.2.8",
+  "version": "0.3.3",
   "deps": {
     "moonbitlang/x": "0.4.45",
     "Arcelyth/html_escape": "0.3.1",

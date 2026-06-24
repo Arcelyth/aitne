@@ -7,21 +7,23 @@ pub fn counter() -> &View {
   .children([
     @Arcelyth/aitne/src/dom.h1()
   .children([
-    @Arcelyth/aitne/src/dom.text("Counter")
+    "Counter"
   ]),
     @Arcelyth/aitne/src/dom.p()
   .children([
-    @Arcelyth/aitne/src/dom.text_dyn({ () => count.get().to_string() })
+    @Arcelyth/aitne/src/dom.text_dyn(
+         () => count.get().to_string() 
+      )
   ]),
     @Arcelyth/aitne/src/dom.button()
   .children([
-    @Arcelyth/aitne/src/dom.text("+1")
+    "+1"
   ])
-  .on(Click, {fn(_e) { set_count.update(fn(v) { v + 1 }) }}),
+  .on(Click, (_) => { set_count.update((v) => { v + 1 }) }),
     @Arcelyth/aitne/src/dom.button()
   .children([
-    @Arcelyth/aitne/src/dom.text("-1")
+    "-1"
   ])
-  .on(Click, {fn(_e) { set_count.update(fn(v) { v - 1 }) }})
+  .on(Click, (_) => { set_count.update((v) => { v - 1 }) })
   ])
 }

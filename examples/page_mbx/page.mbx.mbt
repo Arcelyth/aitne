@@ -9,9 +9,9 @@ pub fn page() -> &View {
     interactive_section(),
     footer_section()
   ])
-  .attr("style", "&quot;max-width: 28rem; width: 100%; background-color: #1e293b; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); border: 1px solid #334155; padding: 2rem;&quot;")
+  .attr("style", "max-width: 28rem; width: 100%; background-color: #1e293b; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); border: 1px solid #334155; padding: 2rem;")
   ])
-  .attr("style", "&quot;min-height: 100vh; background-color: #0f172a; display: flex; align-items: center; justify-content: center; padding: 1rem; font-family: system-ui, -apple-system, sans-serif;&quot;")
+  .attr("style", "min-height: 100vh; background-color: #0f172a; display: flex; align-items: center; justify-content: center; padding: 1rem; font-family: system-ui, -apple-system, sans-serif;")
 }
 
 fn header_section() -> &View {
@@ -19,16 +19,16 @@ fn header_section() -> &View {
   .children([
     @Arcelyth/aitne/src/dom.h1()
   .children([
-    @Arcelyth/aitne/src/dom.text("Aitne")
+    "Aitne"
   ])
-  .attr("style", "&quot;font-size: 2.25rem; font-weight: 800; background: linear-gradient(to right, #2dd4bf, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 0.75rem 0; tracking-content: -0.025em;&quot;"),
+  .attr("style", "font-size: 2.25rem; font-weight: 800; background: linear-gradient(to right, #2dd4bf, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 0.75rem 0; tracking-content: -0.025em;"),
     @Arcelyth/aitne/src/dom.p()
   .children([
-    @Arcelyth/aitne/src/dom.text("Build lightweight, high-performance reactive web application.")
+    "Build lightweight, high-performance reactive web application."
   ])
-  .attr("style", "&quot;color: #94a3b8; font-size: 0.875rem; margin: 0; line-height: 1.5;&quot;")
+  .attr("style", "color: #94a3b8; font-size: 0.875rem; margin: 0; line-height: 1.5;")
   ])
-  .attr("style", "&quot;text-align: center; margin-bottom: 2rem;&quot;")
+  .attr("style", "text-align: center; margin-bottom: 2rem;")
 }
 
 fn interactive_section() -> &View {
@@ -36,12 +36,12 @@ fn interactive_section() -> &View {
   .children([
     @Arcelyth/aitne/src/dom.button()
   .children([
-    @Arcelyth/aitne/src/dom.text("Start")
+    "Start"
   ])
-  .attr("style", "&quot;padding: 0.75rem 1.5rem; width: 100%; background-color: #2563eb; color: #ffffff; font-weight: 600; border-radius: 0.75rem; border: none; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); font-size: 1rem; transition: background-color 0.2s;&quot;")
-  .on(Click, {fn(_ev) { println("Clicked") }})
+  .on(Click, fn(_ev) { println("Clicked") })
+  .attr("style", "padding: 0.75rem 1.5rem; width: 100%; background-color: #2563eb; color: #ffffff; font-weight: 600; border-radius: 0.75rem; border: none; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); font-size: 1rem; transition: background-color 0.2s;")
   ])
-  .attr("style", "&quot;display: flex; flex-direction: column; align-items: center;&quot;")
+  .attr("style", "display: flex; flex-direction: column; align-items: center;")
 }
 
 fn footer_section() -> &View {
@@ -49,10 +49,10 @@ fn footer_section() -> &View {
   .children([
     @Arcelyth/aitne/src/dom.a()
   .children([
-    @Arcelyth/aitne/src/dom.text("document")
+    "document"
   ])
-  .attr("href", "&quot;#&quot;")
-  .attr("style", "&quot;color: #64748b; font-size: 0.875rem; text-decoration: none;&quot;")
+  .attr("href", "#")
+  .attr("style", "color: #64748b; font-size: 0.875rem; text-decoration: none;")
   ])
-  .attr("style", "&quot;text-align: center; margin-top: 2rem;&quot;")
+  .attr("style", "text-align: center; margin-top: 2rem;")
 }

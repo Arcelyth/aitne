@@ -1,5 +1,5 @@
 ///|
-pub fn anchor(href : String, children : Array[&View]) -> &View {
+pub fn anchor(href~ : String, children~ : Array[&View]) -> &View {
   fn inner(href : Memo[String], children : Array[&View]) -> &View {
     let rctx : RouterContext? = use_context()
     let ctx = match rctx {

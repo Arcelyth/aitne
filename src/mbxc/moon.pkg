@@ -1,5 +1,6 @@
 import {
   "moonbitlang/x/fs",
+  "moonbitlang/core/hashmap",
   "Arcelyth/html_escape" @escape,
   "Arcelyth/aitne/src/dom",
 }

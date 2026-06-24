@@ -44,7 +44,7 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
       let s = text.to_owned()
       if s.trim().length() > 0 {
         self.buf.write("\{package_path}/dom.text(\"")
-        self.buf.write(@escape.escape_safe(s.trim().to_owned()))
+        self.buf.write(escape_moonbit_str(s.trim().to_owned()))
         self.buf.write("\")")
       }
     }
@@ -56,7 +56,7 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
     MbxAST::ElementNode(tag, attrs, children) => {
       if @dom.builtin_elements.contains(tag.to_owned()) {
         self.buf.write("\{package_path}/dom.")
-      } 
+      }
       self.buf.write(tag)
       self.buf.write("()")
 
@@ -99,13 +99,20 @@ fn CodeGen::gen_attr(self : CodeGen, attr : MbxAttribute) -> Unit {
   }
 
   if scope == "on" {
-    // on:click -> .on(Click, fn(_e) { ... })
     self.buf.write("\n  .on(")
     self.buf.write(capitalize_event(name))
     self.buf.write(", ")
     match attr.value {
       AttrVal::Static(s) => self.buf.write(s)
-      AttrVal::Dynamic(c) => self.buf.write(c)
+      AttrVal::Dynamic(c) => {
+        let code = c.to_owned().trim()
+        if is_simple_ident(code.to_owned()) {
+          self.buf.write(code)
+          self.buf.write("(_)")
+        } else {
+          self.buf.write(code)
+        }
+      }
     }
     self.buf.write(")")
   } else {
@@ -120,11 +127,31 @@ fn CodeGen::gen_attr(self : CodeGen, attr : MbxAttribute) -> Unit {
     match attr.value {
       AttrVal::Static(s) => {
         self.buf.write("\"")
-        self.buf.write(@escape.escape_safe(s.to_owned()))
+        self.buf.write(escape_moonbit_str(s.to_owned()))
         self.buf.write("\"")
       }
       AttrVal::Dynamic(c) => self.buf.write(c)
     }
     self.buf.write(")")
   }
+}
+
+///|
+fn is_simple_ident(s : String) -> Bool {
+  let s = s.trim()
+  if s.length() == 0 {
+    return false
+  }
+  for i = 0; i < s.length(); i = i + 1 {
+    let c = s[i]
+    let is_valid = (c >= 'a' && c <= 'z') ||
+      (c >= 'A' && c <= 'Z') ||
+      (c >= '0' && c <= '9') ||
+      c == '_' ||
+      c == '-'
+    if !is_valid {
+      return false
+    }
+  }
+  true
 }

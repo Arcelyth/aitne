@@ -1,5 +1,4 @@
 fn main {
-//  let app = page()
-//  
+//  let app = todo_app()
 //  let _ = @dom.mount_to_body(() => app)
 }

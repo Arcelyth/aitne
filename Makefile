@@ -30,6 +30,11 @@ exp_page2:
 	chmod +x ./examples/page_mbx/run.sh
 	./examples/page_mbx/run.sh
 
+exp_todo2: 
+	moon build ./examples/todo_mbx
+	chmod +x ./examples/todo_mbx/run.sh
+	./examples/todo_mbx/run.sh
+
 
 run: 
 	python3 ./scripts/spa_server.py

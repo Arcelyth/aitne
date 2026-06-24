@@ -33,7 +33,7 @@ fn escape_moonbit_str(s : String) -> String {
   let mut res = ""
   for c in s.iter() {
     match c {
-      '\"' => res += "\\\""
+      '"' => res += "\\\""
       '\\' => res += "\\\\"
       '\n' => res += "\\n"
       '\r' => res += "\\r"
@@ -43,6 +43,7 @@ fn escape_moonbit_str(s : String) -> String {
   }
   res
 }
+
 
 ///|
 /// Compiles a single template island into generated MoonBit code.

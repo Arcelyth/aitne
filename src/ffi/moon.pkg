@@ -1,0 +1,3 @@
+options(
+  supported_targets: "js",
+)

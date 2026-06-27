@@ -7,3 +7,7 @@ import {
   "moonbitlang/core/ref",
   "moonbitlang/core/debug",
 }
+
+options(
+  supported_targets: "js",
+)

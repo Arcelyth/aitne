@@ -1,3 +1,4 @@
+using @hashset {type HashSet}
 ///|
 pub fn from_file(
   path : String,

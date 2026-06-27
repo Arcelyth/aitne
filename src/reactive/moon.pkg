@@ -5,3 +5,7 @@ import {
   "moonbitlang/core/ref",
   "tonyfettes/any",
 }
+
+options(
+  supported_targets: "js",
+)

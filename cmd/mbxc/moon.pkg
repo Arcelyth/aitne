@@ -1,9 +1,10 @@
 import {
-  "Arcelyth/aitne/src/mbxc" @mbxc,
-  "moonbitlang/x/fs" @fs,
-  "moonbitlang/x/sys" @sys,
+  "Arcelyth/aitne/src/mbxc",
+  "moonbitlang/x/fs",
+  "moonbitlang/x/sys",
 }
 
 options(
   "is-main": true,
+  targets: { "main.mbt": [ "native" ] },
 )

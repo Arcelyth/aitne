@@ -66,7 +66,7 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
     }
     MbxAST::ElementNode(tag, attrs, children) => {
       let tag_name = tag.to_owned()
-      let is_builtin = @dom.builtin_elements.contains(tag_name)
+      let is_builtin = builtin_elements.contains(tag_name)
 
       let valid_children = []
       for i = 0; i < children.length(); i = i + 1 {

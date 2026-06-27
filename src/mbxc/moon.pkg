@@ -1,6 +1,9 @@
 import {
   "moonbitlang/x/fs",
   "moonbitlang/core/hashmap",
-  "Arcelyth/html_escape" @escape,
-  "Arcelyth/aitne/src/dom",
+  "moonbitlang/core/hashset",
 }
+
+options(
+  supported_targets: "native",
+)

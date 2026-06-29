@@ -6,5 +6,5 @@ import {
 
 options(
   "is-main": true,
-  targets: { "main.mbt": [ "native" ] },
+  supported_targets: "native",
 )

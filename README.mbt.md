@@ -66,64 +66,35 @@ fn todo_app() -> &View {
 ## MBX Format (JSX-like)
  \[*Experimental*\]
 
-Todo list in MBX format:
+Simple router usage in MBX format:
 ```mbx
-using @dom {
-  trait View,
-  div,
-  h1,
-  button,
-  text,
-  input,
-  ul,
-  li,
-  for_node,
-  text_dyn,
+///|
+pub fn app() -> &View {
+  <Router base="/">
+    <Routes fallback={() => <NotFound />}>
+        <Route path="/try" view={() => <Home />} />
+        <ParentRoute 
+            path="/users" 
+            view={() => <UsersPage />}> 
+           <Route path="/:id" view={() => <UserDetailPage />}/> 
+        </ParentRoute>
+        <ParentRoute 
+            path="/t"
+            view={() => <TryPage />}> 
+           <Route path="/t1" view={() => <TryPage />} /> 
+        </ParentRoute>
+    </Routes>
+  </Router>
 }
 
-using @ffi {event_target_value}
-
-fn todo_app() -> &View {
-  let (input_val, set_input_val) = @reactive.create_signal("")
-  let (todo, set_todo) = @reactive.create_signal(["Example."])
-
-  let add_item = _ => {
-    let text = input_val.get()
-    if text != "" {
-      set_todo.set(todo.get() + [text])
-    }
-    set_input_val.set("")
-  }
-
-  let remove_item = item => {
-    let new_list = todo.get().filter(fn(t) { t != item })
-    set_todo.set(new_list)
-  }
-
-  <div>
-    <h1> Todo List </h1>
-    <div>{() => todo.get().length().to_string() }</div>
-    <div>
-      <input 
-        type="text" 
-        value={input_val} 
-        on:input={ev => set_input_val.set(event_target_value(ev))} 
-      />
-      <button on:click={add_item}> Add </button>
-    </div>
-    <ul>
-      {for_node(() => todo.get(), item => {return item }, (item) => {
-        <li>
-          {() => item}
-          <button on:click={_ => remove_item(item)}> "Delete" </button>
-        </li>
-      })}
-    </ul>
-  </div>
-
+///|
+fn main {
+  let _ = @dom.mount_to_body(() => <App />)
 }
 ```
 
-Use command `moon run cmd/mbxc` to compile all the `.mbx` files. <br>
+## CLI Tool
+
+Run `aitne -h` to see the usage.
 
 *This library still work in progress, not production ready!*

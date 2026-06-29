@@ -66,7 +66,8 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
     }
     MbxAST::ElementNode(tag, attrs, children) => {
       let tag_name = tag.to_owned()
-      let is_builtin = builtin_elements.contains(tag_name)
+      let is_builtin = (tag_name[0] >= 'a' && tag_name[0] <= 'z') &&
+        builtin_elements.contains(tag_name)
 
       let valid_children = []
       for i = 0; i < children.length(); i = i + 1 {
@@ -86,7 +87,7 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
 
       if is_builtin {
         self.buf.write("\{package_path}/dom.")
-        self.buf.write(tag)
+        self.buf.write(tag_name)
         self.buf.write("()")
 
         if valid_children.length() > 0 {
@@ -102,7 +103,8 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
 
         attrs.each((attr, val) => self.gen_attr(attr, val))
       } else {
-        self.buf.write(tag)
+        let snake_tag = to_snakecase(tag_name)
+        self.buf.write(snake_tag)
         self.buf.write("(")
 
         let mut need_comma = false
@@ -198,4 +200,82 @@ fn CodeGen::gen_attr(
     self.buf.write("\"")
     self.buf.write(")")
   }
+}
+
+///|
+fn to_camelcase(s : String) -> String {
+  let b = StringBuilder::new()
+  let mut capitalize_next = true
+
+  s
+  .iter()
+  .each(c => {
+    if c == '_' {
+      capitalize_next = true
+    } else if capitalize_next {
+      let upper_c = if c >= 'a' && c <= 'z' {
+        match Int::to_char(c.to_int() - 32) {
+          Some(ch) => ch
+          _ => c
+        }
+      } else {
+        c
+      }
+      b.write(upper_c)
+      capitalize_next = false
+    } else {
+      b.write(c)
+    }
+  })
+
+  b.to_string()
+}
+
+///|
+fn to_snakecase(s : String) -> String {
+  let b = StringBuilder::new()
+  let mut is_first = true
+
+  s
+  .iter()
+  .each(c => {
+    if c >= 'A' && c <= 'Z' {
+      if is_first {
+        is_first = false
+      } else {
+        b.write('_')
+      }
+
+      let lower_c = match Int::to_char(c.to_int() + 32) {
+        Some(ch) => ch
+        _ => c
+      }
+      b.write(lower_c)
+    } else {
+      b.write(c)
+      is_first = false
+    }
+  })
+
+  b.to_string()
+}
+
+///|
+test "to_snakecase_test" {
+  inspect(to_snakecase("UserPage"), content="user_page")
+  inspect(
+    to_snakecase("AitneReactiveFramework"),
+    content="aitne_reactive_framework",
+  )
+  inspect(to_snakecase("routeMbx"), content="route_mbx")
+}
+
+///|
+test "snake_to_camel_test" {
+  inspect(to_camelcase("user_page"), content="UserPage")
+  inspect(
+    to_camelcase("aitne_reactive_framework"),
+    content="AitneReactiveFramework",
+  )
+  inspect(to_camelcase("_inside_route_"), content="InsideRoute")
 }

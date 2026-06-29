@@ -5,5 +5,5 @@ import {
 }
 
 options(
-  supported_targets: "native",
+  supported_targets: "all",
 )

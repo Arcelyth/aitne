@@ -3,8 +3,8 @@ using @dom {trait View, div, h1, p, button, text, a}
 pub fn page() -> &View {
   <div style="min-height: 100vh; background-color: #0f172a; display: flex; align-items: center; justify-content: center; padding: 1rem; font-family: system-ui, -apple-system, sans-serif;">
     <div style="max-width: 28rem; width: 100%; background-color: #1e293b; border-radius: 1rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); border: 1px solid #334155; padding: 2rem;">
-      <header_section />
-      <interactive_section />
+      <HeaderSection />
+      <InteractiveSection />
       <footer_section />
     </div>
   </div>

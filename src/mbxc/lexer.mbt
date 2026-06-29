@@ -56,13 +56,7 @@ pub(all) struct Lexer {
 
 ///|
 pub fn Lexer::new(src : String) -> Lexer {
-  Lexer::{
-    src,
-    cur: 0,
-    brace_depth: 0,
-    tag_depth: 0,
-    in_closing_tag: false,
-  }
+  Lexer::{ src, cur: 0, brace_depth: 0, tag_depth: 0, in_closing_tag: false }
 }
 
 ///|
@@ -92,7 +86,7 @@ fn is_ident_char(c : UInt16) -> Bool {
 ///|
 #inline
 fn is_tag_start_char(c : UInt16) -> Bool {
-  c >= 'a' && c <= 'z'
+  (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
 }
 
 ///|

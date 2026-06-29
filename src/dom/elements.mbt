@@ -4,564 +4,564 @@
 pub struct TagArea {}
 pub impl ElementType for TagArea with tag(_self) { "area" }
 pub impl ElementType for TagArea with is_self_closing(_self) { true }
-pub fn area() -> HtmlElement[TagArea, Unit] { { tag: TagArea::{}, attrs: AttrList::new(), children: () } }
+pub fn area(children?: Array[&View] = []) -> HtmlElement[TagArea, Array[&View]] { { tag: TagArea::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagBase {}
 pub impl ElementType for TagBase with tag(_self) { "base" }
 pub impl ElementType for TagBase with is_self_closing(_self) { true }
-pub fn base() -> HtmlElement[TagBase, Unit] { { tag: TagBase::{}, attrs: AttrList::new(), children: () } }
+pub fn base(children?: Array[&View] = []) -> HtmlElement[TagBase, Array[&View]] { { tag: TagBase::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagBr {}
 pub impl ElementType for TagBr with tag(_self) { "br" }
 pub impl ElementType for TagBr with is_self_closing(_self) { true }
-pub fn br() -> HtmlElement[TagBr, Unit] { { tag: TagBr::{}, attrs: AttrList::new(), children: () } }
+pub fn br(children?: Array[&View] = []) -> HtmlElement[TagBr, Array[&View]] { { tag: TagBr::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagCol {}
 pub impl ElementType for TagCol with tag(_self) { "col" }
 pub impl ElementType for TagCol with is_self_closing(_self) { true }
-pub fn col() -> HtmlElement[TagCol, Unit] { { tag: TagCol::{}, attrs: AttrList::new(), children: () } }
+pub fn col(children?: Array[&View] = []) -> HtmlElement[TagCol, Array[&View]] { { tag: TagCol::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagEmbed {}
 pub impl ElementType for TagEmbed with tag(_self) { "embed" }
 pub impl ElementType for TagEmbed with is_self_closing(_self) { true }
-pub fn embed() -> HtmlElement[TagEmbed, Unit] { { tag: TagEmbed::{}, attrs: AttrList::new(), children: () } }
+pub fn embed(children?: Array[&View] = []) -> HtmlElement[TagEmbed, Array[&View]] { { tag: TagEmbed::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagHr {}
 pub impl ElementType for TagHr with tag(_self) { "hr" }
 pub impl ElementType for TagHr with is_self_closing(_self) { true }
-pub fn hr() -> HtmlElement[TagHr, Unit] { { tag: TagHr::{}, attrs: AttrList::new(), children: () } }
+pub fn hr(children?: Array[&View] = []) -> HtmlElement[TagHr, Array[&View]] { { tag: TagHr::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagImg {}
 pub impl ElementType for TagImg with tag(_self) { "img" }
 pub impl ElementType for TagImg with is_self_closing(_self) { true }
-pub fn img() -> HtmlElement[TagImg, Unit] { { tag: TagImg::{}, attrs: AttrList::new(), children: () } }
+pub fn img(children?: Array[&View] = []) -> HtmlElement[TagImg, Array[&View]] { { tag: TagImg::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagInput {}
 pub impl ElementType for TagInput with tag(_self) { "input" }
 pub impl ElementType for TagInput with is_self_closing(_self) { true }
-pub fn input() -> HtmlElement[TagInput, Unit] { { tag: TagInput::{}, attrs: AttrList::new(), children: () } }
+pub fn input(children?: Array[&View] = []) -> HtmlElement[TagInput, Array[&View]] { { tag: TagInput::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagLink {}
 pub impl ElementType for TagLink with tag(_self) { "link" }
 pub impl ElementType for TagLink with is_self_closing(_self) { true }
-pub fn link() -> HtmlElement[TagLink, Unit] { { tag: TagLink::{}, attrs: AttrList::new(), children: () } }
+pub fn link(children?: Array[&View] = []) -> HtmlElement[TagLink, Array[&View]] { { tag: TagLink::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagMeta {}
 pub impl ElementType for TagMeta with tag(_self) { "meta" }
 pub impl ElementType for TagMeta with is_self_closing(_self) { true }
-pub fn meta() -> HtmlElement[TagMeta, Unit] { { tag: TagMeta::{}, attrs: AttrList::new(), children: () } }
+pub fn meta(children?: Array[&View] = []) -> HtmlElement[TagMeta, Array[&View]] { { tag: TagMeta::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSource {}
 pub impl ElementType for TagSource with tag(_self) { "source" }
 pub impl ElementType for TagSource with is_self_closing(_self) { true }
-pub fn source() -> HtmlElement[TagSource, Unit] { { tag: TagSource::{}, attrs: AttrList::new(), children: () } }
+pub fn source(children?: Array[&View] = []) -> HtmlElement[TagSource, Array[&View]] { { tag: TagSource::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTrack {}
 pub impl ElementType for TagTrack with tag(_self) { "track" }
 pub impl ElementType for TagTrack with is_self_closing(_self) { true }
-pub fn track() -> HtmlElement[TagTrack, Unit] { { tag: TagTrack::{}, attrs: AttrList::new(), children: () } }
+pub fn track(children?: Array[&View] = []) -> HtmlElement[TagTrack, Array[&View]] { { tag: TagTrack::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagWbr {}
 pub impl ElementType for TagWbr with tag(_self) { "wbr" }
 pub impl ElementType for TagWbr with is_self_closing(_self) { true }
-pub fn wbr() -> HtmlElement[TagWbr, Unit] { { tag: TagWbr::{}, attrs: AttrList::new(), children: () } }
+pub fn wbr(children?: Array[&View] = []) -> HtmlElement[TagWbr, Array[&View]] { { tag: TagWbr::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagA {}
 pub impl ElementType for TagA with tag(_self) { "a" }
 pub impl ElementType for TagA with is_self_closing(_self) { false }
-pub fn a() -> HtmlElement[TagA, Unit] { { tag: TagA::{}, attrs: AttrList::new(), children: () } }
+pub fn a(children?: Array[&View] = []) -> HtmlElement[TagA, Array[&View]] { { tag: TagA::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagAbbr {}
 pub impl ElementType for TagAbbr with tag(_self) { "abbr" }
 pub impl ElementType for TagAbbr with is_self_closing(_self) { false }
-pub fn abbr() -> HtmlElement[TagAbbr, Unit] { { tag: TagAbbr::{}, attrs: AttrList::new(), children: () } }
+pub fn abbr(children?: Array[&View] = []) -> HtmlElement[TagAbbr, Array[&View]] { { tag: TagAbbr::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagAddress {}
 pub impl ElementType for TagAddress with tag(_self) { "address" }
 pub impl ElementType for TagAddress with is_self_closing(_self) { false }
-pub fn address() -> HtmlElement[TagAddress, Unit] { { tag: TagAddress::{}, attrs: AttrList::new(), children: () } }
+pub fn address(children?: Array[&View] = []) -> HtmlElement[TagAddress, Array[&View]] { { tag: TagAddress::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagArticle {}
 pub impl ElementType for TagArticle with tag(_self) { "article" }
 pub impl ElementType for TagArticle with is_self_closing(_self) { false }
-pub fn article() -> HtmlElement[TagArticle, Unit] { { tag: TagArticle::{}, attrs: AttrList::new(), children: () } }
+pub fn article(children?: Array[&View] = []) -> HtmlElement[TagArticle, Array[&View]] { { tag: TagArticle::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagAside {}
 pub impl ElementType for TagAside with tag(_self) { "aside" }
 pub impl ElementType for TagAside with is_self_closing(_self) { false }
-pub fn aside() -> HtmlElement[TagAside, Unit] { { tag: TagAside::{}, attrs: AttrList::new(), children: () } }
+pub fn aside(children?: Array[&View] = []) -> HtmlElement[TagAside, Array[&View]] { { tag: TagAside::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagAudio {}
 pub impl ElementType for TagAudio with tag(_self) { "audio" }
 pub impl ElementType for TagAudio with is_self_closing(_self) { false }
-pub fn audio() -> HtmlElement[TagAudio, Unit] { { tag: TagAudio::{}, attrs: AttrList::new(), children: () } }
+pub fn audio(children?: Array[&View] = []) -> HtmlElement[TagAudio, Array[&View]] { { tag: TagAudio::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagB {}
 pub impl ElementType for TagB with tag(_self) { "b" }
 pub impl ElementType for TagB with is_self_closing(_self) { false }
-pub fn b() -> HtmlElement[TagB, Unit] { { tag: TagB::{}, attrs: AttrList::new(), children: () } }
+pub fn b(children?: Array[&View] = []) -> HtmlElement[TagB, Array[&View]] { { tag: TagB::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagBdi {}
 pub impl ElementType for TagBdi with tag(_self) { "bdi" }
 pub impl ElementType for TagBdi with is_self_closing(_self) { false }
-pub fn bdi() -> HtmlElement[TagBdi, Unit] { { tag: TagBdi::{}, attrs: AttrList::new(), children: () } }
+pub fn bdi(children?: Array[&View] = []) -> HtmlElement[TagBdi, Array[&View]] { { tag: TagBdi::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagBdo {}
 pub impl ElementType for TagBdo with tag(_self) { "bdo" }
 pub impl ElementType for TagBdo with is_self_closing(_self) { false }
-pub fn bdo() -> HtmlElement[TagBdo, Unit] { { tag: TagBdo::{}, attrs: AttrList::new(), children: () } }
+pub fn bdo(children?: Array[&View] = []) -> HtmlElement[TagBdo, Array[&View]] { { tag: TagBdo::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagBlockquote {}
 pub impl ElementType for TagBlockquote with tag(_self) { "blockquote" }
 pub impl ElementType for TagBlockquote with is_self_closing(_self) { false }
-pub fn blockquote() -> HtmlElement[TagBlockquote, Unit] { { tag: TagBlockquote::{}, attrs: AttrList::new(), children: () } }
+pub fn blockquote(children?: Array[&View] = []) -> HtmlElement[TagBlockquote, Array[&View]] { { tag: TagBlockquote::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagBody {}
 pub impl ElementType for TagBody with tag(_self) { "body" }
 pub impl ElementType for TagBody with is_self_closing(_self) { false }
-pub fn body() -> HtmlElement[TagBody, Unit] { { tag: TagBody::{}, attrs: AttrList::new(), children: () } }
+pub fn body(children?: Array[&View] = []) -> HtmlElement[TagBody, Array[&View]] { { tag: TagBody::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagButton {}
 pub impl ElementType for TagButton with tag(_self) { "button" }
 pub impl ElementType for TagButton with is_self_closing(_self) { false }
-pub fn button() -> HtmlElement[TagButton, Unit] { { tag: TagButton::{}, attrs: AttrList::new(), children: () } }
+pub fn button(children?: Array[&View] = []) -> HtmlElement[TagButton, Array[&View]] { { tag: TagButton::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagCanvas {}
 pub impl ElementType for TagCanvas with tag(_self) { "canvas" }
 pub impl ElementType for TagCanvas with is_self_closing(_self) { false }
-pub fn canvas() -> HtmlElement[TagCanvas, Unit] { { tag: TagCanvas::{}, attrs: AttrList::new(), children: () } }
+pub fn canvas(children?: Array[&View] = []) -> HtmlElement[TagCanvas, Array[&View]] { { tag: TagCanvas::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagCaption {}
 pub impl ElementType for TagCaption with tag(_self) { "caption" }
 pub impl ElementType for TagCaption with is_self_closing(_self) { false }
-pub fn caption() -> HtmlElement[TagCaption, Unit] { { tag: TagCaption::{}, attrs: AttrList::new(), children: () } }
+pub fn caption(children?: Array[&View] = []) -> HtmlElement[TagCaption, Array[&View]] { { tag: TagCaption::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagCite {}
 pub impl ElementType for TagCite with tag(_self) { "cite" }
 pub impl ElementType for TagCite with is_self_closing(_self) { false }
-pub fn cite() -> HtmlElement[TagCite, Unit] { { tag: TagCite::{}, attrs: AttrList::new(), children: () } }
+pub fn cite(children?: Array[&View] = []) -> HtmlElement[TagCite, Array[&View]] { { tag: TagCite::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagCode {}
 pub impl ElementType for TagCode with tag(_self) { "code" }
 pub impl ElementType for TagCode with is_self_closing(_self) { false }
-pub fn code() -> HtmlElement[TagCode, Unit] { { tag: TagCode::{}, attrs: AttrList::new(), children: () } }
+pub fn code(children?: Array[&View] = []) -> HtmlElement[TagCode, Array[&View]] { { tag: TagCode::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagColgroup {}
 pub impl ElementType for TagColgroup with tag(_self) { "colgroup" }
 pub impl ElementType for TagColgroup with is_self_closing(_self) { false }
-pub fn colgroup() -> HtmlElement[TagColgroup, Unit] { { tag: TagColgroup::{}, attrs: AttrList::new(), children: () } }
+pub fn colgroup(children?: Array[&View] = []) -> HtmlElement[TagColgroup, Array[&View]] { { tag: TagColgroup::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagData {}
 pub impl ElementType for TagData with tag(_self) { "data" }
 pub impl ElementType for TagData with is_self_closing(_self) { false }
-pub fn data() -> HtmlElement[TagData, Unit] { { tag: TagData::{}, attrs: AttrList::new(), children: () } }
+pub fn data(children?: Array[&View] = []) -> HtmlElement[TagData, Array[&View]] { { tag: TagData::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagDatalist {}
 pub impl ElementType for TagDatalist with tag(_self) { "datalist" }
 pub impl ElementType for TagDatalist with is_self_closing(_self) { false }
-pub fn datalist() -> HtmlElement[TagDatalist, Unit] { { tag: TagDatalist::{}, attrs: AttrList::new(), children: () } }
+pub fn datalist(children?: Array[&View] = []) -> HtmlElement[TagDatalist, Array[&View]] { { tag: TagDatalist::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagDd {}
 pub impl ElementType for TagDd with tag(_self) { "dd" }
 pub impl ElementType for TagDd with is_self_closing(_self) { false }
-pub fn dd() -> HtmlElement[TagDd, Unit] { { tag: TagDd::{}, attrs: AttrList::new(), children: () } }
+pub fn dd(children?: Array[&View] = []) -> HtmlElement[TagDd, Array[&View]] { { tag: TagDd::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagDel {}
 pub impl ElementType for TagDel with tag(_self) { "del" }
 pub impl ElementType for TagDel with is_self_closing(_self) { false }
-pub fn del() -> HtmlElement[TagDel, Unit] { { tag: TagDel::{}, attrs: AttrList::new(), children: () } }
+pub fn del(children?: Array[&View] = []) -> HtmlElement[TagDel, Array[&View]] { { tag: TagDel::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagDetails {}
 pub impl ElementType for TagDetails with tag(_self) { "details" }
 pub impl ElementType for TagDetails with is_self_closing(_self) { false }
-pub fn details() -> HtmlElement[TagDetails, Unit] { { tag: TagDetails::{}, attrs: AttrList::new(), children: () } }
+pub fn details(children?: Array[&View] = []) -> HtmlElement[TagDetails, Array[&View]] { { tag: TagDetails::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagDfn {}
 pub impl ElementType for TagDfn with tag(_self) { "dfn" }
 pub impl ElementType for TagDfn with is_self_closing(_self) { false }
-pub fn dfn() -> HtmlElement[TagDfn, Unit] { { tag: TagDfn::{}, attrs: AttrList::new(), children: () } }
+pub fn dfn(children?: Array[&View] = []) -> HtmlElement[TagDfn, Array[&View]] { { tag: TagDfn::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagDialog {}
 pub impl ElementType for TagDialog with tag(_self) { "dialog" }
 pub impl ElementType for TagDialog with is_self_closing(_self) { false }
-pub fn dialog() -> HtmlElement[TagDialog, Unit] { { tag: TagDialog::{}, attrs: AttrList::new(), children: () } }
+pub fn dialog(children?: Array[&View] = []) -> HtmlElement[TagDialog, Array[&View]] { { tag: TagDialog::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagDiv {}
 pub impl ElementType for TagDiv with tag(_self) { "div" }
 pub impl ElementType for TagDiv with is_self_closing(_self) { false }
-pub fn div() -> HtmlElement[TagDiv, Unit] { { tag: TagDiv::{}, attrs: AttrList::new(), children: () } }
+pub fn div(children?: Array[&View] = []) -> HtmlElement[TagDiv, Array[&View]] { { tag: TagDiv::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagDl {}
 pub impl ElementType for TagDl with tag(_self) { "dl" }
 pub impl ElementType for TagDl with is_self_closing(_self) { false }
-pub fn dl() -> HtmlElement[TagDl, Unit] { { tag: TagDl::{}, attrs: AttrList::new(), children: () } }
+pub fn dl(children?: Array[&View] = []) -> HtmlElement[TagDl, Array[&View]] { { tag: TagDl::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagDt {}
 pub impl ElementType for TagDt with tag(_self) { "dt" }
 pub impl ElementType for TagDt with is_self_closing(_self) { false }
-pub fn dt() -> HtmlElement[TagDt, Unit] { { tag: TagDt::{}, attrs: AttrList::new(), children: () } }
+pub fn dt(children?: Array[&View] = []) -> HtmlElement[TagDt, Array[&View]] { { tag: TagDt::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagEm {}
 pub impl ElementType for TagEm with tag(_self) { "em" }
 pub impl ElementType for TagEm with is_self_closing(_self) { false }
-pub fn em() -> HtmlElement[TagEm, Unit] { { tag: TagEm::{}, attrs: AttrList::new(), children: () } }
+pub fn em(children?: Array[&View] = []) -> HtmlElement[TagEm, Array[&View]] { { tag: TagEm::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagFieldset {}
 pub impl ElementType for TagFieldset with tag(_self) { "fieldset" }
 pub impl ElementType for TagFieldset with is_self_closing(_self) { false }
-pub fn fieldset() -> HtmlElement[TagFieldset, Unit] { { tag: TagFieldset::{}, attrs: AttrList::new(), children: () } }
+pub fn fieldset(children?: Array[&View] = []) -> HtmlElement[TagFieldset, Array[&View]] { { tag: TagFieldset::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagFigcaption {}
 pub impl ElementType for TagFigcaption with tag(_self) { "figcaption" }
 pub impl ElementType for TagFigcaption with is_self_closing(_self) { false }
-pub fn figcaption() -> HtmlElement[TagFigcaption, Unit] { { tag: TagFigcaption::{}, attrs: AttrList::new(), children: () } }
+pub fn figcaption(children?: Array[&View] = []) -> HtmlElement[TagFigcaption, Array[&View]] { { tag: TagFigcaption::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagFigure {}
 pub impl ElementType for TagFigure with tag(_self) { "figure" }
 pub impl ElementType for TagFigure with is_self_closing(_self) { false }
-pub fn figure() -> HtmlElement[TagFigure, Unit] { { tag: TagFigure::{}, attrs: AttrList::new(), children: () } }
+pub fn figure(children?: Array[&View] = []) -> HtmlElement[TagFigure, Array[&View]] { { tag: TagFigure::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagFooter {}
 pub impl ElementType for TagFooter with tag(_self) { "footer" }
 pub impl ElementType for TagFooter with is_self_closing(_self) { false }
-pub fn footer() -> HtmlElement[TagFooter, Unit] { { tag: TagFooter::{}, attrs: AttrList::new(), children: () } }
+pub fn footer(children?: Array[&View] = []) -> HtmlElement[TagFooter, Array[&View]] { { tag: TagFooter::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagForm {}
 pub impl ElementType for TagForm with tag(_self) { "form" }
 pub impl ElementType for TagForm with is_self_closing(_self) { false }
-pub fn form() -> HtmlElement[TagForm, Unit] { { tag: TagForm::{}, attrs: AttrList::new(), children: () } }
+pub fn form(children?: Array[&View] = []) -> HtmlElement[TagForm, Array[&View]] { { tag: TagForm::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagH1 {}
 pub impl ElementType for TagH1 with tag(_self) { "h1" }
 pub impl ElementType for TagH1 with is_self_closing(_self) { false }
-pub fn h1() -> HtmlElement[TagH1, Unit] { { tag: TagH1::{}, attrs: AttrList::new(), children: () } }
+pub fn h1(children?: Array[&View] = []) -> HtmlElement[TagH1, Array[&View]] { { tag: TagH1::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagH2 {}
 pub impl ElementType for TagH2 with tag(_self) { "h2" }
 pub impl ElementType for TagH2 with is_self_closing(_self) { false }
-pub fn h2() -> HtmlElement[TagH2, Unit] { { tag: TagH2::{}, attrs: AttrList::new(), children: () } }
+pub fn h2(children?: Array[&View] = []) -> HtmlElement[TagH2, Array[&View]] { { tag: TagH2::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagH3 {}
 pub impl ElementType for TagH3 with tag(_self) { "h3" }
 pub impl ElementType for TagH3 with is_self_closing(_self) { false }
-pub fn h3() -> HtmlElement[TagH3, Unit] { { tag: TagH3::{}, attrs: AttrList::new(), children: () } }
+pub fn h3(children?: Array[&View] = []) -> HtmlElement[TagH3, Array[&View]] { { tag: TagH3::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagH4 {}
 pub impl ElementType for TagH4 with tag(_self) { "h4" }
 pub impl ElementType for TagH4 with is_self_closing(_self) { false }
-pub fn h4() -> HtmlElement[TagH4, Unit] { { tag: TagH4::{}, attrs: AttrList::new(), children: () } }
+pub fn h4(children?: Array[&View] = []) -> HtmlElement[TagH4, Array[&View]] { { tag: TagH4::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagH5 {}
 pub impl ElementType for TagH5 with tag(_self) { "h5" }
 pub impl ElementType for TagH5 with is_self_closing(_self) { false }
-pub fn h5() -> HtmlElement[TagH5, Unit] { { tag: TagH5::{}, attrs: AttrList::new(), children: () } }
+pub fn h5(children?: Array[&View] = []) -> HtmlElement[TagH5, Array[&View]] { { tag: TagH5::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagH6 {}
 pub impl ElementType for TagH6 with tag(_self) { "h6" }
 pub impl ElementType for TagH6 with is_self_closing(_self) { false }
-pub fn h6() -> HtmlElement[TagH6, Unit] { { tag: TagH6::{}, attrs: AttrList::new(), children: () } }
+pub fn h6(children?: Array[&View] = []) -> HtmlElement[TagH6, Array[&View]] { { tag: TagH6::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagHead {}
 pub impl ElementType for TagHead with tag(_self) { "head" }
 pub impl ElementType for TagHead with is_self_closing(_self) { false }
-pub fn head() -> HtmlElement[TagHead, Unit] { { tag: TagHead::{}, attrs: AttrList::new(), children: () } }
+pub fn head(children?: Array[&View] = []) -> HtmlElement[TagHead, Array[&View]] { { tag: TagHead::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagHeader {}
 pub impl ElementType for TagHeader with tag(_self) { "header" }
 pub impl ElementType for TagHeader with is_self_closing(_self) { false }
-pub fn header() -> HtmlElement[TagHeader, Unit] { { tag: TagHeader::{}, attrs: AttrList::new(), children: () } }
+pub fn header(children?: Array[&View] = []) -> HtmlElement[TagHeader, Array[&View]] { { tag: TagHeader::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagHgroup {}
 pub impl ElementType for TagHgroup with tag(_self) { "hgroup" }
 pub impl ElementType for TagHgroup with is_self_closing(_self) { false }
-pub fn hgroup() -> HtmlElement[TagHgroup, Unit] { { tag: TagHgroup::{}, attrs: AttrList::new(), children: () } }
+pub fn hgroup(children?: Array[&View] = []) -> HtmlElement[TagHgroup, Array[&View]] { { tag: TagHgroup::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagHtml {}
 pub impl ElementType for TagHtml with tag(_self) { "html" }
 pub impl ElementType for TagHtml with is_self_closing(_self) { false }
-pub fn html() -> HtmlElement[TagHtml, Unit] { { tag: TagHtml::{}, attrs: AttrList::new(), children: () } }
+pub fn html(children?: Array[&View] = []) -> HtmlElement[TagHtml, Array[&View]] { { tag: TagHtml::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagI {}
 pub impl ElementType for TagI with tag(_self) { "i" }
 pub impl ElementType for TagI with is_self_closing(_self) { false }
-pub fn i() -> HtmlElement[TagI, Unit] { { tag: TagI::{}, attrs: AttrList::new(), children: () } }
+pub fn i(children?: Array[&View] = []) -> HtmlElement[TagI, Array[&View]] { { tag: TagI::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagIframe {}
 pub impl ElementType for TagIframe with tag(_self) { "iframe" }
 pub impl ElementType for TagIframe with is_self_closing(_self) { false }
-pub fn iframe() -> HtmlElement[TagIframe, Unit] { { tag: TagIframe::{}, attrs: AttrList::new(), children: () } }
+pub fn iframe(children?: Array[&View] = []) -> HtmlElement[TagIframe, Array[&View]] { { tag: TagIframe::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagIns {}
 pub impl ElementType for TagIns with tag(_self) { "ins" }
 pub impl ElementType for TagIns with is_self_closing(_self) { false }
-pub fn ins() -> HtmlElement[TagIns, Unit] { { tag: TagIns::{}, attrs: AttrList::new(), children: () } }
+pub fn ins(children?: Array[&View] = []) -> HtmlElement[TagIns, Array[&View]] { { tag: TagIns::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagKbd {}
 pub impl ElementType for TagKbd with tag(_self) { "kbd" }
 pub impl ElementType for TagKbd with is_self_closing(_self) { false }
-pub fn kbd() -> HtmlElement[TagKbd, Unit] { { tag: TagKbd::{}, attrs: AttrList::new(), children: () } }
+pub fn kbd(children?: Array[&View] = []) -> HtmlElement[TagKbd, Array[&View]] { { tag: TagKbd::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagLabel {}
 pub impl ElementType for TagLabel with tag(_self) { "label" }
 pub impl ElementType for TagLabel with is_self_closing(_self) { false }
-pub fn label() -> HtmlElement[TagLabel, Unit] { { tag: TagLabel::{}, attrs: AttrList::new(), children: () } }
+pub fn label(children?: Array[&View] = []) -> HtmlElement[TagLabel, Array[&View]] { { tag: TagLabel::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagLegend {}
 pub impl ElementType for TagLegend with tag(_self) { "legend" }
 pub impl ElementType for TagLegend with is_self_closing(_self) { false }
-pub fn legend() -> HtmlElement[TagLegend, Unit] { { tag: TagLegend::{}, attrs: AttrList::new(), children: () } }
+pub fn legend(children?: Array[&View] = []) -> HtmlElement[TagLegend, Array[&View]] { { tag: TagLegend::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagLi {}
 pub impl ElementType for TagLi with tag(_self) { "li" }
 pub impl ElementType for TagLi with is_self_closing(_self) { false }
-pub fn li() -> HtmlElement[TagLi, Unit] { { tag: TagLi::{}, attrs: AttrList::new(), children: () } }
+pub fn li(children?: Array[&View] = []) -> HtmlElement[TagLi, Array[&View]] { { tag: TagLi::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagMain_ {}
 pub impl ElementType for TagMain_ with tag(_self) { "main" }
 pub impl ElementType for TagMain_ with is_self_closing(_self) { false }
-pub fn main_() -> HtmlElement[TagMain_, Unit] { { tag: TagMain_::{}, attrs: AttrList::new(), children: () } }
+pub fn main_(children?: Array[&View] = []) -> HtmlElement[TagMain_, Array[&View]] { { tag: TagMain_::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagMap {}
 pub impl ElementType for TagMap with tag(_self) { "map" }
 pub impl ElementType for TagMap with is_self_closing(_self) { false }
-pub fn map() -> HtmlElement[TagMap, Unit] { { tag: TagMap::{}, attrs: AttrList::new(), children: () } }
+pub fn map(children?: Array[&View] = []) -> HtmlElement[TagMap, Array[&View]] { { tag: TagMap::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagMark {}
 pub impl ElementType for TagMark with tag(_self) { "mark" }
 pub impl ElementType for TagMark with is_self_closing(_self) { false }
-pub fn mark() -> HtmlElement[TagMark, Unit] { { tag: TagMark::{}, attrs: AttrList::new(), children: () } }
+pub fn mark(children?: Array[&View] = []) -> HtmlElement[TagMark, Array[&View]] { { tag: TagMark::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagMenu {}
 pub impl ElementType for TagMenu with tag(_self) { "menu" }
 pub impl ElementType for TagMenu with is_self_closing(_self) { false }
-pub fn menu() -> HtmlElement[TagMenu, Unit] { { tag: TagMenu::{}, attrs: AttrList::new(), children: () } }
+pub fn menu(children?: Array[&View] = []) -> HtmlElement[TagMenu, Array[&View]] { { tag: TagMenu::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagMeter {}
 pub impl ElementType for TagMeter with tag(_self) { "meter" }
 pub impl ElementType for TagMeter with is_self_closing(_self) { false }
-pub fn meter() -> HtmlElement[TagMeter, Unit] { { tag: TagMeter::{}, attrs: AttrList::new(), children: () } }
+pub fn meter(children?: Array[&View] = []) -> HtmlElement[TagMeter, Array[&View]] { { tag: TagMeter::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagNav {}
 pub impl ElementType for TagNav with tag(_self) { "nav" }
 pub impl ElementType for TagNav with is_self_closing(_self) { false }
-pub fn nav() -> HtmlElement[TagNav, Unit] { { tag: TagNav::{}, attrs: AttrList::new(), children: () } }
+pub fn nav(children?: Array[&View] = []) -> HtmlElement[TagNav, Array[&View]] { { tag: TagNav::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagNoscript {}
 pub impl ElementType for TagNoscript with tag(_self) { "noscript" }
 pub impl ElementType for TagNoscript with is_self_closing(_self) { false }
-pub fn noscript() -> HtmlElement[TagNoscript, Unit] { { tag: TagNoscript::{}, attrs: AttrList::new(), children: () } }
+pub fn noscript(children?: Array[&View] = []) -> HtmlElement[TagNoscript, Array[&View]] { { tag: TagNoscript::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagObject {}
 pub impl ElementType for TagObject with tag(_self) { "object" }
 pub impl ElementType for TagObject with is_self_closing(_self) { false }
-pub fn object() -> HtmlElement[TagObject, Unit] { { tag: TagObject::{}, attrs: AttrList::new(), children: () } }
+pub fn object(children?: Array[&View] = []) -> HtmlElement[TagObject, Array[&View]] { { tag: TagObject::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagOl {}
 pub impl ElementType for TagOl with tag(_self) { "ol" }
 pub impl ElementType for TagOl with is_self_closing(_self) { false }
-pub fn ol() -> HtmlElement[TagOl, Unit] { { tag: TagOl::{}, attrs: AttrList::new(), children: () } }
+pub fn ol(children?: Array[&View] = []) -> HtmlElement[TagOl, Array[&View]] { { tag: TagOl::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagOptgroup {}
 pub impl ElementType for TagOptgroup with tag(_self) { "optgroup" }
 pub impl ElementType for TagOptgroup with is_self_closing(_self) { false }
-pub fn optgroup() -> HtmlElement[TagOptgroup, Unit] { { tag: TagOptgroup::{}, attrs: AttrList::new(), children: () } }
+pub fn optgroup(children?: Array[&View] = []) -> HtmlElement[TagOptgroup, Array[&View]] { { tag: TagOptgroup::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagOutput {}
 pub impl ElementType for TagOutput with tag(_self) { "output" }
 pub impl ElementType for TagOutput with is_self_closing(_self) { false }
-pub fn output() -> HtmlElement[TagOutput, Unit] { { tag: TagOutput::{}, attrs: AttrList::new(), children: () } }
+pub fn output(children?: Array[&View] = []) -> HtmlElement[TagOutput, Array[&View]] { { tag: TagOutput::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagP {}
 pub impl ElementType for TagP with tag(_self) { "p" }
 pub impl ElementType for TagP with is_self_closing(_self) { false }
-pub fn p() -> HtmlElement[TagP, Unit] { { tag: TagP::{}, attrs: AttrList::new(), children: () } }
+pub fn p(children?: Array[&View] = []) -> HtmlElement[TagP, Array[&View]] { { tag: TagP::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagPicture {}
 pub impl ElementType for TagPicture with tag(_self) { "picture" }
 pub impl ElementType for TagPicture with is_self_closing(_self) { false }
-pub fn picture() -> HtmlElement[TagPicture, Unit] { { tag: TagPicture::{}, attrs: AttrList::new(), children: () } }
+pub fn picture(children?: Array[&View] = []) -> HtmlElement[TagPicture, Array[&View]] { { tag: TagPicture::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagPortal {}
 pub impl ElementType for TagPortal with tag(_self) { "portal" }
 pub impl ElementType for TagPortal with is_self_closing(_self) { false }
-pub fn portal() -> HtmlElement[TagPortal, Unit] { { tag: TagPortal::{}, attrs: AttrList::new(), children: () } }
+pub fn portal(children?: Array[&View] = []) -> HtmlElement[TagPortal, Array[&View]] { { tag: TagPortal::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagPre {}
 pub impl ElementType for TagPre with tag(_self) { "pre" }
 pub impl ElementType for TagPre with is_self_closing(_self) { false }
-pub fn pre() -> HtmlElement[TagPre, Unit] { { tag: TagPre::{}, attrs: AttrList::new(), children: () } }
+pub fn pre(children?: Array[&View] = []) -> HtmlElement[TagPre, Array[&View]] { { tag: TagPre::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagProgress {}
 pub impl ElementType for TagProgress with tag(_self) { "progress" }
 pub impl ElementType for TagProgress with is_self_closing(_self) { false }
-pub fn progress() -> HtmlElement[TagProgress, Unit] { { tag: TagProgress::{}, attrs: AttrList::new(), children: () } }
+pub fn progress(children?: Array[&View] = []) -> HtmlElement[TagProgress, Array[&View]] { { tag: TagProgress::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagQ {}
 pub impl ElementType for TagQ with tag(_self) { "q" }
 pub impl ElementType for TagQ with is_self_closing(_self) { false }
-pub fn q() -> HtmlElement[TagQ, Unit] { { tag: TagQ::{}, attrs: AttrList::new(), children: () } }
+pub fn q(children?: Array[&View] = []) -> HtmlElement[TagQ, Array[&View]] { { tag: TagQ::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagRp {}
 pub impl ElementType for TagRp with tag(_self) { "rp" }
 pub impl ElementType for TagRp with is_self_closing(_self) { false }
-pub fn rp() -> HtmlElement[TagRp, Unit] { { tag: TagRp::{}, attrs: AttrList::new(), children: () } }
+pub fn rp(children?: Array[&View] = []) -> HtmlElement[TagRp, Array[&View]] { { tag: TagRp::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagRt {}
 pub impl ElementType for TagRt with tag(_self) { "rt" }
 pub impl ElementType for TagRt with is_self_closing(_self) { false }
-pub fn rt() -> HtmlElement[TagRt, Unit] { { tag: TagRt::{}, attrs: AttrList::new(), children: () } }
+pub fn rt(children?: Array[&View] = []) -> HtmlElement[TagRt, Array[&View]] { { tag: TagRt::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagRuby {}
 pub impl ElementType for TagRuby with tag(_self) { "ruby" }
 pub impl ElementType for TagRuby with is_self_closing(_self) { false }
-pub fn ruby() -> HtmlElement[TagRuby, Unit] { { tag: TagRuby::{}, attrs: AttrList::new(), children: () } }
+pub fn ruby(children?: Array[&View] = []) -> HtmlElement[TagRuby, Array[&View]] { { tag: TagRuby::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagS {}
 pub impl ElementType for TagS with tag(_self) { "s" }
 pub impl ElementType for TagS with is_self_closing(_self) { false }
-pub fn s() -> HtmlElement[TagS, Unit] { { tag: TagS::{}, attrs: AttrList::new(), children: () } }
+pub fn s(children?: Array[&View] = []) -> HtmlElement[TagS, Array[&View]] { { tag: TagS::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSamp {}
 pub impl ElementType for TagSamp with tag(_self) { "samp" }
 pub impl ElementType for TagSamp with is_self_closing(_self) { false }
-pub fn samp() -> HtmlElement[TagSamp, Unit] { { tag: TagSamp::{}, attrs: AttrList::new(), children: () } }
+pub fn samp(children?: Array[&View] = []) -> HtmlElement[TagSamp, Array[&View]] { { tag: TagSamp::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagScript {}
 pub impl ElementType for TagScript with tag(_self) { "script" }
 pub impl ElementType for TagScript with is_self_closing(_self) { false }
-pub fn script() -> HtmlElement[TagScript, Unit] { { tag: TagScript::{}, attrs: AttrList::new(), children: () } }
+pub fn script(children?: Array[&View] = []) -> HtmlElement[TagScript, Array[&View]] { { tag: TagScript::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSearch {}
 pub impl ElementType for TagSearch with tag(_self) { "search" }
 pub impl ElementType for TagSearch with is_self_closing(_self) { false }
-pub fn search() -> HtmlElement[TagSearch, Unit] { { tag: TagSearch::{}, attrs: AttrList::new(), children: () } }
+pub fn search(children?: Array[&View] = []) -> HtmlElement[TagSearch, Array[&View]] { { tag: TagSearch::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSection {}
 pub impl ElementType for TagSection with tag(_self) { "section" }
 pub impl ElementType for TagSection with is_self_closing(_self) { false }
-pub fn section() -> HtmlElement[TagSection, Unit] { { tag: TagSection::{}, attrs: AttrList::new(), children: () } }
+pub fn section(children?: Array[&View] = []) -> HtmlElement[TagSection, Array[&View]] { { tag: TagSection::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSelect {}
 pub impl ElementType for TagSelect with tag(_self) { "select" }
 pub impl ElementType for TagSelect with is_self_closing(_self) { false }
-pub fn select() -> HtmlElement[TagSelect, Unit] { { tag: TagSelect::{}, attrs: AttrList::new(), children: () } }
+pub fn select(children?: Array[&View] = []) -> HtmlElement[TagSelect, Array[&View]] { { tag: TagSelect::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSlot {}
 pub impl ElementType for TagSlot with tag(_self) { "slot" }
 pub impl ElementType for TagSlot with is_self_closing(_self) { false }
-pub fn slot() -> HtmlElement[TagSlot, Unit] { { tag: TagSlot::{}, attrs: AttrList::new(), children: () } }
+pub fn slot(children?: Array[&View] = []) -> HtmlElement[TagSlot, Array[&View]] { { tag: TagSlot::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSmall {}
 pub impl ElementType for TagSmall with tag(_self) { "small" }
 pub impl ElementType for TagSmall with is_self_closing(_self) { false }
-pub fn small() -> HtmlElement[TagSmall, Unit] { { tag: TagSmall::{}, attrs: AttrList::new(), children: () } }
+pub fn small(children?: Array[&View] = []) -> HtmlElement[TagSmall, Array[&View]] { { tag: TagSmall::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSpan {}
 pub impl ElementType for TagSpan with tag(_self) { "span" }
 pub impl ElementType for TagSpan with is_self_closing(_self) { false }
-pub fn span() -> HtmlElement[TagSpan, Unit] { { tag: TagSpan::{}, attrs: AttrList::new(), children: () } }
+pub fn span(children?: Array[&View] = []) -> HtmlElement[TagSpan, Array[&View]] { { tag: TagSpan::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagStrong {}
 pub impl ElementType for TagStrong with tag(_self) { "strong" }
 pub impl ElementType for TagStrong with is_self_closing(_self) { false }
-pub fn strong() -> HtmlElement[TagStrong, Unit] { { tag: TagStrong::{}, attrs: AttrList::new(), children: () } }
+pub fn strong(children?: Array[&View] = []) -> HtmlElement[TagStrong, Array[&View]] { { tag: TagStrong::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagStyle {}
 pub impl ElementType for TagStyle with tag(_self) { "style" }
 pub impl ElementType for TagStyle with is_self_closing(_self) { false }
-pub fn style() -> HtmlElement[TagStyle, Unit] { { tag: TagStyle::{}, attrs: AttrList::new(), children: () } }
+pub fn style(children?: Array[&View] = []) -> HtmlElement[TagStyle, Array[&View]] { { tag: TagStyle::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSub {}
 pub impl ElementType for TagSub with tag(_self) { "sub" }
 pub impl ElementType for TagSub with is_self_closing(_self) { false }
-pub fn sub() -> HtmlElement[TagSub, Unit] { { tag: TagSub::{}, attrs: AttrList::new(), children: () } }
+pub fn sub(children?: Array[&View] = []) -> HtmlElement[TagSub, Array[&View]] { { tag: TagSub::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSummary {}
 pub impl ElementType for TagSummary with tag(_self) { "summary" }
 pub impl ElementType for TagSummary with is_self_closing(_self) { false }
-pub fn summary() -> HtmlElement[TagSummary, Unit] { { tag: TagSummary::{}, attrs: AttrList::new(), children: () } }
+pub fn summary(children?: Array[&View] = []) -> HtmlElement[TagSummary, Array[&View]] { { tag: TagSummary::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagSup {}
 pub impl ElementType for TagSup with tag(_self) { "sup" }
 pub impl ElementType for TagSup with is_self_closing(_self) { false }
-pub fn sup() -> HtmlElement[TagSup, Unit] { { tag: TagSup::{}, attrs: AttrList::new(), children: () } }
+pub fn sup(children?: Array[&View] = []) -> HtmlElement[TagSup, Array[&View]] { { tag: TagSup::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTable {}
 pub impl ElementType for TagTable with tag(_self) { "table" }
 pub impl ElementType for TagTable with is_self_closing(_self) { false }
-pub fn table() -> HtmlElement[TagTable, Unit] { { tag: TagTable::{}, attrs: AttrList::new(), children: () } }
+pub fn table(children?: Array[&View] = []) -> HtmlElement[TagTable, Array[&View]] { { tag: TagTable::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTbody {}
 pub impl ElementType for TagTbody with tag(_self) { "tbody" }
 pub impl ElementType for TagTbody with is_self_closing(_self) { false }
-pub fn tbody() -> HtmlElement[TagTbody, Unit] { { tag: TagTbody::{}, attrs: AttrList::new(), children: () } }
+pub fn tbody(children?: Array[&View] = []) -> HtmlElement[TagTbody, Array[&View]] { { tag: TagTbody::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTd {}
 pub impl ElementType for TagTd with tag(_self) { "td" }
 pub impl ElementType for TagTd with is_self_closing(_self) { false }
-pub fn td() -> HtmlElement[TagTd, Unit] { { tag: TagTd::{}, attrs: AttrList::new(), children: () } }
+pub fn td(children?: Array[&View] = []) -> HtmlElement[TagTd, Array[&View]] { { tag: TagTd::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTemplate {}
 pub impl ElementType for TagTemplate with tag(_self) { "template" }
 pub impl ElementType for TagTemplate with is_self_closing(_self) { false }
-pub fn template() -> HtmlElement[TagTemplate, Unit] { { tag: TagTemplate::{}, attrs: AttrList::new(), children: () } }
+pub fn template(children?: Array[&View] = []) -> HtmlElement[TagTemplate, Array[&View]] { { tag: TagTemplate::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTextarea {}
 pub impl ElementType for TagTextarea with tag(_self) { "textarea" }
 pub impl ElementType for TagTextarea with is_self_closing(_self) { false }
-pub fn textarea() -> HtmlElement[TagTextarea, Unit] { { tag: TagTextarea::{}, attrs: AttrList::new(), children: () } }
+pub fn textarea(children?: Array[&View] = []) -> HtmlElement[TagTextarea, Array[&View]] { { tag: TagTextarea::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTfoot {}
 pub impl ElementType for TagTfoot with tag(_self) { "tfoot" }
 pub impl ElementType for TagTfoot with is_self_closing(_self) { false }
-pub fn tfoot() -> HtmlElement[TagTfoot, Unit] { { tag: TagTfoot::{}, attrs: AttrList::new(), children: () } }
+pub fn tfoot(children?: Array[&View] = []) -> HtmlElement[TagTfoot, Array[&View]] { { tag: TagTfoot::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTh {}
 pub impl ElementType for TagTh with tag(_self) { "th" }
 pub impl ElementType for TagTh with is_self_closing(_self) { false }
-pub fn th() -> HtmlElement[TagTh, Unit] { { tag: TagTh::{}, attrs: AttrList::new(), children: () } }
+pub fn th(children?: Array[&View] = []) -> HtmlElement[TagTh, Array[&View]] { { tag: TagTh::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagThead {}
 pub impl ElementType for TagThead with tag(_self) { "thead" }
 pub impl ElementType for TagThead with is_self_closing(_self) { false }
-pub fn thead() -> HtmlElement[TagThead, Unit] { { tag: TagThead::{}, attrs: AttrList::new(), children: () } }
+pub fn thead(children?: Array[&View] = []) -> HtmlElement[TagThead, Array[&View]] { { tag: TagThead::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTime {}
 pub impl ElementType for TagTime with tag(_self) { "time" }
 pub impl ElementType for TagTime with is_self_closing(_self) { false }
-pub fn time() -> HtmlElement[TagTime, Unit] { { tag: TagTime::{}, attrs: AttrList::new(), children: () } }
+pub fn time(children?: Array[&View] = []) -> HtmlElement[TagTime, Array[&View]] { { tag: TagTime::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTitle {}
 pub impl ElementType for TagTitle with tag(_self) { "title" }
 pub impl ElementType for TagTitle with is_self_closing(_self) { false }
-pub fn title() -> HtmlElement[TagTitle, Unit] { { tag: TagTitle::{}, attrs: AttrList::new(), children: () } }
+pub fn title(children?: Array[&View] = []) -> HtmlElement[TagTitle, Array[&View]] { { tag: TagTitle::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagTr {}
 pub impl ElementType for TagTr with tag(_self) { "tr" }
 pub impl ElementType for TagTr with is_self_closing(_self) { false }
-pub fn tr() -> HtmlElement[TagTr, Unit] { { tag: TagTr::{}, attrs: AttrList::new(), children: () } }
+pub fn tr(children?: Array[&View] = []) -> HtmlElement[TagTr, Array[&View]] { { tag: TagTr::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagU {}
 pub impl ElementType for TagU with tag(_self) { "u" }
 pub impl ElementType for TagU with is_self_closing(_self) { false }
-pub fn u() -> HtmlElement[TagU, Unit] { { tag: TagU::{}, attrs: AttrList::new(), children: () } }
+pub fn u(children?: Array[&View] = []) -> HtmlElement[TagU, Array[&View]] { { tag: TagU::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagUl {}
 pub impl ElementType for TagUl with tag(_self) { "ul" }
 pub impl ElementType for TagUl with is_self_closing(_self) { false }
-pub fn ul() -> HtmlElement[TagUl, Unit] { { tag: TagUl::{}, attrs: AttrList::new(), children: () } }
+pub fn ul(children?: Array[&View] = []) -> HtmlElement[TagUl, Array[&View]] { { tag: TagUl::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagVar_ {}
 pub impl ElementType for TagVar_ with tag(_self) { "var" }
 pub impl ElementType for TagVar_ with is_self_closing(_self) { false }
-pub fn var_() -> HtmlElement[TagVar_, Unit] { { tag: TagVar_::{}, attrs: AttrList::new(), children: () } }
+pub fn var_(children?: Array[&View] = []) -> HtmlElement[TagVar_, Array[&View]] { { tag: TagVar_::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagVideo {}
 pub impl ElementType for TagVideo with tag(_self) { "video" }
 pub impl ElementType for TagVideo with is_self_closing(_self) { false }
-pub fn video() -> HtmlElement[TagVideo, Unit] { { tag: TagVideo::{}, attrs: AttrList::new(), children: () } }
+pub fn video(children?: Array[&View] = []) -> HtmlElement[TagVideo, Array[&View]] { { tag: TagVideo::{}, attrs: AttrList::new(), children: children } }
 
 pub struct TagOption_ {}
 pub impl ElementType for TagOption_ with tag(_self) { "option" }
 pub impl ElementType for TagOption_ with is_self_closing(_self) { false }
-pub fn option_() -> HtmlElement[TagOption_, Unit] { { tag: TagOption_::{}, attrs: AttrList::new(), children: () } }
+pub fn option_(children?: Array[&View] = []) -> HtmlElement[TagOption_, Array[&View]] { { tag: TagOption_::{}, attrs: AttrList::new(), children: children } }

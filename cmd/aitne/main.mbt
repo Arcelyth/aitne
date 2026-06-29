@@ -1,4 +1,12 @@
 ///|
+fn compile_file(path : String, show : Bool, tmp : Bool) -> Unit {
+  if path.has_suffix(".mbx") {
+    let target = path[0:path.length()] + ".mbt"
+    let _ = @mbxc.from_file(path, show~, to=Some(target.to_owned()), tmp~)
+  }
+}
+
+///|
 pub fn walk_and_compile(
   dir : String,
   show? : Bool = false,
@@ -16,9 +24,8 @@ pub fn walk_and_compile(
 
         if @fs.is_dir(path) {
           walk_and_compile(path, show~, tmp~)
-        } else if path.has_suffix(".mbx") {
-          let target = path[0:path.length()] + ".mbt"
-          let _ = @mbxc.from_file(path, show~, to=Some(target.to_owned()), tmp~)
+        } else {
+          compile_file(path, show, tmp)
         }
       }
     Err(e) => debug(e)
@@ -37,6 +44,8 @@ fn main {
       let mut show = false
       let mut tmp = false
       let mut help = false
+      let mut target_file : String? = None
+      let mut step = 1
       let target_dir = "."
 
       if arg_len == 3 && args[2] == "help" {
@@ -44,18 +53,33 @@ fn main {
         return
       }
 
-      for i = 2; i < args.length(); i = i + 1 {
+      for i = 2; i < args.length(); i = i + step {
+        step = 1
         let arg = args[i]
         match arg {
           "--show" | "-s" => show = true
           "--template" | "-t" => tmp = true
+          "--file" | "-f" =>
+            if i + 1 < args.length() {
+              target_file = Some(args[i + 1])
+              step = 2
+            } else {
+              println("Error: Missing file path for --file/-f option")
+              return
+            }
           _ => ()
         }
       }
-      let res = try? walk_and_compile(target_dir, show~, tmp~)
-      match res {
-        Ok(_) => ()
-        Err(e) => debug(e)
+
+      match target_file {
+        Some(file) => compile_file(file, show, tmp)
+        None => {
+          let res = try? walk_and_compile(target_dir, show~, tmp~)
+          match res {
+            Ok(_) => ()
+            Err(e) => debug(e)
+          }
+        }
       }
     }
     "init" => ()
@@ -88,6 +112,7 @@ fn show_mbxc_help() -> Unit {
     #|options: 
     #|  --show, -s            output the compile process information
     #|  --template, -t        use template mode [WIP]
+    #|  --file, -f <file>     compile a specific MBX file
 
   println(content)
 }

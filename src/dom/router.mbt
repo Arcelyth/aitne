@@ -40,9 +40,9 @@ pub struct RouterChildren(ViewFn)
 
 ///|
 pub fn router(
-  children : RouterChildren,
-  base? : String? = None,
-  set_is_routing? : ((Bool) -> Unit)? = None,
+  children? : Array[RouterChildren] = [],
+  base? : String,
+  set_is_routing? : (Bool) -> Unit,
 ) -> &View {
   let location = BrowserUrl::new()
 
@@ -67,11 +67,18 @@ pub fn router(
     set_is_routing,
   })
 
-  children()
+  if children.length() >= 1 {
+    children[0]()
+  } else {
+    ()
+  }
 }
 
 ///|
-pub fn[Ch] route(path : String, view : ViewFn) -> NestedRoute[Ch] {
+pub fn[Ch] route(
+  path? : String = "/",
+  view? : ViewFn = () => (),
+) -> NestedRoute[Ch] {
   NestedRoute::new(path, view)
 }
 
@@ -80,17 +87,17 @@ type ViewFn = () -> &View
 
 ///|
 pub fn[Ch] parent_route(
-  path : String,
-  view : () -> &View,
-  children : Ch,
+  path? : String = "/",
+  view? : () -> &View = () => (),
+  children~ : Ch,
 ) -> NestedRoute[Ch] {
   NestedRoute::new(path, view).child(children)
 }
 
 ///|
 pub fn[Ch : MatchNestedRoutes] routes(
-  fallback : ViewFn,
-  children : Ch,
+  fallback? : ViewFn = () => (),
+  children? : Ch,
 ) -> RouterChildren {
   RouterChildren(() => {
     let _loc : BrowserUrl? = use_context()
@@ -202,7 +209,8 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn build(
         // Path changed
         router.path.val = new_path
 
-        let dom_pos : (@ffi.Node, @ffi.Node?)? = match router.view.val.elements().get(0) {
+        let dom_pos : (@ffi.Node, @ffi.Node?)? = match
+          router.view.val.elements().get(0) {
           Some(first_el) => {
             let parent = @ffi.dom_parent(first_el)
             if @ffi.dom_is_null(parent) {
@@ -268,7 +276,8 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn rebuild(
 
       router.path.val = url.path
 
-      let dom_pos : (@ffi.Node, @ffi.Node?)? = match router.view.val.elements().get(0) {
+      let dom_pos : (@ffi.Node, @ffi.Node?)? = match
+        router.view.val.elements().get(0) {
         Some(first_el) => {
           let parent = @ffi.dom_parent(first_el)
           if @ffi.dom_is_null(parent) {

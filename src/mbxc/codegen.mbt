@@ -31,6 +31,57 @@ fn capitalize_event(event : String) -> String {
 }
 
 ///|
+fn CodeGen::gen_expr_code(self : CodeGen, expr_str : StringView) -> Unit {
+  let expr_string = expr_str.to_owned()
+  let lexer = Lexer::new(expr_string)
+  let tokens = lexer.tokenizer() catch {
+    _ => {
+      self.buf.write(expr_string)
+      return
+    }
+  }
+
+  let idx = [0]
+  let len = tokens.length()
+
+  fn parse_nodes() -> Array[MbxAST] {
+    let nodes = []
+    while idx[0] < len {
+      let tok = tokens[idx[0]]
+      match tok {
+        Token::TagClose(_) => break
+        _ => {
+          idx[0] += 1
+          match tok {
+            Token::RawText(s) => nodes.push(MbxAST::PureCode(s))
+            Token::CodeBlock(s) => nodes.push(MbxAST::PureCode(s))
+            Token::TagSelfClose(t) =>
+              nodes.push(MbxAST::ElementNode(t.tag, t.attrs, []))
+            Token::TagOpen(t) => {
+              let children = parse_nodes()
+              if idx[0] < len {
+                match tokens[idx[0]] {
+                  Token::TagClose(c) => if c.tag == t.tag { idx[0] += 1 }
+                  _ => ()
+                }
+              }
+              nodes.push(MbxAST::ElementNode(t.tag, t.attrs, children))
+            }
+            _ => ()
+          }
+        }
+      }
+    }
+    nodes
+  }
+
+  let nodes = parse_nodes()
+  for node in nodes {
+    self.gen_node(node)
+  }
+}
+
+///|
 fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
   match node {
     MbxAST::PureCode(code) => self.buf.write(code)
@@ -88,18 +139,20 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
       if is_builtin {
         self.buf.write("\{package_path}/dom.")
         self.buf.write(tag_name)
-        self.buf.write("()")
+        self.buf.write("(")
 
         if valid_children.length() > 0 {
-          self.buf.write("\n  .children([\n    ")
+          self.buf.write("children=[")
           for i = 0; i < valid_children.length(); i = i + 1 {
             if i > 0 {
-              self.buf.write(",\n    ")
+              self.buf.write(", ")
             }
             self.gen_node(valid_children[i])
           }
-          self.buf.write("\n  ])")
+          self.buf.write("]")
         }
+
+        self.buf.write(")")
 
         attrs.each((attr, val) => self.gen_attr(attr, val))
       } else {
@@ -128,12 +181,13 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
           self.buf.write(name)
           self.buf.write("=")
 
-          if scope == "on" || (scope == "" && name == "value") {
-            self.buf.write(val)
-          } else {
-            self.buf.write("\"")
-            self.buf.write(escape_moonbit_str(val.to_owned()))
-            self.buf.write("\"")
+          match val {
+            AttrValue::Expr(code) => self.gen_expr_code(code)
+            AttrValue::Str(s) => {
+              self.buf.write("\"")
+              self.buf.write(escape_moonbit_str(s.to_owned()))
+              self.buf.write("\"")
+            }
           }
         })
 
@@ -165,11 +219,7 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
 }
 
 ///|
-fn CodeGen::gen_attr(
-  self : CodeGen,
-  attr : TokenAttr,
-  val : StringView,
-) -> Unit {
+fn CodeGen::gen_attr(self : CodeGen, attr : TokenAttr, val : AttrValue) -> Unit {
   let name = attr.name.to_owned()
   let scope = match attr.ns {
     Some(s) => s.to_owned()
@@ -180,11 +230,25 @@ fn CodeGen::gen_attr(
     self.buf.write("\n  .on(")
     self.buf.write(capitalize_event(name))
     self.buf.write(", ")
-    self.buf.write(val)
+    match val {
+      AttrValue::Expr(code) => self.gen_expr_code(code)
+      AttrValue::Str(s) => {
+        self.buf.write("\"")
+        self.buf.write(escape_moonbit_str(s.to_owned()))
+        self.buf.write("\"")
+      }
+    }
     self.buf.write(")")
   } else if scope == "" && name == "value" {
     self.buf.write("\n  .value(")
-    self.buf.write(val)
+    match val {
+      AttrValue::Expr(code) => self.gen_expr_code(code)
+      AttrValue::Str(s) => {
+        self.buf.write("\"")
+        self.buf.write(escape_moonbit_str(s.to_owned()))
+        self.buf.write("\"")
+      }
+    }
     self.buf.write(")")
   } else {
     self.buf.write("\n  .attr(\"")
@@ -195,9 +259,14 @@ fn CodeGen::gen_attr(
     self.buf.write(name)
     self.buf.write("\", ")
 
-    self.buf.write("\"")
-    self.buf.write(escape_moonbit_str(val.to_owned()))
-    self.buf.write("\"")
+    match val {
+      AttrValue::Expr(code) => self.gen_expr_code(code)
+      AttrValue::Str(s) => {
+        self.buf.write("\"")
+        self.buf.write(escape_moonbit_str(s.to_owned()))
+        self.buf.write("\"")
+      }
+    }
     self.buf.write(")")
   }
 }

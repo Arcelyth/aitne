@@ -11,7 +11,7 @@ pub(all) struct TokenAttr {
 /// <div style="">
 pub(all) struct TagOpen {
   tag : StringView
-  attrs : HashMap[TokenAttr, StringView]
+  attrs : HashMap[TokenAttr, AttrValue]
 } derive(Debug, Eq, Show)
 
 ///|
@@ -24,7 +24,7 @@ pub(all) struct TagClose {
 /// <div />
 pub(all) struct TagSelfClose {
   tag : StringView
-  attrs : HashMap[TokenAttr, StringView]
+  attrs : HashMap[TokenAttr, AttrValue]
 } derive(Debug, Eq, Show)
 
 ///|
@@ -44,6 +44,12 @@ pub(all) enum Token {
   HashBraceOpen // #{
   HashBraceClose // }#
 } derive(Debug, Eq, Show)
+
+///|
+pub(all) enum AttrValue {
+  Str(StringView)
+  Expr(StringView)
+} derive(Debug, Show, Eq)
 
 ///|
 pub(all) struct Lexer {
@@ -288,7 +294,7 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
           }
           let tag = self.src[tag_start:self.cur]
 
-          let attrs : HashMap[TokenAttr, StringView] = HashMap([])
+          let attrs : HashMap[TokenAttr, AttrValue] = HashMap([])
 
           while !self.is_end() {
             while !self.is_end() && is_space(self.src[self.cur]) {
@@ -323,8 +329,8 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
             while !self.is_end() && is_space(self.src[self.cur]) {
               self.cur += 1
             }
-            // Empty string view fallback
-            let mut val_sv = self.src[self.cur:self.cur]
+
+            let mut val_attr = AttrValue::Str(self.src[self.cur:self.cur])
 
             if !self.is_end() && self.src[self.cur] == '=' {
               self.cur += 1
@@ -349,10 +355,10 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
                   if self.is_end() {
                     raise LexerError("Unclosed attribute value")
                   }
-                  val_sv = self.src[val_start:self.cur]
+                  val_attr = AttrValue::Str(self.src[val_start:self.cur])
                   self.cur += 1 // skip quote
                 } else if quote_c == '{' {
-                  val_sv = self.read_code_block()
+                  val_attr = AttrValue::Expr(self.read_code_block())
                 } else {
                   // unquoted attribute value
                   let val_start = self.cur
@@ -362,12 +368,12 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
                         self.src[self.cur] != '>' {
                     self.cur += 1
                   }
-                  val_sv = self.src[val_start:self.cur]
+                  val_attr = AttrValue::Str(self.src[val_start:self.cur])
                 }
               }
             }
 
-            attrs.set(TokenAttr::{ ns, name }, val_sv)
+            attrs.set(TokenAttr::{ ns, name }, val_attr)
           }
 
           if !self.is_end() && self.src[self.cur] == '/' {

@@ -1,47 +1,31 @@
 ///|
-test "parser_basic_and_nested" {
-  // <div>hello <img src="a.png"/></div>
-  let tokens = [
-    Token::TagOpen({ tag: "div", attrs: HashMap([]) }),
-    Token::RawText("hello "),
-    Token::TagSelfClose({
-      tag: "img",
-      attrs: HashMap([({ ns: None, name: "src" }, "a.png")]),
-    }),
-    Token::TagClose({ tag: "div" }),
-  ]
-
-  let parser = Parser::new(tokens)
-  let ast = parser.parse()
-
-  inspect(
-    ast,
-    content="[ElementNode(div, HashMap::from_array([]), [PureCode(hello ), ElementNode(img, HashMap::from_array([({ns: None, name: src}, a.png)]), [])])]",
-  )
-}
+using @hashmap {type HashMap}
 
 ///|
-test "parser_embedded_code_blocks" {
-  // let v = #{ <div>{ () => #{ <div /> }# }</div> }#
+test "parse valid mbx node with attributes and dynamic expression" {
+  let div_attrs = HashMap([])
+  div_attrs.set(
+    TokenAttr::{ ns: None, name: "eat" },
+    AttrValue::Expr("() => omg()"),
+  )
+
   let tokens = [
-    Token::RawText("let v = "),
-    Token::HashBraceOpen,
-    Token::TagOpen({ tag: "div", attrs: HashMap([]) }),
+    // <div eat={() => omg()}> {() => <div/>} </div>
+    Token::TagOpen({ tag: "div", attrs: div_attrs }),
+    Token::RawText(" "),
     Token::BraceOpen,
-    Token::RawText(" () => "),
-    Token::HashBraceOpen,
+    Token::RawText("() => "),
     Token::TagSelfClose({ tag: "div", attrs: HashMap([]) }),
-    Token::HashBraceClose,
     Token::BraceClose,
+    Token::RawText(" "),
     Token::TagClose({ tag: "div" }),
-    Token::HashBraceClose,
   ]
 
   let parser = Parser::new(tokens)
-  let ast = parser.parse()
+  let result = parser.parse()
 
   inspect(
-    ast,
-    content="[PureCode(let v = ), ElementNode(div, HashMap::from_array([]), [PureCode( () => ), ElementNode(div, HashMap::from_array([]), [])])]",
+    result,
+    content="[ElementNode(div, HashMap::from_array([({ns: None, name: eat}, Expr(() => omg()))]), [RawText( ), DynamicCode([PureCode(() => ), ElementNode(div, HashMap::from_array([]), [])]), RawText( )])]",
   )
 }

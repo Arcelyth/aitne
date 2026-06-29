@@ -2,7 +2,6 @@
 test "lexer_basic_html" {
   let src =
     #|<div>hello</div>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
@@ -17,7 +16,6 @@ test "lexer_string_handle" {
   let src =
     #|let a = "<div>"
     #|<div>"<div>"</div>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
@@ -32,7 +30,6 @@ test "lexer_<_handle_outside" {
   let src =
     #|if a < b
     #|<div>"<div>"</div>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
@@ -46,7 +43,6 @@ test "lexer_<_handle_outside" {
 test "lexer_<_handle_inside" {
   let src =
     #|<div>a < b</div>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
@@ -60,13 +56,12 @@ test "lexer_<_handle_inside" {
 test "lexer_attributes" {
   let src =
     #|<div id="app"></div>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   inspect(
     tokens,
-    content="[TagOpen({tag: div, attrs: HashMap::from_array([({ns: None, name: id}, app)])}), TagClose({tag: div})]",
+    content="[TagOpen({tag: div, attrs: HashMap::from_array([({ns: None, name: id}, Str(app))])}), TagClose({tag: div})]",
   )
 }
 
@@ -74,41 +69,38 @@ test "lexer_attributes" {
 test "lexer_event_attribute" {
   let src =
     #|<button on:click={() => 1}>+</button>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   inspect(
     tokens,
-    content="[TagOpen({tag: button, attrs: HashMap::from_array([({ns: Some(on), name: click}, () => 1)])}), RawText(+), TagClose({tag: button})]",
+    content="[TagOpen({tag: button, attrs: HashMap::from_array([({ns: Some(on), name: click}, Expr(() => 1))])}), RawText(+), TagClose({tag: button})]",
   )
 }
 
 ///|
-test "lexer_self_closing" {
+test "lexer_self_closing_str" {
   let src =
     #|<img src="a.png"/>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   inspect(
     tokens,
-    content="[TagSelfClose({tag: img, attrs: HashMap::from_array([({ns: None, name: src}, a.png)])})]",
+    content="[TagSelfClose({tag: img, attrs: HashMap::from_array([({ns: None, name: src}, Str(a.png))])})]",
   )
 }
 
 ///|
-test "lexer_self_closing" {
+test "lexer_self_closing_expr" {
   let src =
     #|<button on:click={() => a}/>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   inspect(
     tokens,
-    content="[TagSelfClose({tag: button, attrs: HashMap::from_array([({ns: Some(on), name: click}, () => a)])})]",
+    content="[TagSelfClose({tag: button, attrs: HashMap::from_array([({ns: Some(on), name: click}, Expr(() => a))])})]",
   )
 }
 
@@ -117,7 +109,6 @@ test "lexer_code_then_html" {
   let src =
     #|let a = 1
     #|<div>{() => a}</div>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
@@ -132,7 +123,6 @@ test "lexer_no_brace" {
   let src =
     #|let a = 1
     #|<div>() => a</div>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
@@ -147,7 +137,6 @@ test "lexer_has_brace_html" {
   let src =
     #|let v = #{
     #|  <div>{ () => #{ <div/>}#}</div>}#
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
@@ -161,13 +150,12 @@ test "lexer_has_brace_html" {
 test "lexer_nested_code_block_attr" {
   let src =
     #|<div value={{ a: { b: 1 } }}></div>
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   inspect(
     tokens,
-    content="[TagOpen({tag: div, attrs: HashMap::from_array([({ns: None, name: value}, { a: { b: 1 } })])}), TagClose({tag: div})]",
+    content="[TagOpen({tag: div, attrs: HashMap::from_array([({ns: None, name: value}, Expr({ a: { b: 1 } }))])}), TagClose({tag: div})]",
   )
 }
 
@@ -175,12 +163,24 @@ test "lexer_nested_code_block_attr" {
 test "custom_component" {
   let src =
     #|<What />
-
   let lexer = Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   inspect(
     tokens,
     content="[TagSelfClose({tag: What, attrs: HashMap::from_array([])})]",
+  )
+}
+
+///|
+test "lexer_mixed_attributes" {
+  let src =
+    #|<div data-count={123}></div>
+  let lexer = Lexer::new(src)
+  let tokens = lexer.tokenizer()
+
+  inspect(
+    tokens,
+    content="[TagOpen({tag: div, attrs: HashMap::from_array([({ns: None, name: data-count}, Expr(123))])}), TagClose({tag: div})]",
   )
 }

@@ -18,19 +18,21 @@ using @dom {
 
 ///|
 pub fn app() -> &View {
-  router(
-    routes(() => not_found(), [
-      route("/", () => home()),
-      route("/try", () => try_page()),
-      parent_route(
-        "/users",
-        () => users_page(),
-        route("/:id", () => user_detail_page()),
-      ),
-      parent_route("/t", () => try_page(), route("/t1", () => try_page())),
-    ]),
-    base=Some(""),
-  )
+  <Router base="/">
+    <Routes fallback={() => <NotFound />}>
+        <Route path="/try" view={() => <Home />} />
+        <ParentRoute 
+            path="/users" 
+            view={() => <UsersPage />}> 
+           <Route path="/:id" view={() => <UserDetailPage />}/> 
+        </ParentRoute>
+        <ParentRoute 
+            path="/t"
+            view={() => <TryPage />}> 
+           <Route path="/t1" view={() => <TryPage />} /> 
+        </ParentRoute>
+    </Routes>
+  </Router>
 }
 
 ///|

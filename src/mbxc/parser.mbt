@@ -10,8 +10,9 @@ pub(all) enum MbxAST {
   RawText(StringView)
   DynamicCode(Array[MbxAST])
   // name, attrs, children
-  ElementNode(StringView, HashMap[TokenAttr, StringView], Array[MbxAST])
+  ElementNode(StringView, HashMap[TokenAttr, AttrValue], Array[MbxAST])
 } derive(Debug, Show, Eq)
+
 
 ///|
 pub(all) struct Parser {
@@ -102,7 +103,7 @@ fn Parser::parse_node(self : Parser) -> MbxAST? raise MbxcError {
                   }
                   self.advance()
                 }
-                Token::TagOpen(_) => {
+                Token::TagOpen(_) | Token::TagSelfClose(_) => {
                   let code_str = code_buf.to_string()
                   if code_str.length() > 0 {
                     local_children.push(MbxAST::PureCode(code_str))

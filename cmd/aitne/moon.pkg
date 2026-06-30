@@ -8,5 +8,5 @@ import {
 
 options(
   "is-main": true,
-  supported_targets: "all",
+  supported_targets: "native",
 )

@@ -6,3 +6,4 @@ target
 .moonagent/
 *.html
 *.mbx.mbt
+dist/

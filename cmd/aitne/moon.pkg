@@ -1,10 +1,12 @@
 import {
   "Arcelyth/aitne/src/mbxc",
+  "Arcelyth/aitne/cmd/aitne/eirene",
   "moonbitlang/x/fs",
   "moonbitlang/x/sys",
+  "moonbitlang/async",
 }
 
 options(
   "is-main": true,
-  supported_targets: "all",
+  supported_targets: "native",
 )

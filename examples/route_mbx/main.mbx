@@ -20,7 +20,7 @@ using @dom {
 pub fn app() -> &View {
   <Router base="/">
     <Routes fallback={() => <NotFound />}>
-        <Route path="/try" view={() => <Home />} />
+        <Route path="/" view={() => <Home />} />
         <ParentRoute 
             path="/users" 
             view={() => <UsersPage />}> 

@@ -33,10 +33,14 @@ pub fn walk_and_compile(
 }
 
 ///|
-fn main {
+#cfg(target="native")
+async fn main {
   let args = @sys.get_cli_args()
   let arg_len = args.length()
   let cmd = if arg_len == 1 { "help" } else { args[1] }
+
+  let mut target_file : String? = None
+  let mut step = 1
 
   match cmd {
     "help" => show_main_help()
@@ -44,8 +48,6 @@ fn main {
       let mut show = false
       let mut tmp = false
       let mut help = false
-      let mut target_file : String? = None
-      let mut step = 1
       let target_dir = "."
 
       if arg_len == 3 && args[2] == "help" {
@@ -82,6 +84,61 @@ fn main {
         }
       }
     }
+    "run" => {
+      if arg_len == 3 && args[2] == "help" {
+        show_run_help()
+        return
+      }
+
+      for i = 2; i < args.length(); i = i + step {
+        step = 1
+        let arg = args[i]
+        match arg {
+          "--file" | "-f" =>
+            if i + 1 < args.length() {
+              target_file = Some(args[i + 1])
+              step = 2
+            } else {
+              println("Error: Missing file path for --file/-f option")
+              return
+            }
+          _ => ()
+        }
+      }
+
+      let content = match target_file {
+        Some(file) =>
+          match (try? @fs.read_file_to_string("file")) {
+            Ok(f) => f
+            Err(_) => {
+              println("Failed to read file \{file}")
+              return
+            }
+          }
+        None =>
+          if @fs.path_exists("./eirene.toml") {
+            match (try? @fs.read_file_to_string("./eirene.toml")) {
+              Ok(f) => f
+              Err(err) => {
+                println("Failed to read file ./eirene.toml")
+                return
+              }
+            }
+          } else {
+            println("Error: Cannot find 'eirene.toml' at the current folder")
+            return
+          }
+      }
+
+      match (try? @eirene.load_config(content)) {
+        Ok(cfg) =>
+          match (try? @eirene.start_server(cfg)) {
+            Ok(_) => ()
+            Err(err) => println("Server Error: \{err}")
+          }
+        Err(err) => println("Config Error: \{err}")
+      }
+    }
     "init" => ()
     cmd => show_unknown_command(cmd)
   }
@@ -93,8 +150,9 @@ fn show_main_help() -> Unit {
     #|Usage: aitne [command] [options]
     #| 
     #|command: 
-    #|  init                initialize a new project
+    #|  init                initialize a new project [WIP]
     #|  mbxc                compile all the MBX file under current dictionary
+    #|  run                 run current project locally
 
   println(content)
 }
@@ -113,6 +171,17 @@ fn show_mbxc_help() -> Unit {
     #|  --show, -s            output the compile process information
     #|  --template, -t        use template mode [WIP]
     #|  --file, -f <file>     compile a specific MBX file
+
+  println(content)
+}
+
+///|
+fn show_run_help() -> Unit {
+  let content =
+    #|Usage: aitne mbxc [options]
+    #| 
+    #|options: 
+    #|  --file, -f <file>     specify an eirene.toml file
 
   println(content)
 }

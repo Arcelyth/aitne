@@ -72,7 +72,7 @@ Simple router usage in MBX format:
 pub fn app() -> &View {
   <Router base="/">
     <Routes fallback={() => <NotFound />}>
-        <Route path="/try" view={() => <Home />} />
+        <Route path="/" view={() => <Home />} />
         <ParentRoute 
             path="/users" 
             view={() => <UsersPage />}> 
@@ -91,6 +91,26 @@ pub fn app() -> &View {
 fn main {
   let _ = @dom.mount_to_body(() => <App />)
 }
+```
+
+## Eirene
+
+Eirene is a simple web server built in MoonBit, specifically designed to serve static assets and handle Single Page Application (SPA) routing fallbacks for the Aitne ecosystem. <br>
+An example 'eirene.toml' config file:
+```toml
+[app]
+name = "examples"
+mode = "development"
+entry_html = "index.html"
+
+[build]
+target = "js"
+src_dir = "src"
+out_dir = "."
+
+[server]
+host = "127.0.0.1"
+port = 8000
 ```
 
 ## CLI Tool

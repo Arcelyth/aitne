@@ -18,5 +18,8 @@
   ],
   "description": "A lightweight and high-performance reactive web framework.",
   "preferred-target": "js",
-  "supported-targets": ["js", "native"]
+  "supported-targets": ["js", "native"],
+  "exclude": [
+    "examples"
+  ]
 }

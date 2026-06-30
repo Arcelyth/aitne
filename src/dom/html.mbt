@@ -209,24 +209,24 @@ pub fn[T : ElementType, C : Render] HtmlElement::add_attr(
   }
 }
 
-///|
-/// Shorthand: set an attribute by key + value.
-pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::attr(
-  self : HtmlElement[T, C],
-  key : String,
-  val : P,
-) -> HtmlElement[T, C] {
-  self.add_attr(prop(key, val))
-}
 
 ///|
 /// Shorthand: set a DOM property.
+#alias(attr)
 pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::prop(
   self : HtmlElement[T, C],
   key : String,
   value : P,
 ) -> HtmlElement[T, C] {
   self.add_attr(prop(key, value))
+}
+
+///|
+pub fn[T : ElementType, C : Render, Cl : IntoClass] HtmlElement::class(
+  self : HtmlElement[T, C],
+  class: Cl,
+) -> HtmlElement[T, C] {
+  self.add_attr(class_val(class))
 }
 
 ///|

@@ -11,6 +11,7 @@ cat > "$target_file" << 'EOF'
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page Example</title>
+    <style link="./examples/page/public/style.css"></style>
     <script type="module" src="./_build/js/debug/build/examples/page/page.js"></script>
 </head>
 <body>

@@ -2,6 +2,7 @@ using @dom {trait View, div, h1, p, button, text, a}
 
 pub fn page() -> &View {
   div()
+    .class("page")
     .style("min-height: 100vh; background-color: #0f172a; display: flex; align-items: center; justify-content: center; padding: 1rem; font-family: system-ui, -apple-system, sans-serif;")
     .children([
       div()
@@ -16,6 +17,7 @@ pub fn page() -> &View {
 
 fn header_section() -> &View {
   div()
+    .class("header_section")
     .style("text-align: center; margin-bottom: 2rem;")
     .children([
       h1()
@@ -29,6 +31,7 @@ fn header_section() -> &View {
 
 fn interactive_section() -> &View {
   div()
+  .class("interactive_section")
     .style("display: flex; flex-direction: column; align-items: center;")
     .children([
       button()
@@ -42,6 +45,7 @@ fn interactive_section() -> &View {
 
 fn footer_section() -> &View {
   div()
+    .class("footer_section")
     .style("text-align: center; margin-top: 2rem;")
     .children([
       a()

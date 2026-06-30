@@ -250,6 +250,17 @@ fn CodeGen::gen_attr(self : CodeGen, attr : TokenAttr, val : AttrValue) -> Unit 
       }
     }
     self.buf.write(")")
+  } else if scope == "" && name == "class" {
+    self.buf.write("\n  .class(")
+    match val {
+      AttrValue::Expr(code) => self.gen_expr_code(code)
+      AttrValue::Str(s) => {
+        self.buf.write("\"")
+        self.buf.write(escape_moonbit_str(s.to_owned()))
+        self.buf.write("\"")
+      }
+    }
+    self.buf.write(")")
   } else {
     self.buf.write("\n  .attr(\"")
     if scope != "" {

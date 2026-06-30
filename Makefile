@@ -41,7 +41,8 @@ exp_route2:
 	./examples/route_mbx/run.sh
 
 run: 
-	python3 ./scripts/spa_server.py
+	moon run --target=native cmd/aitne -- run 
+
 
 # tests
 mbxc_test: 

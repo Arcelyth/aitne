@@ -6,5 +6,4 @@ target
 .moonagent/
 *.html
 *.mbx.mbt
-eirene.toml
 dist/

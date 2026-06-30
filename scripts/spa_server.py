@@ -1,3 +1,4 @@
+# This script is replaced by eirene
 import os
 from http.server import SimpleHTTPRequestHandler, test
 

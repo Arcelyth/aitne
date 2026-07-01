@@ -6,6 +6,7 @@ import {
   "moonbitlang/x/sys",
   "moonbitlang/async",
   "moonbitlang/async/http",
+  "moonbitlang/async/process",
 }
 
 options(

@@ -194,6 +194,7 @@ async fn main {
         "Setup: Initializing project `\{p_name}` using template `\{tmpl_name}`...",
       )
       let repo_url = "https://github.com/aitne-dev/template-\{tmpl_name}.git"
+      init_project(p_name, tmpl_name)
     }
     cmd => show_unknown_command(cmd)
   }

@@ -1,0 +1,72 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        target:
+          - name: linux-x64
+            runner: ubuntu-24.04
+            ext: 
+
+          - name: linux-arm64
+            runner: ubuntu-24.04-arm
+            ext: 
+
+          - name: macos-x64
+            runner: macos-15-intel
+            ext: 
+
+          - name: macos-arm64
+            runner: macos-15
+            ext: 
+
+          - name: windows-x64
+            runner: windows-2025
+            ext: .exe
+
+          - name: windows-arm64
+            runner: windows-11-arm
+            ext: .exe
+
+    runs-on: ${{ matrix.target.runner }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Moonbit
+        uses: hustcer/setup-moonbit@v1
+
+      - name: Build Native Cmd Binary
+        run: |
+          moon build cmd/aitne --target=native --release
+
+      - name: Prepare Artifacts
+        shell: bash
+        run: |
+          mkdir dist
+
+          EXE_EXT="${{ matrix.target.ext }}"
+
+          SRC_BIN=$(find _build/native/release/build/cmd -type f \( -name "aitne.exe" \) | head -n 1)
+          
+          if [ -z "$SRC_BIN" ]; then
+            echo "Error: Cannot find compiled binary!"
+            exit 1
+          fi
+          
+          cp "$SRC_BIN" "dist/aitne-${{ matrix.target.name }}${EXE_EXT}"
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*

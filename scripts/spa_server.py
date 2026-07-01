@@ -1,4 +1,6 @@
 # This script is replaced by eirene
+# But if you are a Windows user you can use this script because 
+# eirene not support windows now
 import os
 from http.server import SimpleHTTPRequestHandler, test
 

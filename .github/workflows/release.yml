@@ -19,9 +19,10 @@ jobs:
           - runner: macos-latest
             name: macos-arm64
             ext: ""
-          - runner: windows-latest
-            name: windows-x64
-            ext: ".exe"
+#   Maybe will support Windows in future          
+#          - runner: windows-latest
+#            name: windows-x64
+#            ext: ".exe"
 
     runs-on: ${{ matrix.target.runner }}
 

@@ -93,6 +93,17 @@ fn main {
 }
 ```
 
+## CLI Tool
+
+*`aitne` CLI tool depends on async library which not support Windows now* <br>
+
+To create a new project use `aitne init your_project` or use `aitne init your_project -t template_name` to choose a template. <br>
+
+Using `aitne run` to start a local web server, default on port `8000`. <br>
+
+Run `aitne -h` to see the usage.
+
+
 ## Eirene
 
 Eirene is a simple web server built in MoonBit, specifically designed to serve static assets and handle Single Page Application (SPA) routing fallbacks for the Aitne ecosystem. <br>
@@ -113,8 +124,5 @@ host = "127.0.0.1"
 port = 8000
 ```
 
-## CLI Tool
-
-Run `aitne -h` to see the usage.
 
 *This library still work in progress, not production ready!*

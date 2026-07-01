@@ -4,11 +4,6 @@ on:
   push:
     tags:
       - "v*"
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
 
 permissions:
   contents: write
@@ -21,6 +16,12 @@ jobs:
           - runner: ubuntu-latest
             name: linux-x64
             ext: ""
+          - runner: macos-latest
+            name: macos-arm64 
+            ext: ""
+          - runner: windows-latest
+            name: windows-x64 
+            ext: ".exe"
 
     runs-on: ${{ matrix.target.runner }}
 

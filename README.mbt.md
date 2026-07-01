@@ -93,9 +93,16 @@ fn main {
 }
 ```
 
-## CLI Tool
+## Aitne CLI
 
-*`aitne` CLI tool depends on async library which not support Windows now* <br>
+*`aitne` CLI depends on async library which not support Windows now* <br>
+
+### Install Aitne CLI 
+
+macOS/Linux
+```bash
+curl -fsSL https://raw.githubusercontent.com/Arcelyth/aitne/main/scripts/install.sh | bash
+```
 
 To create a new project use `aitne init your_project` or use `aitne init your_project -t template_name` to choose a template. <br>
 

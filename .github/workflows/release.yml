@@ -17,10 +17,10 @@ jobs:
             name: linux-x64
             ext: ""
           - runner: macos-latest
-            name: macos-arm64 
+            name: macos-arm64
             ext: ""
           - runner: windows-latest
-            name: windows-x64 
+            name: windows-x64
             ext: ".exe"
 
     runs-on: ${{ matrix.target.runner }}
@@ -33,6 +33,7 @@ jobs:
         uses: hustcer/setup-moonbit@v1
 
       - name: Build Native Cmd Binary
+        shell: bash
         run: |
           rm -rf .mooncakes
           moon update

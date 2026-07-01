@@ -209,7 +209,6 @@ pub fn[T : ElementType, C : Render] HtmlElement::add_attr(
   }
 }
 
-
 ///|
 /// Shorthand: set a DOM property.
 #alias(attr)
@@ -224,7 +223,7 @@ pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::prop(
 ///|
 pub fn[T : ElementType, C : Render, Cl : IntoClass] HtmlElement::class(
   self : HtmlElement[T, C],
-  class: Cl,
+  class : Cl,
 ) -> HtmlElement[T, C] {
   self.add_attr(class_val(class))
 }

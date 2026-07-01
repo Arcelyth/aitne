@@ -139,7 +139,62 @@ async fn main {
         Err(err) => println("Config Error: \{err}")
       }
     }
-    "init" => ()
+    "init" => {
+      let mut project_name : String? = None
+      let mut template : String? = None
+      if arg_len == 3 && args[2] == "help" {
+        show_init_help()
+        return
+      }
+
+      if arg_len == 3 && (args[2] == "--list" || args[2] == "-l") {
+        list_templates_local()
+        return
+      } else if arg_len == 3 && (args[2] == "--list-remote" || args[2] == "-lr") {
+        list_templates_remote()
+        return
+      }
+
+      if arg_len >= 3 {
+        project_name = Some(args[2])
+      } else {
+        println("Error: Please enter project's name")
+        return
+      }
+
+      for i = 3; i < args.length(); i = i + step {
+        step = 1
+        let arg = args[i]
+        match arg {
+          "--template" | "-t" =>
+            if i + 1 < args.length() {
+              template = Some(args[i + 1])
+              step = 2
+            } else {
+              println("Error: Missing template name")
+              return
+            }
+          _ => ()
+        }
+      }
+
+      let tmpl_name = match template {
+        Some(t) => t
+        None => "starter"
+      }
+      let p_name = match project_name {
+        Some(n) => n
+        None => {
+          println("Error: Project name is none, this should be unreachable")
+          return
+        }
+      }
+
+      println(
+        "Setup: Initializing project `\{p_name}` using template `\{tmpl_name}`...",
+      )
+      let repo_url = "https://github.com/aitne-dev/template-\{tmpl_name}.git"
+    }
     cmd => show_unknown_command(cmd)
   }
 }
@@ -182,6 +237,19 @@ fn show_run_help() -> Unit {
     #| 
     #|options: 
     #|  --file, -f <file>     specify an eirene.toml file
+
+  println(content)
+}
+
+///|
+fn show_init_help() -> Unit {
+  let content =
+    #|Usage: aitne init <project_name> [options]
+    #| 
+    #|options: 
+    #|  --template, -t <name>     specity a template [default: starter]
+    #|  --list, -l                list all the usable templates
+    #|  --list-remote, -lr        list all the usable templates from github
 
   println(content)
 }

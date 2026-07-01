@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - "v*"
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -13,29 +18,9 @@ jobs:
     strategy:
       matrix:
         target:
-          - name: linux-x64
-            runner: ubuntu-24.04
-            ext: 
-
-          - name: linux-arm64
-            runner: ubuntu-24.04-arm
-            ext: 
-
-          - name: macos-x64
-            runner: macos-15-intel
-            ext: 
-
-          - name: macos-arm64
-            runner: macos-15
-            ext: 
-
-          - name: windows-x64
-            runner: windows-2025
-            ext: .exe
-
-          - name: windows-arm64
-            runner: windows-11-arm
-            ext: .exe
+          - runner: ubuntu-latest
+            name: linux-x64
+            ext: ""
 
     runs-on: ${{ matrix.target.runner }}
 
@@ -48,6 +33,9 @@ jobs:
 
       - name: Build Native Cmd Binary
         run: |
+          rm -rf .mooncakes
+          moon update
+          moon install
           moon build cmd/aitne --target=native --release
 
       - name: Prepare Artifacts
@@ -58,12 +46,12 @@ jobs:
           EXE_EXT="${{ matrix.target.ext }}"
 
           SRC_BIN=$(find _build/native/release/build/cmd -type f \( -name "aitne.exe" \) | head -n 1)
-          
+
           if [ -z "$SRC_BIN" ]; then
             echo "Error: Cannot find compiled binary!"
             exit 1
           fi
-          
+
           cp "$SRC_BIN" "dist/aitne-${{ matrix.target.name }}${EXE_EXT}"
 
       - name: Upload to GitHub Release

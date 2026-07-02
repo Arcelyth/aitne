@@ -1,0 +1,62 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request: 
+    branches: 
+      - "main"
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest] 
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Moonbit
+        uses: hustcer/setup-moonbit@v1
+
+      - name: Build native cmd binary
+        shell: bash
+        run: |
+          rm -rf .mooncakes
+          moon update
+          moon install
+          moon build cmd/aitne --target=native --release
+
+      - name: Verify executable 
+        shell: bash
+        run: |
+          ./_build/native/release/build/cmd/aitne/aitne.exe help
+
+  test:
+    name: Test ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest] 
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Moonbit
+        uses: hustcer/setup-moonbit@v1
+
+      - name: Build native cmd binary
+        shell: bash
+        run: |
+          rm -rf .mooncakes
+          moon update
+          moon install
+          moon test 
+

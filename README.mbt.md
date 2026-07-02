@@ -2,8 +2,6 @@
 
 ![Aitne Banner](./logos/banner.svg)
 
-![docs](https://mooncakes.io/docs/Arcelyth/aitne)
-
 A lightweight and high-performance web framework with fine-grained reactivity. Inspired by [leptos](https://github.com/leptos-rs/leptos) and [solidjs](https://github.com/solidjs/solid). Support MBX (JSX-like) format to develop.
 
 ## Getting Started
@@ -132,7 +130,7 @@ port = 8000
 
 ## Learn more
 
-[Book](https://aitne-dev.github.io/book/)
-[API Document](https://mooncakes.io/docs/Arcelyth/aitne)
+[Book](https://aitne-dev.github.io/book) <br>
+[API Document](https://mooncakes.io/docs/Arcelyth/aitne) <br>
 
 *This library still work in progress, not production ready!*

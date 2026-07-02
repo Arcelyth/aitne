@@ -58,5 +58,5 @@ jobs:
           rm -rf .mooncakes
           moon update
           moon install
-          moon test 
+          moon test src/* 
 

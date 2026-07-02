@@ -1,28 +1,46 @@
 # Aitne
 
+![Aitne Banner](./logos/banner.svg)
+
+![docs](https://mooncakes.io/docs/Arcelyth/aitne)
+
 A lightweight and high-performance web framework with fine-grained reactivity. Inspired by [leptos](https://github.com/leptos-rs/leptos) and [solidjs](https://github.com/solidjs/solid). Support MBX (JSX-like) format to develop.
+
+## Getting Started
+
+### Installing CLI
+
+macOS/Linux:
+```bash
+curl -fsSL https://raw.githubusercontent.com/Arcelyth/aitne/main/scripts/install.sh | bash
+```
+
+*`aitne` CLI depends on async library which not support Windows now*
+
+### Initializing
+
+```bash
+aitne init your_project
+cd your_project
+```
+
+Build your project:
+```bash
+aitne build
+```
+
+### Running
+
+```
+aitne run
+```
+
+This will start a web server on `http://localhost:8000` by default which depends on `eirene.toml` config file.
 
 ## Examples
 
 Todo list: 
 ```moonbit
-///|
-using @dom {
-  trait View,
-  div,
-  h1,
-  button,
-  text,
-  input,
-  ul,
-  li,
-  for_node,
-  text_dyn,
-}
-
-///|
-using @ffi {event_target_value}
-
 ///|
 fn todo_app() -> &View {
   let (input_val, set_input_val) = @reactive.create_signal("")
@@ -48,7 +66,7 @@ fn todo_app() -> &View {
       input()
       .attr("type", "text")
       .value(input_val)
-      .on(Input, ev => set_input_val.set(event_target_value(ev))),
+      .on(Input, ev => set_input_val.set(@ffi.event_target_value(ev))),
       button().on(Click, add_item).children([text("Add")]),
     ]),
     ul().children([
@@ -64,7 +82,6 @@ fn todo_app() -> &View {
 ```
 
 ## MBX Format (JSX-like)
- \[*Experimental*\]
 
 Simple router usage in MBX format:
 ```mbx
@@ -93,24 +110,6 @@ fn main {
 }
 ```
 
-## Aitne CLI
-
-*`aitne` CLI depends on async library which not support Windows now* <br>
-
-### Install Aitne CLI 
-
-macOS/Linux
-```bash
-curl -fsSL https://raw.githubusercontent.com/Arcelyth/aitne/main/scripts/install.sh | bash
-```
-
-To create a new project use `aitne init your_project` or use `aitne init your_project -t template_name` to choose a template. <br>
-
-Using `aitne run` to start a local web server, default on port `8000`. <br>
-
-Run `aitne -h` to see the usage.
-
-
 ## Eirene
 
 Eirene is a simple web server built in MoonBit, specifically designed to serve static assets and handle Single Page Application (SPA) routing fallbacks for the Aitne ecosystem. <br>
@@ -131,5 +130,9 @@ host = "127.0.0.1"
 port = 8000
 ```
 
+## Learn more
+
+[Book](https://aitne-dev.github.io/book/)
+[API Document](https://mooncakes.io/docs/Arcelyth/aitne)
 
 *This library still work in progress, not production ready!*

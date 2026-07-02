@@ -1,8 +1,29 @@
 ///|
-fn compile_file(path : String, show : Bool, tmp : Bool) -> Unit {
+fn compile_file(
+  path : String,
+  show : Bool,
+  tmp : Bool,
+  out_dir : String?,
+) -> Unit {
   if path.has_suffix(".mbx") {
-    let target = path[0:path.length()] + ".mbt"
-    let _ = @mbxc.from_file(path, show~, to=Some(target.to_owned()), tmp~)
+    let target = match out_dir {
+      Some(dir) => {
+        let mut last_slash = -1
+        for i = 0; i < path.length(); i = i + 1 {
+          if path[i] == '/' || path[i] == '\\' {
+            last_slash = i
+          }
+        }
+        let filename = if last_slash == -1 {
+          path
+        } else {
+          path[last_slash:path.length()].to_owned()
+        }
+        dir + filename + ".mbt"
+      }
+      None => path + ".mbt"
+    }
+    let _ = @mbxc.from_file(path, show~, to=Some(target), tmp~)
   }
 }
 
@@ -11,6 +32,7 @@ pub fn walk_and_compile(
   dir : String,
   show? : Bool = false,
   tmp? : Bool = false,
+  out_dir : String?,
 ) -> Unit raise @fs.IOError {
   let entries = try? @fs.read_dir(dir)
   match entries {
@@ -23,9 +45,9 @@ pub fn walk_and_compile(
         let path = dir + "/" + file
 
         if @fs.is_dir(path) {
-          walk_and_compile(path, show~, tmp~)
+          walk_and_compile(path, show~, tmp~, out_dir)
         } else {
-          compile_file(path, show, tmp)
+          compile_file(path, show, tmp, out_dir)
         }
       }
     Err(e) => debug(e)
@@ -49,6 +71,7 @@ async fn main {
       let mut tmp = false
       let mut help = false
       let target_dir = "."
+      let mut out_dir : String? = None 
 
       if arg_len == 3 && args[2] == "help" {
         show_mbxc_help()
@@ -61,6 +84,14 @@ async fn main {
         match arg {
           "--show" | "-s" => show = true
           "--template" | "-t" => tmp = true
+          "--out-dir" | "-o" =>
+            if i + 1 < args.length() {
+              out_dir = Some(args[i + 1])
+              step = 2
+            } else {
+              println("Error: Missing path for --out-dir/-o option")
+              return
+            }
           "--file" | "-f" =>
             if i + 1 < args.length() {
               target_file = Some(args[i + 1])
@@ -73,10 +104,25 @@ async fn main {
         }
       }
 
+      match out_dir {
+        Some(dir) =>
+          if !@fs.path_exists(dir) {
+            let create_res = try? @fs.create_dir(dir)
+            match create_res {
+              Ok(_) => ()
+              Err(e) => {
+                println("Error: Failed to create output directory '\{dir}'")
+                return
+              }
+            }
+          }
+        None => ()
+      }
+
       match target_file {
-        Some(file) => compile_file(file, show, tmp)
+        Some(file) => compile_file(file, show, tmp, out_dir)
         None => {
-          let res = try? walk_and_compile(target_dir, show~, tmp~)
+          let res = try? walk_and_compile(target_dir, show~, tmp~, out_dir)
           match res {
             Ok(_) => ()
             Err(e) => debug(e)
@@ -196,6 +242,7 @@ async fn main {
       let repo_url = "https://github.com/aitne-dev/template-\{tmpl_name}.git"
       init_project(p_name, tmpl_name)
     }
+    "build" => handle_build()
     cmd => show_unknown_command(cmd)
   }
 }
@@ -206,9 +253,10 @@ fn show_main_help() -> Unit {
     #|Usage: aitne [command] [options]
     #| 
     #|command: 
-    #|  init                initialize a new project [WIP]
+    #|  init                initialize a new project
     #|  mbxc                compile all the MBX file under current dictionary
     #|  run                 run current project locally
+    #|  build               build aitne project
 
   println(content)
 }
@@ -226,6 +274,7 @@ fn show_mbxc_help() -> Unit {
     #|options: 
     #|  --show, -s            output the compile process information
     #|  --template, -t        use template mode [WIP]
+    #|  --out-dir, -o <path>  the output path
     #|  --file, -f <file>     compile a specific MBX file
 
   println(content)

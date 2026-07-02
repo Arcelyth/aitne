@@ -105,7 +105,7 @@ async fn[X] download_template_stream(
         }
 
         try {
-          if not(@fs.path_exists(target_dir)) {
+          if !(@fs.path_exists(target_dir)) {
             @fs.create_dir(target_dir)
           }
 

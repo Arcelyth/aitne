@@ -108,6 +108,11 @@ fn main {
 }
 ```
 
+## Editor Support
+- [Neovim](https://github.com/aitne-dev/mbx.nvim)
+- [Zed](https://github.com/aitne-dev/mbx-zed)
+- [VScode](https://github.com/aitne-dev/vscode-mbx)
+
 ## Eirene
 
 Eirene is a simple web server built in MoonBit, specifically designed to serve static assets and handle Single Page Application (SPA) routing fallbacks for the Aitne ecosystem. <br>

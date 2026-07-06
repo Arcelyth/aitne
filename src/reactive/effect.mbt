@@ -103,10 +103,7 @@ pub fn[T] RenderEffect::new_with_value(
   let inner = Ref(EffectInner::new(fun))
   let sub = ToASubscriber::to_asubscriber(inner)
   let value = Some(
-    owner.with_(() => {
-      Observer::replace(Some(sub))
-      fun(init_val)
-    }),
+    owner.with_(() => Observer::with_replace(Some(sub), () => fun(init_val))),
   )
   let e = RenderEffect::{ value, inner, owner: Ref(owner) }
   let ref_e = Ref(e)
@@ -120,12 +117,9 @@ pub fn[T] RenderEffect::new_isomorphic(fun : (T?) -> T) -> Ref[RenderEffect[T]] 
   let owner = Owner::new()
   let inner = Ref(EffectInner::new(fun))
   let sub = ToASubscriber::to_asubscriber(inner)
-  let init_val = owner.with_(() => {
-    Observer::replace(Some(sub))
-    fun(None)
-  })
-
-  let value = Some(init_val)
+  let value = Some(
+    owner.with_(() => Observer::with_replace(Some(sub), () => fun(None))),
+  )
 
   let e = RenderEffect::{ value, inner, owner: Ref(owner) }
   let ref_e = Ref(e)
@@ -153,10 +147,11 @@ pub fn[T] RenderEffect::run(effect : RenderEffect[T]) -> Unit {
   let subscriber_trait = inner as &Subscriber
   subscriber_trait.clean_sources(sub)
   effect.owner.val.with_cleanup(() => {
-    Observer::replace(Some(sub))
+    Observer::with_replace(Some(sub), fn() {
+      let next_value = (inner.val.cb)(effect.value)
 
-    let next_value = (inner.val.cb)(effect.value)
-    effect.value = Some(next_value)
+      effect.value = Some(next_value)
+    })
   })
 }
 
@@ -172,8 +167,7 @@ pub fn[T] Effect::run(effect : Effect[T]) -> Unit {
   let subscriber_trait = inner as &Subscriber
   subscriber_trait.clean_sources(sub)
   e.owner.val.with_cleanup(() => {
-    Observer::replace(Some(sub))
-    let _ = (inner.val.cb)(None)
+    Observer::with_replace(Some(sub), fn() { let _ = (inner.val.cb)(None) })
   })
 }
 

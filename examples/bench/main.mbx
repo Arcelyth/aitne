@@ -1,0 +1,147 @@
+using @dom {
+  trait View,
+  div,
+  h1,
+  button,
+  table,
+  tbody,
+  tr,
+  td,
+  a,
+  span,
+  for_node,
+  rx_class,
+}
+
+let adjectives : Array[String] = ["pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean", "elegant", "easy", "angry", "crazy", "helpful", "mushy", "odd", "unsightly", "adorable", "important", "inexpensive", "cheap", "expensive", "fancy"]
+
+let colors : Array[String] = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "white", "black", "orange"]
+
+let nouns : Array[String] = ["table", "chair", "house", "bbq", "desk", "car", "pony", "cookie", "sandwich", "burger", "pizza", "mouse", "keyboard"]
+
+struct Row {
+  id : Int
+  label : @reactive.ReadSignal[String]
+  set_label : @reactive.WriteSignal[String]
+}
+
+let next_id : Ref[Int] = Ref(1)
+let seed : Ref[Int] = Ref(12345)
+
+fn pseudo_random(max : Int) -> Int {
+  seed.val = (seed.val * 1103515245 + 12345) & 0x7fffffff
+  seed.val % max
+}
+
+fn build_data(count : Int) -> Array[Row] {
+  let res = []
+  for i = 0; i < count; i = i + 1 {
+    let adj = adjectives[pseudo_random(adjectives.length())]
+    let col = colors[pseudo_random(colors.length())]
+    let nou = nouns[pseudo_random(nouns.length())]
+    let label_str = adj + " " + col + " " + nou
+    let (label, set_label) = @reactive.create_signal(label_str)
+    res.push(Row::{ id: next_id.val, label, set_label })
+    next_id.val += 1
+  }
+  res
+}
+
+fn btn(id~: String, text~: String, on_click~: (@ffi.Event) -> Unit) -> &View {
+    <div class="col-sm-6 smallpad">
+        <button id={id} class="btn btn-primary btn-block" type="button" on:click={on_click}>
+            {() => text}
+        </button>
+    </div>
+}
+
+fn app() -> &View {
+  let (data, set_data) = @reactive.create_signal([])
+  let (selected, set_selected) = @reactive.create_signal(-1)
+
+  let run = _ => {
+    set_data.set(build_data(1000))
+  }
+
+  let run_lots = _ => {
+    set_data.set(build_data(10000))
+  }
+
+  let add = _ => {
+    set_data.set(data.get() + build_data(1000))
+  }
+
+  let update = _ => {
+    let d = data.get()
+    for i = 0; i < d.length(); i = i + 10 {
+      let row = d[i]
+      row.set_label.set(row.label.get() + " !!!")
+    }
+  }
+
+  let clear = _ => {
+    set_data.set([])
+  }
+
+  let swap_rows = _ => {
+    let d = data.get()
+    if d.length() > 998 {
+      let list = []
+      for i = 0; i < d.length(); i = i + 1 {
+        list.push(d[i])
+      }
+      let item = list[1]
+      list[1] = list[998]
+      list[998] = item
+      set_data.set(list)
+    }
+  }
+
+  let selector = @reactive.Selector::new(() => selected.get())
+  <div class="container">
+    <div class="jumbotron">
+      <div class="row">
+        <div class="col-md-6">
+          <h1> Aitne </h1>
+        </div>
+        <div class="col-md-6">
+          <div class="row">
+            <Btn id="run" text="Create 1,000 rows" on_click={run}/>
+            <Btn id="runlots" text="Create 10,000 rows" on_click={run_lots}/>
+            <Btn id="add" text="Append 1,000 rows" on_click={add}/>
+            <Btn id="update" text="Update every 10th row" on_click={update}/>
+            <Btn id="clear" text="Clear" on_click={clear}/>
+            <Btn id="swaprows" text="Swap Rows" on_click={swap_rows}/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <table class="table table-hover table-striped test-data">
+      <tbody>
+        {for_node(() => data.get(), row => { return row.id.to_string() }, row => {
+          let row_id = row.id
+          <tr class={() => if selector.selected(row_id) {"danger"} else {""}}>
+            <td class="col-md-1"> {() => row_id.to_string()} </td>
+            <td class="col-md-4">
+              <a on:click={_ => set_selected.set(row_id)}> {() => row.label.get()} </a>
+            </td>
+            <td class="col-md-1">
+              <a on:click={_ => {
+                let filtered = data.get().filter(fn(r) { r.id != row_id })
+                set_data.set(filtered)
+              }}>
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+              </a>
+            </td>
+            <td class="col-md-6"></td>
+          </tr>
+        })}
+      </tbody>
+    </table>
+    <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span>
+  </div>
+}
+
+fn main {
+  let _ = @dom.mount_to_body(() => <App />)
+}

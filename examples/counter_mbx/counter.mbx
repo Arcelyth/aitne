@@ -7,7 +7,7 @@ pub fn counter() -> &View {
     <h1>Counter</h1>
     <p>{ () => count.get().to_string() }</p>
 
-    <button on:click={(_) => { set_count.update((v) => { v + 1 }) }}>
+    <button on:click={(_) => { set_count.set(count.get() + 1) }}>
       +1
     </button>
 

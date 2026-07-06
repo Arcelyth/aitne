@@ -20,7 +20,6 @@ exp_todo:
 	
 # use mbx format
 exp_counter2: 
-	moon run cmd/mbxc
 	moon build ./examples/counter_mbx
 	chmod +x ./examples/counter_mbx/run.sh
 	./examples/counter_mbx/run.sh
@@ -50,6 +49,10 @@ exp_effect:
 	chmod +x ./examples/effect/run.sh
 	./examples/effect/run.sh
 
+exp_bench: 
+	moon build ./examples/bench/
+	chmod +x ./examples/bench/run.sh
+	./examples/bench/run.sh
 
 # macOS/Linux
 run: 

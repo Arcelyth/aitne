@@ -1,17 +1,5 @@
 ///|
-using @hashmap {type HashMap}
-
-///|
-using @hashset {type HashSet}
-
-///|
 /// A reactive, keyed dynamic list.
-///
-/// Renders each item in the collection, diffing by key across
-/// updates so that DOM nodes are reused / moved rather than
-/// re-created from scratch.  Anchored between two comment
-/// markers so that the surrounding DOM structure is never
-/// disturbed.
 pub struct ForNode[T, K] {
   each : () -> Array[T]
   key : (T) -> K
@@ -33,18 +21,13 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
   let start = @ffi.dom_create_comment("for-start")
   let end = @ffi.dom_create_comment("for-end")
 
-  // Extract fields so closures can capture them.
   let each = self.each
   let key_fn = self.key
   let render_fn = self.render
 
-  // Track rendered nodes per key so we can reuse them.
-  let cache : Ref[HashMap[K, Array[@ffi.Node]]] = @ref.new(HashMap([]))
-  // Whether the initial render has already happened.
+  let cache : Ref[@hashmap.HashMap[K, RenderState]] = @ref.new(HashMap([]) )
   let mounted : Ref[Bool] = @ref.new(false)
-  // Parent and end-anchor refs set during init / reconciliation.
   let parent_ref : Ref[@ffi.Node?] = @ref.new(None)
-  let end_ref : Ref[@ffi.Node] = @ref.new(end)
 
   let do_reconcile = fn(_) {
     let items = each()
@@ -54,52 +37,56 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
       None => return
     }
     let old_cache = cache.val
+    
+    let new_cache : @hashmap.HashMap[K, RenderState] = HashMap([])
+    let used_old_keys : @hashset.HashSet[K] = HashSet([])
 
-    // Build new cache and track which old nodes were reused.
-    let new_cache : HashMap[K, Array[@ffi.Node]] = HashMap([])
-    let used_old_keys : HashSet[K] = HashSet([])
+    let mut current_node_opt = dom_next_sibling(start)
 
     for item in items {
       let k = key_fn(item)
       match old_cache.get(k) {
-        Some(old_nodes) => {
+        Some(old_state) => {
           used_old_keys.add(k)
-          new_cache[k] = old_nodes
+          new_cache[k] = old_state
+          
+          let nodes = old_state.elements()
+          for n in nodes {
+            let is_match = match current_node_opt {
+              Some(cur_n) => @ffi.prim_node_eq(n, cur_n)
+              None => false
+            }
 
-          // Make sure they are positioned correctly
-          if old_nodes.length() > 0 {
-            let first = old_nodes[0]
-            let first_parent = @ffi.dom_parent(first)
-            if !@ffi.dom_is_null(first_parent) &&
-              @ffi.prim_node_eq(first_parent, parent) {
-              @ffi.dom_insert_before(parent, first, end_ref.val)
+            if is_match {
+              match current_node_opt {
+                Some(cur_n) => current_node_opt = dom_next_sibling(cur_n)
+                None => ()
+              }
             } else {
-              @ffi.dom_insert_before(parent, first, end_ref.val)
+              match current_node_opt {
+                Some(cur_n) => @ffi.dom_insert_before(parent, n, cur_n)
+                None => @ffi.dom_append(parent, n)
+              }
             }
           }
         }
         None => {
           let child_view = render_fn(item)
           let child_state = child_view.build()
-          child_state.mount(parent, end_ref.val)
-          let nodes = child_state.elements()
-          new_cache[k] = nodes
+          new_cache[k] = child_state
+          
+          match current_node_opt {
+            Some(cur_n) => child_state.mount(parent, cur_n)
+            None => child_state.mount(parent, end)
+          }
         }
       }
     }
 
-    // Remove old nodes that are no longer in the data.
     for old_k in old_cache.keys() {
       guard !used_old_keys.contains(old_k) else { continue }
       match old_cache.get(old_k) {
-        Some(old_nodes) =>
-          for n in old_nodes {
-            let n_parent = @ffi.dom_parent(n)
-            if !@ffi.dom_is_null(n_parent) &&
-              @ffi.prim_node_eq(n_parent, parent) {
-              @ffi.dom_remove(n)
-            }
-          }
+        Some(old_state) => old_state.unmount()
         None => ()
       }
     }
@@ -107,23 +94,19 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
     cache.val = new_cache
   }
 
-  // Create the reconciliation effect.
-  // First run is a no-op (init handles initial render).
   let _ = @reactive.Effect::new(do_reconcile)
 
   let init = fn(parent : @ffi.Node) {
     parent_ref.val = Some(parent)
-
     let items = each()
-    let init_cache : HashMap[K, Array[@ffi.Node]] = HashMap([])
+    let init_cache : @hashmap.HashMap[K, RenderState] = HashMap([])
 
     for item in items {
       let k = key_fn(item)
       let child_view = render_fn(item)
       let child_state = child_view.build()
-      child_state.mount(parent, end_ref.val)
-      let nodes = child_state.elements()
-      init_cache[k] = nodes
+      child_state.mount(parent, end)
+      init_cache[k] = child_state
     }
 
     cache.val = init_cache
@@ -143,8 +126,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn rebuild(
   _self,
   _state : Ref[RenderState],
 ) -> Unit {
-  // ForNode is reactive — updates happen through the effect,
-  // not through rebuild.
+  // ForNode is reactive — updates happen through the effect.
 }
 
 ///|
@@ -170,7 +152,8 @@ pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn to_html_with_buf
 }
 
 ///|
-/// ForNode (dynamic list) implements View.
 pub impl[T, K : Hash + Eq] View for ForNode[T, K] with fn style(self, _s) -> &View {
   self
 }
+
+

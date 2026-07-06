@@ -349,7 +349,7 @@ pub fn text_dyn(f : () -> String) -> DynTextNode {
 ///|
 pub impl Render for DynTextNode with fn build(self) -> RenderState {
   let node = @ffi.prim_create_text_node(document(), (self.getter)())
-  @reactive.create_effect(fn() {
+  let _ = @reactive.Effect::new(fn(_) {
     @ffi.dom_set_text(@ffi.text_as_node(node), (self.getter)())
   })
   RenderState::Text(TextState::{ node, })

@@ -1,7 +1,7 @@
 ///|
 /// Global scheduler used to batch, deduplicate, and flush pending effects.
 pub struct Scheduler {
-  mut pending : Array[Ref[Effect]]
+  mut pending : Array[&EffectRunner]
   queued : @hashset.HashSet[UInt]
   mut flushing : Bool
   mut batch_depth : Int
@@ -19,10 +19,10 @@ pub let scheduler : Ref[Scheduler] = @ref.new(Scheduler::{
 ///|
 /// Schedule an effect for execution.
 /// The same effect will only be queued once per flush cycle.
-pub fn schedule_effect(effect : Ref[Effect]) -> Unit {
-  guard !scheduler.val.queued.contains(effect.val.id) else { return }
+pub fn schedule_effect(effect : &EffectRunner) -> Unit {
+  guard !scheduler.val.queued.contains(effect.get_id()) else { return }
 
-  scheduler.val.queued.add(effect.val.id)
+  scheduler.val.queued.add(effect.get_id())
   scheduler.val.pending.push(effect)
 
   guard scheduler.val.batch_depth == 0 && !scheduler.val.flushing else {
@@ -55,8 +55,9 @@ pub fn flush_scheduler() -> Unit {
     while i < current_pending.length() {
       let effect = current_pending[i]
 
-      scheduler.val.queued.remove(effect.val.id)
-      Effect::run(effect)
+      scheduler.val.queued.remove(effect.get_id())
+//      Effect::run(effect)
+      effect.run_effect()
 
       i = i + 1
     }

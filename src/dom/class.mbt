@@ -1,4 +1,7 @@
 ///|
+using @reactive {type RenderEffect}
+
+///|
 pub fn[C : IntoClass] class_val(class : C) -> Class[C] {
   Class(class)
 }
@@ -94,4 +97,82 @@ pub impl IntoClass for String with fn rebuild(self, state : Ref[AttrState]) -> U
 ///|
 pub impl IntoClass for String with fn dry_resolve(_self) -> Unit {
 
+}
+
+///|
+pub(all) struct RxClass[T](() -> T)
+
+///|
+pub fn[T : IntoClass] rx_class(f : () -> T) -> RxClass[T] {
+  RxClass(f)
+}
+
+///|
+pub impl[T : IntoClass] IntoClass for RxClass[T] with fn html_len(_self) -> Int {
+  0
+}
+
+///|
+pub impl[T : IntoClass] IntoClass for RxClass[T] with fn to_html(
+  _self,
+  _style : StringBuilder,
+) -> Unit {
+  ()
+}
+
+///|
+pub impl[T : IntoClass] IntoClass for RxClass[T] with fn dry_resolve(_self) -> Unit {
+  ()
+}
+
+///|
+pub impl[T : IntoClass] IntoClass for RxClass[T] with fn build(
+  self,
+  el : @ffi.Element,
+) -> AttrState {
+  RenderEffect(
+    RenderEffect::new(prev => {
+      let val = (self.0)()
+      match prev {
+        Some(state) => {
+          let r = Ref(state)
+          val.rebuild(r)
+          r.val
+        }
+        _ => val.build(el)
+      }
+    }),
+  )
+}
+
+///|
+pub impl[T : IntoClass] IntoClass for RxClass[T] with fn rebuild(
+  self,
+  state : Ref[AttrState],
+) -> Unit {
+  match state.val {
+    RenderEffect(re) => {
+      let pre_val = re.val.take_value()
+      state.val = RenderEffect(
+        RenderEffect::new_with_value(
+          prev => {
+            let val = (self.0)()
+            match prev {
+              Some(state) => {
+                let r = Ref(state)
+                val.rebuild(r)
+                r.val
+              }
+              _ => {
+                println("Error: Unreachable")
+                panic()
+              }
+            }
+          },
+          pre_val,
+        ),
+      )
+    }
+    _ => ()
+  }
 }

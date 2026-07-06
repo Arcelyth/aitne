@@ -10,6 +10,7 @@ using @dom {
   a,
   span,
   for_node,
+  rx_class,
 }
 
 let adjectives : Array[String] = ["pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean", "elegant", "easy", "angry", "crazy", "helpful", "mushy", "odd", "unsightly", "adorable", "important", "inexpensive", "cheap", "expensive", "fancy"]
@@ -96,6 +97,7 @@ fn app() -> &View {
     }
   }
 
+  let selector = @reactive.Selector::new(() => selected.get())
   <div class="container">
     <div class="jumbotron">
       <div class="row">
@@ -118,7 +120,7 @@ fn app() -> &View {
       <tbody>
         {for_node(() => data.get(), row => { return row.id.to_string() }, row => {
           let row_id = row.id
-          <tr class={if selected.get() == row_id { "danger" } else { "" }}>
+          <tr class={() => if selector.selected(row_id) {"danger"} else {""}}>
             <td class="col-md-1"> {() => row_id.to_string()} </td>
             <td class="col-md-4">
               <a on:click={_ => set_selected.set(row_id)}> {() => row.label.get()} </a>

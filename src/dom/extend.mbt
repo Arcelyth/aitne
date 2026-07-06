@@ -46,7 +46,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
   let parent_ref : Ref[@ffi.Node?] = @ref.new(None)
   let end_ref : Ref[@ffi.Node] = @ref.new(end)
 
-  let do_reconcile = fn() {
+  let do_reconcile = fn(_) {
     let items = each()
     guard mounted.val else { return }
     let parent = match parent_ref.val {
@@ -70,7 +70,8 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
           if old_nodes.length() > 0 {
             let first = old_nodes[0]
             let first_parent = @ffi.dom_parent(first)
-            if !@ffi.dom_is_null(first_parent) && @ffi.prim_node_eq(first_parent, parent) {
+            if !@ffi.dom_is_null(first_parent) &&
+              @ffi.prim_node_eq(first_parent, parent) {
               @ffi.dom_insert_before(parent, first, end_ref.val)
             } else {
               @ffi.dom_insert_before(parent, first, end_ref.val)
@@ -94,7 +95,8 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
         Some(old_nodes) =>
           for n in old_nodes {
             let n_parent = @ffi.dom_parent(n)
-            if !@ffi.dom_is_null(n_parent) && @ffi.prim_node_eq(n_parent, parent) {
+            if !@ffi.dom_is_null(n_parent) &&
+              @ffi.prim_node_eq(n_parent, parent) {
               @ffi.dom_remove(n)
             }
           }
@@ -107,7 +109,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
 
   // Create the reconciliation effect.
   // First run is a no-op (init handles initial render).
-  @reactive.create_effect(do_reconcile)
+  let _ = @reactive.Effect::new(do_reconcile)
 
   let init = fn(parent : @ffi.Node) {
     parent_ref.val = Some(parent)
@@ -138,7 +140,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
 
 ///|
 pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn rebuild(
-  self,
+  _self,
   _state : Ref[RenderState],
 ) -> Unit {
   // ForNode is reactive — updates happen through the effect,

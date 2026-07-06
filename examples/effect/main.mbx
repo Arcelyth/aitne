@@ -1,0 +1,26 @@
+using @dom { trait View }
+
+fn app() -> &View {
+  let (count, set_count) = @reactive.create_signal(0)
+
+  @reactive.create_effect(() => {
+    println("Value: \{count.get}");
+  });
+
+  <div>
+    <h1>Counter</h1>
+    <p>{ () => count.get().to_string() }</p>
+
+    <button on:click={(_) => { set_count.update((v) => { v + 1 }) }}>
+      +1
+    </button>
+
+    <button on:click={(_) => { set_count.update((v) => { v - 1 }) }}>
+      -1
+    </button>
+  </div>
+}
+
+fn main {
+  let _ = @dom.mount_to_body(() => <App />)
+}

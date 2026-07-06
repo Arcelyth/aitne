@@ -1,0 +1,10 @@
+import {
+  "Arcelyth/aitne/src/dom" @dom,
+  "Arcelyth/aitne/src/mbxc" @mbxc,
+  "Arcelyth/aitne/src/reactive" @reactive,
+  "moonbitlang/x/fs" @fs,
+}
+
+options(
+  "is-main": true,
+)

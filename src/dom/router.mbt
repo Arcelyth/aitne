@@ -192,7 +192,7 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn build(
     }),
   )
 
-  @reactive.create_effect(fn() {
+  let _ = @reactive.Effect::new(fn(_) {
     current_url.track()
     let url = current_url.get_untracked()
     let new_path = url.path

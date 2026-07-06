@@ -7,6 +7,7 @@ pub enum AttrState {
   Bool(Bool)
   Element(@ffi.Element)
   Pair(AttrState, AttrState)
+  RenderEffect(Ref[RenderEffect[AttrState]])
   EventBound(RemoveEventHandler)
 }
 

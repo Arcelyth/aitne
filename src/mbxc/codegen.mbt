@@ -253,7 +253,11 @@ fn CodeGen::gen_attr(self : CodeGen, attr : TokenAttr, val : AttrValue) -> Unit 
   } else if scope == "" && name == "class" {
     self.buf.write("\n  .class(")
     match val {
-      AttrValue::Expr(code) => self.gen_expr_code(code)
+      AttrValue::Expr(code) => {
+        self.buf.write("\{package_path}/dom.rx_class(")
+        self.gen_expr_code(code)
+        self.buf.write(")")
+      }
       AttrValue::Str(s) => {
         self.buf.write("\"")
         self.buf.write(escape_moonbit_str(s.to_owned()))

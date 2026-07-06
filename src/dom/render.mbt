@@ -146,7 +146,6 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
       @ffi.dom_remove(s.end_anchor)
     }
     Router(s) => {
-      println("[Debug] router unmount")
       s.view.val.unmount()
     }
     None => ()
@@ -191,7 +190,6 @@ pub impl Mountable for RenderState with fn mount(
       }
     }
     Router(s) => {
-      println("[Debug] router mount")
       s.view.val.mount(parent, marker)
     }
     None => ()

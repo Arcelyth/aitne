@@ -1,5 +1,5 @@
 ///|
-using @reactive {type ReadSignal, create_effect}
+using @reactive {type ReadSignal}
 
 ///|
 /// A DOM property attribute
@@ -130,7 +130,7 @@ pub impl[S : Show] IntoProperty for ReadSignal[S] with fn to_html(
 
 ///|
 pub impl[S : Show] IntoProperty for ReadSignal[S] with fn build(self, el, key) -> AttrState {
-  create_effect(fn() {
+  let _ = @reactive.Effect::new(fn(_) {
     let val = self.get()
     @ffi.dom_set_prop(@ffi.el_as_node(el), key, val.to_string())
   })

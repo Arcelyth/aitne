@@ -40,6 +40,17 @@ exp_route2:
 	chmod +x ./examples/route_mbx/run.sh
 	./examples/route_mbx/run.sh
 
+exp_dyn: 
+	moon build ./examples/dyn/
+	chmod +x ./examples/dyn/run.sh
+	./examples/dyn/run.sh
+
+exp_effect: 
+	moon build ./examples/effect/
+	chmod +x ./examples/effect/run.sh
+	./examples/effect/run.sh
+
+
 # macOS/Linux
 run: 
 	moon run --target=native cmd/aitne -- run 

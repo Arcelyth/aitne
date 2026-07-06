@@ -1,0 +1,31 @@
+using @dom { trait View }
+
+fn app() -> &View {
+  let (selected, set_selected) = @reactive.create_signal(false)
+
+  <div>
+    <button on:click={_ => {
+      set_selected.set(!selected.get())
+    }}>
+      "toggle"
+    </button>
+
+    <div
+      class={
+        () => {
+          if selected.get() {
+            "danger"
+          } else {
+            ""
+          }
+        }
+      }
+    >
+      {() => if selected.get() { "selected" } else { "normal" }}
+    </div>
+  </div>
+}
+
+fn main {
+  let _ = @dom.mount_to_body(() => <App />)
+}

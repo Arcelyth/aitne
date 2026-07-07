@@ -1,6 +1,6 @@
 name = "Arcelyth/aitne"
 
-version = "0.4.8"
+version = "0.4.9"
 
 import {
   "moonbitlang/x@0.4.45",

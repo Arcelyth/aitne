@@ -138,5 +138,6 @@ port = 8000
 
 [Book](https://aitne-dev.github.io/book) <br>
 [API Document](https://mooncakes.io/docs/Arcelyth/aitne) <br>
+[Benchmark](https://github.com/aitne-dev/js-framework-benchmark) <br>
 
 *This library still work in progress, not production ready!*

@@ -189,7 +189,7 @@ pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with 
 
 ///|
 /// Replace children of this element.
-pub fn[T : ElementType, C : Render] HtmlElement::children(
+pub fn[T, C] HtmlElement::children(
   self : HtmlElement[T, C],
   kids : Array[&View],
 ) -> HtmlElement[T, Array[&View]] {
@@ -198,7 +198,7 @@ pub fn[T : ElementType, C : Render] HtmlElement::children(
 
 ///|
 /// Add an attribute to this element.
-pub fn[T : ElementType, C : Render] HtmlElement::add_attr(
+pub fn[T, C] HtmlElement::add_attr(
   self : HtmlElement[T, C],
   attr : &Attribute,
 ) -> HtmlElement[T, C] {

@@ -1,5 +1,5 @@
 ///|
-using @dom {trait View, div, h1, p, button, text, a}
+using @dom {trait View}
 
 ///|
 pub fn page() -> &View {

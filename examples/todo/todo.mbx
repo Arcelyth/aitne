@@ -1,15 +1,4 @@
-using @dom {
-  trait View,
-  div,
-  h1,
-  button,
-  text,
-  input,
-  ul,
-  li,
-  for_node,
-  text_dyn,
-}
+using @dom {trait View, for_node}
 
 using @ffi {event_target_value}
 

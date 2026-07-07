@@ -53,7 +53,7 @@ pub fn caption(children? : Array[&View]) -> HtmlElement[TagCaption, Array[&View]
 
 pub fn cite(children? : Array[&View]) -> HtmlElement[TagCite, Array[&View]]
 
-pub fn[C : IntoClass] class_val(C) -> Class[C]
+pub fn[C] class_val(C) -> Class[C]
 
 pub fn clear_between(@ffi.Node, @ffi.Node) -> Unit
 
@@ -213,7 +213,7 @@ pub fn pre(children? : Array[&View]) -> HtmlElement[TagPre, Array[&View]]
 
 pub fn progress(children? : Array[&View]) -> HtmlElement[TagProgress, Array[&View]]
 
-pub fn[P : IntoProperty] prop(String, P) -> Property[P]
+pub fn[P] prop(String, P) -> Property[P]
 
 pub fn provide_router_context(RouterContext) -> Unit
 
@@ -233,7 +233,7 @@ pub fn rt(children? : Array[&View]) -> HtmlElement[TagRt, Array[&View]]
 
 pub fn ruby(children? : Array[&View]) -> HtmlElement[TagRuby, Array[&View]]
 
-pub fn[T : IntoClass] rx_class(() -> T) -> RxClass[T]
+pub fn[T] rx_class(() -> T) -> RxClass[T]
 
 pub fn s(children? : Array[&View]) -> HtmlElement[TagS, Array[&View]]
 
@@ -259,7 +259,7 @@ pub fn strong(children? : Array[&View]) -> HtmlElement[TagStrong, Array[&View]]
 
 pub fn style(children? : Array[&View]) -> HtmlElement[TagStyle, Array[&View]]
 
-pub fn[S : IntoStyle] style_val(S) -> Style[S]
+pub fn[S] style_val(S) -> Style[S]
 
 pub fn sub(children? : Array[&View]) -> HtmlElement[TagSub, Array[&View]]
 
@@ -402,8 +402,8 @@ pub(all) struct HtmlElement[T, C] {
   attrs : AttrList
   children : C
 }
-pub fn[T : ElementType, C : Render] HtmlElement::add_attr(Self[T, C], &Attribute) -> Self[T, C]
-pub fn[T : ElementType, C : Render] HtmlElement::children(Self[T, C], Array[&View]) -> Self[T, Array[&View]]
+pub fn[T, C] HtmlElement::add_attr(Self[T, C], &Attribute) -> Self[T, C]
+pub fn[T, C] HtmlElement::children(Self[T, C], Array[&View]) -> Self[T, Array[&View]]
 pub fn[T : ElementType, C : Render, Cl : IntoClass] HtmlElement::class(Self[T, C], Cl) -> Self[T, C]
 pub fn[T : ElementType, C : Render] HtmlElement::on(Self[T, C], EventType, (@ffi.Event) -> Unit) -> Self[T, C]
 #alias(attr)

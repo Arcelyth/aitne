@@ -1,18 +1,5 @@
 ///|
-using @dom {
-  trait View,
-  div,
-  h1,
-  button,
-  table,
-  tbody,
-  tr,
-  td,
-  a,
-  span,
-  for_node,
-  rx_class,
-}
+using @dom {trait View, for_node}
 
 ///|
 let adjectives : Array[String] = [

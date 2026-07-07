@@ -9,7 +9,7 @@ pub struct Property[P] {
 }
 
 ///|
-pub fn[P : IntoProperty] prop(key : String, value : P) -> Property[P] {
+pub fn[P] prop(key : String, value : P) -> Property[P] {
   Property::{ key, value }
 }
 

@@ -2,7 +2,7 @@
 using @reactive {type RenderEffect}
 
 ///|
-pub fn[C : IntoClass] class_val(class : C) -> Class[C] {
+pub fn[C] class_val(class : C) -> Class[C] {
   Class(class)
 }
 
@@ -103,7 +103,7 @@ pub impl IntoClass for String with fn dry_resolve(_self) -> Unit {
 pub(all) struct RxClass[T](() -> T)
 
 ///|
-pub fn[T : IntoClass] rx_class(f : () -> T) -> RxClass[T] {
+pub fn[T] rx_class(f : () -> T) -> RxClass[T] {
   RxClass(f)
 }
 

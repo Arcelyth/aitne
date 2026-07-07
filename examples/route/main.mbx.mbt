@@ -1,13 +1,7 @@
 ///|
 using @dom {
   trait View,
-  div,
-  h2,
-  h3,
-  p,
   text,
-  ul,
-  li,
   anchor,
   router,
   routes,

@@ -1,17 +1,4 @@
-using @dom {
-  trait View,
-  div,
-  h1,
-  button,
-  table,
-  tbody,
-  tr,
-  td,
-  a,
-  span,
-  for_node,
-  rx_class,
-}
+using @dom {trait View, for_node}
 
 let adjectives : Array[String] = ["pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean", "elegant", "easy", "angry", "crazy", "helpful", "mushy", "odd", "unsightly", "adorable", "important", "inexpensive", "cheap", "expensive", "fancy"]
 

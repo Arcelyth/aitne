@@ -5,7 +5,7 @@
 pub struct Style[S](S)
 
 ///|
-pub fn[S : IntoStyle] style_val(s : S) -> Style[S] {
+pub fn[S] style_val(s : S) -> Style[S] {
   Style(s)
 }
 

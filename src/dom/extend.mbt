@@ -155,25 +155,3 @@ pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn to_html_with_buf
 pub impl[T, K : Hash + Eq] View for ForNode[T, K] with fn style(self, _s) -> &View {
   self
 }
-
-//pub fn[T] for_n(
-//  each~: () -> Unit, 
-//  key~: (T) -> &View,
-//  children?: Array[&View] = [],
-//) -> &View {
-//  let parent = match Owner::current() {
-//    Some(o) => o
-//    None => {
-//      println("Failed to get current owner")
-//      panic()
-//    }
-//  }
-//
-//  let 
-//
-//}
-//
-//pub struct Keyed 
-//
-//
-//

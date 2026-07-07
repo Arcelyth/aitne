@@ -60,11 +60,11 @@ jobs:
 
       - name: moon check
         run: |
-          moon check src/*
+          moon check 
 
       - name: moon test
         run: |
-          moon test src/*
+          moon test 
 
       - name: lint
         run: |

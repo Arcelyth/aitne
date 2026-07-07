@@ -1,0 +1,18 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Arcelyth/aitne/examples/counter"
+
+import {
+  "Arcelyth/aitne/src/dom",
+}
+
+// Values
+pub fn counter() -> &@dom.View
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

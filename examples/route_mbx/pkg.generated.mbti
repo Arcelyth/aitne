@@ -1,0 +1,28 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Arcelyth/aitne/examples/route_mbx"
+
+import {
+  "Arcelyth/aitne/src/dom",
+}
+
+// Values
+pub fn app() -> &@dom.View
+
+pub fn home() -> &@dom.View
+
+pub fn not_found() -> &@dom.View
+
+pub fn try_page() -> &@dom.View
+
+pub fn user_detail_page() -> &@dom.View
+
+pub fn users_page() -> &@dom.View
+
+// Errors
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+

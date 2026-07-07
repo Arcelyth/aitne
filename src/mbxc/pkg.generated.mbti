@@ -1,0 +1,103 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Arcelyth/aitne/src/mbxc"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/hashmap",
+  "moonbitlang/core/hashset",
+}
+
+// Values
+pub let builtin_elements : @hashset.HashSet[String]
+
+pub fn from_file(String, show? : Bool, to? : String?, tmp? : Bool) -> String?
+
+// Errors
+type MbxcError derive(Show, @debug.Debug)
+
+// Types and methods
+pub(all) enum AttrValue {
+  Str(StringView)
+  Expr(StringView)
+} derive(Eq, Show, @debug.Debug)
+
+pub struct CodeGen {
+  buf : StringBuilder
+}
+pub fn CodeGen::generate(Self, Array[MbxAST]) -> String
+pub fn CodeGen::new() -> Self
+
+pub(all) struct CodeGenTmp {
+  ast : Array[MbxAST]
+}
+pub fn CodeGenTmp::generate(Self) -> String
+pub fn CodeGenTmp::new(Array[MbxAST]) -> Self
+
+pub struct DocTag {
+} derive(Eq, Show, @debug.Debug)
+
+pub(all) struct Lexer {
+  src : String
+  mut cur : Int
+  mut brace_depth : Int
+  mut tag_depth : Int
+  mut in_closing_tag : Bool
+}
+pub fn Lexer::is_end(Self) -> Bool
+pub fn Lexer::new(String) -> Self
+pub fn Lexer::next_token(Self) -> Token? raise MbxcError
+pub fn Lexer::peek(Self, Int) -> UInt16?
+pub fn Lexer::scan_comment(Self) -> Unit
+pub fn Lexer::scan_string(Self) -> Unit raise MbxcError
+pub fn Lexer::tokenizer(Self) -> Array[Token] raise MbxcError
+
+pub(all) enum MbxAST {
+  PureCode(StringView)
+  RawText(StringView)
+  DynamicCode(Array[MbxAST])
+  ElementNode(StringView, @hashmap.HashMap[TokenAttr, AttrValue], Array[MbxAST])
+} derive(Eq, Show, @debug.Debug)
+
+pub(all) struct Parser {
+  tokens : Array[Token]
+  mut cur : Int
+}
+pub fn Parser::new(Array[Token]) -> Self
+pub fn Parser::parse(Self) -> Array[MbxAST] raise MbxcError
+
+pub(all) struct TagClose {
+  tag : StringView
+} derive(Eq, Show, @debug.Debug)
+
+pub(all) struct TagOpen {
+  tag : StringView
+  attrs : @hashmap.HashMap[TokenAttr, AttrValue]
+} derive(Eq, Show, @debug.Debug)
+
+pub(all) struct TagSelfClose {
+  tag : StringView
+  attrs : @hashmap.HashMap[TokenAttr, AttrValue]
+} derive(Eq, Show, @debug.Debug)
+
+pub(all) enum Token {
+  TagOpen(TagOpen)
+  TagClose(TagClose)
+  TagSelfClose(TagSelfClose)
+  DocTag(DocTag)
+  RawText(StringView)
+  CodeBlock(StringView)
+  BraceOpen
+  BraceClose
+  HashBraceOpen
+  HashBraceClose
+} derive(Eq, Show, @debug.Debug)
+
+pub(all) struct TokenAttr {
+  ns : StringView?
+  name : StringView
+} derive(Eq, Hash, Show, @debug.Debug)
+
+// Type aliases
+
+// Traits
+

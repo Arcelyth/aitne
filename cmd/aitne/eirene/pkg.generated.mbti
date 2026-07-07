@@ -1,0 +1,65 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Arcelyth/aitne/cmd/aitne/eirene"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn load_config(String) -> Config raise EireneError
+
+// Errors
+type EireneError derive(Show, @debug.Debug)
+
+// Types and methods
+pub struct AppConfig {
+  name : String
+  mode : CfgMode
+  entry_html : String
+} derive(Show, @debug.Debug)
+
+pub struct AssetsConfig {
+  static_dir : String
+  inject_scripts : Array[String]
+} derive(Show, @debug.Debug)
+
+pub struct BuildConfig {
+  target : CfgTarget
+  src_dir : String
+  out_dir : String
+  public_path : String
+  minify : Bool
+  sourcemap : Bool
+  experimental_wasm_gc : Bool
+} derive(Show, @debug.Debug)
+
+pub enum CfgMode {
+  Development
+  Production
+} derive(Show, @debug.Debug)
+
+pub enum CfgTarget {
+  Js
+} derive(Show, @debug.Debug)
+
+pub struct Config {
+  app : AppConfig
+  build : BuildConfig
+  server : ServerConfig
+  assets : AssetsConfig
+} derive(Show, @debug.Debug)
+
+pub struct ServerConfig {
+  host : String
+  port : Int
+  spa_fallback : Bool
+  hmr_enabled : Bool
+  hmr_port : Int
+  https_enabled : Bool
+  proxy : Map[String, String]
+} derive(Show, @debug.Debug)
+
+// Type aliases
+
+// Traits
+

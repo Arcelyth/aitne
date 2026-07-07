@@ -1,0 +1,201 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Arcelyth/aitne/src/ffi"
+
+// Values
+pub fn anchor_get_attr(Element, String) -> String
+
+pub fn anchor_has_attr(Element, String) -> Bool
+
+pub fn anchor_href(Element) -> String
+
+pub fn anchor_target(Element) -> String
+
+pub fn cancel_animation_frame(AnimationFrameHandle) -> Unit
+
+pub fn clear_interval(IntervalHandle) -> Unit
+
+pub fn clear_timeout(TimeoutHandle) -> Unit
+
+pub fn comment_as_node(Comment) -> Node
+
+pub fn current_hash() -> String
+
+pub fn current_origin() -> String
+
+pub fn current_pathname() -> String
+
+pub fn current_search() -> String
+
+pub fn dom_add_class(Node, String) -> Unit
+
+pub fn dom_add_event(Node, String, (Event) -> Unit) -> Unit
+
+pub fn dom_append(Node, Node) -> Unit
+
+pub fn dom_clear_children(Node) -> Unit
+
+pub fn dom_create_comment(String) -> Node
+
+pub fn dom_create_effect(() -> Unit) -> Unit
+
+pub fn dom_insert_before(Node, Node, Node) -> Unit
+
+pub fn dom_is_null(Node) -> Bool
+
+pub fn dom_null_node() -> Node
+
+pub fn dom_parent(Node) -> Node
+
+pub fn dom_remove(Node) -> Unit
+
+pub fn dom_remove_attr(Element, String) -> Unit
+
+pub fn dom_remove_attribute(Element, String) -> Unit
+
+pub fn dom_remove_child(Node, Node) -> Unit
+
+pub fn dom_remove_self(Node) -> Unit
+
+pub fn dom_set_attr(Element, String, String) -> Unit
+
+pub fn dom_set_attribute(Element, String, String) -> Unit
+
+pub fn dom_set_prop(Node, String, String) -> Unit
+
+pub fn dom_set_property_bool(Element, String, Bool) -> Unit
+
+pub fn dom_set_text(Node, String) -> Unit
+
+pub fn dom_tag_name(Node) -> String
+
+pub fn el_as_node(Element) -> Node
+
+pub fn event_alt_key(Event) -> Bool
+
+pub fn event_button(Event) -> Int
+
+pub fn event_composed_path(Event) -> JsArray
+
+pub fn event_ctrl_key(Event) -> Bool
+
+pub fn event_default_prevented(Event) -> Bool
+
+pub fn event_meta_key(Event) -> Bool
+
+pub fn event_prevent_default(Event) -> Unit
+
+pub fn event_shift_key(Event) -> Bool
+
+pub fn event_target_checked(Event) -> Bool
+
+pub fn event_target_value(Event) -> String
+
+pub fn get_bool_property(Element, String) -> Bool
+
+pub fn get_property(Element, String) -> String
+
+pub fn history_push_state(String) -> Unit
+
+pub fn history_replace_state(String) -> Unit
+
+pub fn js_array_get(JsArray, Int) -> Node
+
+pub fn js_array_length(JsArray) -> Int
+
+pub fn node_as_element(Node) -> Element
+
+pub fn node_is_anchor(Node) -> Bool
+
+pub fn on_popstate(() -> Unit) -> () -> Unit
+
+pub fn prim_add_event_listener(Element, String, (Event) -> Unit) -> EventHandle
+
+pub fn prim_add_event_listener_capture(Element, String, (Event) -> Unit) -> EventHandle
+
+pub fn prim_call_event_handle(EventHandle) -> Unit
+
+pub fn prim_clone_node(Node) -> Node
+
+pub fn prim_create_element(Document, String) -> Element
+
+pub fn prim_create_template(String) -> Node
+
+pub fn prim_create_text_node(Document, String) -> Text
+
+pub fn prim_document() -> Document
+
+pub fn prim_first_child(Node) -> Node
+
+pub fn prim_get_body(Document) -> Node
+
+pub fn prim_get_element_by_id(Document, String) -> Node?
+
+pub fn prim_is_null(Node) -> Bool
+
+pub fn prim_next_sibling(Node) -> Node
+
+pub fn prim_node_eq(Node, Node) -> Bool
+
+pub fn prim_window() -> Window
+
+pub fn remove_property(Element, String) -> Unit
+
+pub fn request_animation_frame(() -> Unit) -> AnimationFrameHandle
+
+pub fn set_interval(() -> Unit, Int) -> IntervalHandle
+
+pub fn set_property(Element, String, String) -> Unit
+
+pub fn set_timeout(() -> Unit, Int) -> TimeoutHandle
+
+pub fn set_window_href(String) -> Unit
+
+pub fn text_as_node(Text) -> Node
+
+pub fn url_can_parse(String, String) -> Bool
+
+pub fn url_hash_from_base(String, String) -> String
+
+pub fn url_origin_from_base(String, String) -> String
+
+pub fn url_path_from_base(String, String) -> String
+
+pub fn url_search_from_base(String, String) -> String
+
+pub fn window_add_event_listener(String, (Event) -> Unit) -> Unit
+
+pub fn window_event_listener(String, (Event) -> Unit) -> EventHandle
+
+pub fn window_remove_event_listener(String, (Event) -> Unit) -> Unit
+
+// Errors
+
+// Types and methods
+pub type AnimationFrameHandle
+
+pub type Comment
+
+pub type Document
+
+pub type Element
+
+pub type Event
+
+pub type EventHandle
+
+pub type IntervalHandle
+
+pub type JsArray
+
+pub type Node
+
+pub type Text
+
+pub type TimeoutHandle
+
+pub type Window
+
+// Type aliases
+
+// Traits
+

@@ -1,0 +1,1155 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Arcelyth/aitne/src/dom"
+
+import {
+  "Arcelyth/aitne/src/ffi",
+  "Arcelyth/aitne/src/reactive",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/ref",
+}
+
+// Values
+pub fn a(children? : Array[&View]) -> HtmlElement[TagA, Array[&View]]
+
+pub fn abbr(children? : Array[&View]) -> HtmlElement[TagAbbr, Array[&View]]
+
+pub fn add_event_listener(@ffi.Element, String, (@ffi.Event) -> Unit) -> RemoveEventHandler
+
+pub fn add_event_listener_capture(@ffi.Element, String, (@ffi.Event) -> Unit) -> RemoveEventHandler
+
+pub fn address(children? : Array[&View]) -> HtmlElement[TagAddress, Array[&View]]
+
+pub fn anchor(href~ : String, children~ : Array[&View]) -> &View
+
+pub fn area(children? : Array[&View]) -> HtmlElement[TagArea, Array[&View]]
+
+pub fn article(children? : Array[&View]) -> HtmlElement[TagArticle, Array[&View]]
+
+pub fn aside(children? : Array[&View]) -> HtmlElement[TagAside, Array[&View]]
+
+pub fn audio(children? : Array[&View]) -> HtmlElement[TagAudio, Array[&View]]
+
+pub fn b(children? : Array[&View]) -> HtmlElement[TagB, Array[&View]]
+
+pub fn base(children? : Array[&View]) -> HtmlElement[TagBase, Array[&View]]
+
+pub fn bdi(children? : Array[&View]) -> HtmlElement[TagBdi, Array[&View]]
+
+pub fn bdo(children? : Array[&View]) -> HtmlElement[TagBdo, Array[&View]]
+
+pub fn begins_with_query_or_hash(String) -> Bool
+
+pub fn blockquote(children? : Array[&View]) -> HtmlElement[TagBlockquote, Array[&View]]
+
+pub fn body(children? : Array[&View]) -> HtmlElement[TagBody, Array[&View]]
+
+pub fn br(children? : Array[&View]) -> HtmlElement[TagBr, Array[&View]]
+
+pub fn button(children? : Array[&View]) -> HtmlElement[TagButton, Array[&View]]
+
+pub fn canvas(children? : Array[&View]) -> HtmlElement[TagCanvas, Array[&View]]
+
+pub fn caption(children? : Array[&View]) -> HtmlElement[TagCaption, Array[&View]]
+
+pub fn cite(children? : Array[&View]) -> HtmlElement[TagCite, Array[&View]]
+
+pub fn[C : IntoClass] class_val(C) -> Class[C]
+
+pub fn clear_between(@ffi.Node, @ffi.Node) -> Unit
+
+pub fn code(children? : Array[&View]) -> HtmlElement[TagCode, Array[&View]]
+
+pub fn col(children? : Array[&View]) -> HtmlElement[TagCol, Array[&View]]
+
+pub fn colgroup(children? : Array[&View]) -> HtmlElement[TagColgroup, Array[&View]]
+
+pub fn data(children? : Array[&View]) -> HtmlElement[TagData, Array[&View]]
+
+pub fn datalist(children? : Array[&View]) -> HtmlElement[TagDatalist, Array[&View]]
+
+pub fn dd(children? : Array[&View]) -> HtmlElement[TagDd, Array[&View]]
+
+pub fn del(children? : Array[&View]) -> HtmlElement[TagDel, Array[&View]]
+
+pub fn details(children? : Array[&View]) -> HtmlElement[TagDetails, Array[&View]]
+
+pub fn dfn(children? : Array[&View]) -> HtmlElement[TagDfn, Array[&View]]
+
+pub fn dialog(children? : Array[&View]) -> HtmlElement[TagDialog, Array[&View]]
+
+pub fn div(children? : Array[&View]) -> HtmlElement[TagDiv, Array[&View]]
+
+pub fn dl(children? : Array[&View]) -> HtmlElement[TagDl, Array[&View]]
+
+pub fn document() -> @ffi.Document
+
+pub fn dom_create_element(String) -> @ffi.Element
+
+pub fn dom_create_text_node(String) -> @ffi.Text
+
+pub fn dom_get_body() -> @ffi.Node
+
+pub fn dom_get_element_by_id(String) -> @ffi.Node?
+
+pub fn dom_next_sibling(@ffi.Node) -> @ffi.Node?
+
+pub fn dt(children? : Array[&View]) -> HtmlElement[TagDt, Array[&View]]
+
+pub fn em(children? : Array[&View]) -> HtmlElement[TagEm, Array[&View]]
+
+pub fn embed(children? : Array[&View]) -> HtmlElement[TagEmbed, Array[&View]]
+
+pub fn fieldset(children? : Array[&View]) -> HtmlElement[TagFieldset, Array[&View]]
+
+pub fn figcaption(children? : Array[&View]) -> HtmlElement[TagFigcaption, Array[&View]]
+
+pub fn figure(children? : Array[&View]) -> HtmlElement[TagFigure, Array[&View]]
+
+pub fn footer(children? : Array[&View]) -> HtmlElement[TagFooter, Array[&View]]
+
+pub fn[T, K : Hash + Eq] for_node(() -> Array[T], (T) -> K, (T) -> &View) -> &View
+
+pub fn form(children? : Array[&View]) -> HtmlElement[TagForm, Array[&View]]
+
+pub fn h1(children? : Array[&View]) -> HtmlElement[TagH1, Array[&View]]
+
+pub fn h2(children? : Array[&View]) -> HtmlElement[TagH2, Array[&View]]
+
+pub fn h3(children? : Array[&View]) -> HtmlElement[TagH3, Array[&View]]
+
+pub fn h4(children? : Array[&View]) -> HtmlElement[TagH4, Array[&View]]
+
+pub fn h5(children? : Array[&View]) -> HtmlElement[TagH5, Array[&View]]
+
+pub fn h6(children? : Array[&View]) -> HtmlElement[TagH6, Array[&View]]
+
+pub fn handle_anchor_click(String, (String, String) -> Result[Url, String], (Url, LocationChange) -> Unit) -> (@ffi.Event) -> Unit
+
+pub fn has_scheme(String) -> Bool
+
+pub fn head(children? : Array[&View]) -> HtmlElement[TagHead, Array[&View]]
+
+pub fn header(children? : Array[&View]) -> HtmlElement[TagHeader, Array[&View]]
+
+pub fn hgroup(children? : Array[&View]) -> HtmlElement[TagHgroup, Array[&View]]
+
+pub fn hr(children? : Array[&View]) -> HtmlElement[TagHr, Array[&View]]
+
+pub fn html(children? : Array[&View]) -> HtmlElement[TagHtml, Array[&View]]
+
+pub fn i(children? : Array[&View]) -> HtmlElement[TagI, Array[&View]]
+
+pub fn iframe(children? : Array[&View]) -> HtmlElement[TagIframe, Array[&View]]
+
+pub fn img(children? : Array[&View]) -> HtmlElement[TagImg, Array[&View]]
+
+pub fn input(children? : Array[&View]) -> HtmlElement[TagInput, Array[&View]]
+
+pub fn ins(children? : Array[&View]) -> HtmlElement[TagIns, Array[&View]]
+
+pub fn insert_at(@ffi.Node, @ffi.Node, @ffi.Node) -> Unit
+
+pub fn kbd(children? : Array[&View]) -> HtmlElement[TagKbd, Array[&View]]
+
+pub fn label(children? : Array[&View]) -> HtmlElement[TagLabel, Array[&View]]
+
+pub fn legend(children? : Array[&View]) -> HtmlElement[TagLegend, Array[&View]]
+
+pub fn li(children? : Array[&View]) -> HtmlElement[TagLi, Array[&View]]
+
+pub fn link(children? : Array[&View]) -> HtmlElement[TagLink, Array[&View]]
+
+pub fn main_(children? : Array[&View]) -> HtmlElement[TagMain_, Array[&View]]
+
+pub fn map(children? : Array[&View]) -> HtmlElement[TagMap, Array[&View]]
+
+pub fn mark(children? : Array[&View]) -> HtmlElement[TagMark, Array[&View]]
+
+pub fn menu(children? : Array[&View]) -> HtmlElement[TagMenu, Array[&View]]
+
+pub fn meta(children? : Array[&View]) -> HtmlElement[TagMeta, Array[&View]]
+
+pub fn meter(children? : Array[&View]) -> HtmlElement[TagMeter, Array[&View]]
+
+pub fn mount_to_body(() -> &View) -> RenderState
+
+pub fn mount_to_id(String, () -> &View) -> RenderState?
+
+pub fn nav(children? : Array[&View]) -> HtmlElement[TagNav, Array[&View]]
+
+pub fn normalize(String, Bool) -> String
+
+pub fn normalize_path(String) -> String
+
+pub fn noscript(children? : Array[&View]) -> HtmlElement[TagNoscript, Array[&View]]
+
+pub fn object(children? : Array[&View]) -> HtmlElement[TagObject, Array[&View]]
+
+pub fn ol(children? : Array[&View]) -> HtmlElement[TagOl, Array[&View]]
+
+pub fn on(EventDesp, (@ffi.Event) -> Unit) -> On
+
+pub fn on_window_event(String, (@ffi.Event) -> Unit) -> () -> Unit
+
+pub fn optgroup(children? : Array[&View]) -> HtmlElement[TagOptgroup, Array[&View]]
+
+pub fn option_(children? : Array[&View]) -> HtmlElement[TagOption_, Array[&View]]
+
+pub fn outlet() -> &View
+
+pub fn output(children? : Array[&View]) -> HtmlElement[TagOutput, Array[&View]]
+
+pub fn p(children? : Array[&View]) -> HtmlElement[TagP, Array[&View]]
+
+pub fn[Ch] parent_route(path? : String, view? : () -> &View, children~ : Ch) -> NestedRoute[Ch]
+
+pub fn parse_url_with_base(String, String) -> Result[Url, String]
+
+pub fn picture(children? : Array[&View]) -> HtmlElement[TagPicture, Array[&View]]
+
+pub fn portal(children? : Array[&View]) -> HtmlElement[TagPortal, Array[&View]]
+
+pub fn pre(children? : Array[&View]) -> HtmlElement[TagPre, Array[&View]]
+
+pub fn progress(children? : Array[&View]) -> HtmlElement[TagProgress, Array[&View]]
+
+pub fn[P : IntoProperty] prop(String, P) -> Property[P]
+
+pub fn provide_router_context(RouterContext) -> Unit
+
+pub fn q(children? : Array[&View]) -> HtmlElement[TagQ, Array[&View]]
+
+pub fn resolve_path(String, String, String?) -> String
+
+pub fn[Ch] route(path? : String, view? : () -> &View) -> NestedRoute[Ch]
+
+pub fn router(children? : Array[RouterChildren], base? : String, set_is_routing? : (Bool) -> Unit) -> &View
+
+pub fn[Ch : MatchNestedRoutes] routes(fallback? : () -> &View, children? : Ch) -> RouterChildren
+
+pub fn rp(children? : Array[&View]) -> HtmlElement[TagRp, Array[&View]]
+
+pub fn rt(children? : Array[&View]) -> HtmlElement[TagRt, Array[&View]]
+
+pub fn ruby(children? : Array[&View]) -> HtmlElement[TagRuby, Array[&View]]
+
+pub fn[T : IntoClass] rx_class(() -> T) -> RxClass[T]
+
+pub fn s(children? : Array[&View]) -> HtmlElement[TagS, Array[&View]]
+
+pub fn samp(children? : Array[&View]) -> HtmlElement[TagSamp, Array[&View]]
+
+pub fn script(children? : Array[&View]) -> HtmlElement[TagScript, Array[&View]]
+
+pub fn search(children? : Array[&View]) -> HtmlElement[TagSearch, Array[&View]]
+
+pub fn section(children? : Array[&View]) -> HtmlElement[TagSection, Array[&View]]
+
+pub fn select(children? : Array[&View]) -> HtmlElement[TagSelect, Array[&View]]
+
+pub fn slot(children? : Array[&View]) -> HtmlElement[TagSlot, Array[&View]]
+
+pub fn small(children? : Array[&View]) -> HtmlElement[TagSmall, Array[&View]]
+
+pub fn source(children? : Array[&View]) -> HtmlElement[TagSource, Array[&View]]
+
+pub fn span(children? : Array[&View]) -> HtmlElement[TagSpan, Array[&View]]
+
+pub fn strong(children? : Array[&View]) -> HtmlElement[TagStrong, Array[&View]]
+
+pub fn style(children? : Array[&View]) -> HtmlElement[TagStyle, Array[&View]]
+
+pub fn[S : IntoStyle] style_val(S) -> Style[S]
+
+pub fn sub(children? : Array[&View]) -> HtmlElement[TagSub, Array[&View]]
+
+pub fn summary(children? : Array[&View]) -> HtmlElement[TagSummary, Array[&View]]
+
+pub fn sup(children? : Array[&View]) -> HtmlElement[TagSup, Array[&View]]
+
+pub fn table(children? : Array[&View]) -> HtmlElement[TagTable, Array[&View]]
+
+pub fn tbody(children? : Array[&View]) -> HtmlElement[TagTbody, Array[&View]]
+
+pub fn td(children? : Array[&View]) -> HtmlElement[TagTd, Array[&View]]
+
+pub fn template(children? : Array[&View]) -> HtmlElement[TagTemplate, Array[&View]]
+
+pub fn text(String) -> TextNode
+
+pub fn text_dyn(() -> String) -> DynTextNode
+
+pub fn textarea(children? : Array[&View]) -> HtmlElement[TagTextarea, Array[&View]]
+
+pub fn tfoot(children? : Array[&View]) -> HtmlElement[TagTfoot, Array[&View]]
+
+pub fn th(children? : Array[&View]) -> HtmlElement[TagTh, Array[&View]]
+
+pub fn thead(children? : Array[&View]) -> HtmlElement[TagThead, Array[&View]]
+
+pub fn time(children? : Array[&View]) -> HtmlElement[TagTime, Array[&View]]
+
+pub fn title(children? : Array[&View]) -> HtmlElement[TagTitle, Array[&View]]
+
+pub fn to_params(Array[(String, String)]) -> Params
+
+pub fn tr(children? : Array[&View]) -> HtmlElement[TagTr, Array[&View]]
+
+pub fn track(children? : Array[&View]) -> HtmlElement[TagTrack, Array[&View]]
+
+pub fn u(children? : Array[&View]) -> HtmlElement[TagU, Array[&View]]
+
+pub fn ul(children? : Array[&View]) -> HtmlElement[TagUl, Array[&View]]
+
+pub fn use_resolved_path(String) -> @reactive.Memo[String]
+
+pub fn use_router_context() -> RouterContext?
+
+pub fn var_(children? : Array[&View]) -> HtmlElement[TagVar_, Array[&View]]
+
+pub fn video(children? : Array[&View]) -> HtmlElement[TagVideo, Array[&View]]
+
+pub fn wbr(children? : Array[&View]) -> HtmlElement[TagWbr, Array[&View]]
+
+pub fn window() -> @ffi.Window
+
+// Errors
+
+// Types and methods
+pub(all) struct Attr[K, V](K, V)
+pub impl[K : AttributeKey, V : AttributeValue] Attribute for Attr[K, V]
+
+pub(all) struct AttrList {
+  items : Array[&Attribute]
+}
+pub fn AttrList::new() -> Self
+pub impl Attribute for AttrList
+
+pub enum AttrState {
+  None
+  Str(String)
+  Bool(Bool)
+  Element(@ffi.Element)
+  Pair(AttrState, AttrState)
+  RenderEffect(@ref.Ref[@reactive.RenderEffect[AttrState]])
+  EventBound(RemoveEventHandler)
+}
+
+pub(all) struct BrowserUrl {
+  url : @reactive.RwSignal[Url]
+  path_stack : Array[Url]
+  is_back : @reactive.RwSignal[Bool]
+}
+pub fn BrowserUrl::complete_navigation(Self, LocationChange) -> Unit
+pub fn BrowserUrl::current() -> Url
+pub fn BrowserUrl::init(Self, String?) -> Unit
+pub fn BrowserUrl::new() -> Self
+pub fn BrowserUrl::redirect(Self, String) -> Unit
+pub impl @reactive.TypeName for BrowserUrl
+
+pub(all) struct Class[C](C)
+pub impl[C : IntoClass] Attribute for Class[C]
+
+pub struct DomCache {
+  mut window : @ffi.Window?
+  mut document : @ffi.Document?
+}
+
+pub struct DynTextNode {
+  getter : () -> String
+}
+pub impl Render for DynTextNode
+pub impl RenderHtml for DynTextNode
+pub impl View for DynTextNode
+
+pub struct ElementState {
+  el : @ffi.Element
+  mut attrs : AttrState
+  mut children : RenderState
+}
+
+pub(all) struct EventDesp {
+  name : String
+  bubbles : Bool
+  capture : Bool
+}
+
+pub(all) enum EventType {
+  Click
+  Input
+  Change
+  Submit
+  Keydown
+  Keyup
+}
+pub fn EventType::to_string(Self) -> String
+
+pub struct ForNode[T, K] {
+  each : () -> Array[T]
+  key : (T) -> K
+  render : (T) -> &View
+}
+pub impl[T, K : Hash + Eq] Render for ForNode[T, K]
+pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K]
+pub impl[T, K : Hash + Eq] View for ForNode[T, K]
+
+pub struct FragmentState {
+  children : Array[RenderState]
+}
+
+pub(all) struct HtmlElement[T, C] {
+  tag : T
+  attrs : AttrList
+  children : C
+}
+pub fn[T : ElementType, C : Render] HtmlElement::add_attr(Self[T, C], &Attribute) -> Self[T, C]
+pub fn[T : ElementType, C : Render] HtmlElement::children(Self[T, C], Array[&View]) -> Self[T, Array[&View]]
+pub fn[T : ElementType, C : Render, Cl : IntoClass] HtmlElement::class(Self[T, C], Cl) -> Self[T, C]
+pub fn[T : ElementType, C : Render] HtmlElement::on(Self[T, C], EventType, (@ffi.Event) -> Unit) -> Self[T, C]
+#alias(attr)
+pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::prop(Self[T, C], String, P) -> Self[T, C]
+pub fn[T : ElementType, C : Render, S : IntoStyle] HtmlElement::style(Self[T, C], S) -> Self[T, C]
+pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::value(Self[T, C], P) -> Self[T, C]
+pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C]
+pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C]
+pub impl[T : ElementType, C : Render + RenderHtml] View for HtmlElement[T, C]
+
+pub(all) struct Location {
+  pathname : @reactive.Memo[String]
+  search : @reactive.Memo[String]
+  hash : @reactive.Memo[String]
+} derive(@debug.Debug)
+pub fn Location::current() -> Self
+pub fn Location::new(@reactive.RwSignal[Url]) -> Self
+
+pub struct LocationChange {
+  value : String
+  replace : Bool
+  scroll : Bool
+} derive(Default)
+
+pub(all) struct Matched(@reactive.Memo[String])
+pub impl @reactive.TypeName for Matched
+
+pub struct MultiBlockState {
+  start_anchor : @ffi.Node
+  end_anchor : @ffi.Node
+  init : ((@ffi.Node) -> Unit)?
+  cleanup : (() -> Unit)?
+}
+pub fn MultiBlockState::new(String, String) -> Self
+pub fn MultiBlockState::set_cleanup(Self, () -> Unit) -> Self
+
+pub(all) struct NestedMatch {
+  id : UInt
+  matched : String
+  params : Array[(String, String)]
+  child : NestedMatch?
+  view_fn : () -> &View
+}
+pub fn NestedMatch::build(Self, Url, String?, @ref.Ref[Array[() -> @reactive.Trigger]], @ref.Ref[Array[RouteContext]], @ref.Ref[@reactive.Owner]) -> Unit
+pub fn NestedMatch::rebuild(Self, Url, String?, Int, @ref.Ref[Array[RouteContext]], @ref.Ref[@reactive.Owner]) -> Int
+pub impl @debug.Debug for NestedMatch
+
+pub(all) struct NestedRoute[Ch] {
+  id : UInt
+  path : String
+  child : Ch?
+  view : () -> &View
+}
+pub fn[Ch] NestedRoute::child(Self[Ch], Ch) -> Self[Ch]
+pub fn[Ch : MatchNestedRoutes] NestedRoute::match_nested(Self[Ch], String) -> ((UInt, NestedMatch)?, String)
+pub fn[Ch] NestedRoute::new(String, () -> &View) -> Self[Ch]
+pub impl[Ch : MatchNestedRoutes] MatchNestedRoutes for NestedRoute[Ch]
+pub impl[Ch] @debug.Debug for NestedRoute[Ch]
+
+pub(all) struct NestedRouteView[D] {
+  location : Location
+  routes : RouteDefs[D]
+  outer_owner : @ref.Ref[@reactive.Owner]
+  current_url : @reactive.RwSignal[Url]
+  base : String?
+  fallback : () -> &View
+  set_is_routing : ((Bool) -> Unit)?
+}
+pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D]
+pub impl[D : MatchNestedRoutes] RenderHtml for NestedRouteView[D]
+pub impl[D : MatchNestedRoutes] View for NestedRouteView[D]
+pub impl[D] @debug.Debug for NestedRouteView[D]
+
+pub struct On {
+  event : EventDesp
+  owner : @reactive.Owner
+  fun : (@ffi.Event) -> Unit
+}
+pub impl Attribute for On
+
+pub struct OutletView {
+  child : RouteContext?
+  outer_owner : @reactive.Owner
+}
+pub impl Render for OutletView
+pub impl RenderHtml for OutletView
+pub impl View for OutletView
+
+pub struct Params(Array[(String, Array[String])]) derive(Eq, @debug.Debug)
+pub fn Params::add(Self, String, String) -> Unit
+pub fn Params::contains(Self, String) -> Bool
+pub fn Params::empty() -> Self
+pub fn Params::from_search(String) -> Self
+pub fn Params::get(Self, String) -> String?
+pub fn Params::get_all(Self, String) -> Array[String]
+pub fn Params::iter(Self) -> Iter[(String, String)]
+pub fn Params::merge(Self, Self) -> Self
+pub fn Params::replace(Self, String, String) -> Unit
+
+pub enum Position {
+  Current
+  FirstChild
+  NextChild
+  NextChildAfterText
+  OnlyChild
+  LastChild
+} derive(Eq, @debug.Debug)
+
+pub struct Property[P] {
+  key : String
+  value : P
+}
+pub impl[P : IntoProperty] Attribute for Property[P]
+
+pub struct RemoveEventHandler(@ffi.EventHandle?)
+pub fn RemoveEventHandler::invoke(Self) -> Unit
+pub fn RemoveEventHandler::new(@ffi.EventHandle) -> Self
+pub fn RemoveEventHandler::take(@ref.Ref[Self]) -> @ffi.EventHandle?
+
+pub enum RenderState {
+  None
+  Element(ElementState)
+  Text(TextState)
+  Fragment(FragmentState)
+  MultiBlock(MultiBlockState)
+  Router(RouterState)
+}
+pub impl Mountable for RenderState
+
+pub(all) struct RouteContext {
+  mut id : UInt
+  url : @reactive.RwSignal[Url]
+  params : @reactive.RwSignal[Params]
+  matched : @reactive.RwSignal[String]
+  base : String?
+  view_fn : @ref.Ref[(@reactive.Owner) -> &View]
+  owner : @ref.Ref[@reactive.Owner?]
+  mut preload_owner : @reactive.Owner
+  mut child : RouteContext?
+  trigger : @reactive.Trigger
+}
+pub impl @reactive.TypeName for RouteContext
+
+pub struct RouteDefs[Ch] {
+  base : String?
+  children : Ch
+}
+pub fn[Ch : MatchNestedRoutes] RouteDefs::match_route(Self[Ch], String) -> NestedMatch?
+pub impl[Ch] @debug.Debug for RouteDefs[Ch]
+
+pub struct RouterChildren(() -> &View)
+
+pub(all) struct RouterContext {
+  base : String?
+  current_url : @reactive.RwSignal[Url]
+  location : Location
+  set_is_routing : ((Bool) -> Unit)?
+}
+pub fn RouterContext::resolve_path(Self, String, String?) -> String
+pub impl @reactive.TypeName for RouterContext
+
+pub struct RouterState {
+  path : @ref.Ref[String]
+  current_url : @reactive.RwSignal[Url]
+  outlets : @ref.Ref[Array[RouteContext]]
+  view : @ref.Ref[RenderState]
+  outer_owner : @ref.Ref[@reactive.Owner]
+}
+
+pub(all) struct RxClass[T](() -> T)
+pub impl[T : IntoClass] IntoClass for RxClass[T]
+
+pub struct Style[S](S)
+pub impl[S : IntoStyle] Attribute for Style[S]
+
+pub struct TagA {
+}
+pub impl ElementType for TagA
+
+pub struct TagAbbr {
+}
+pub impl ElementType for TagAbbr
+
+pub struct TagAddress {
+}
+pub impl ElementType for TagAddress
+
+pub struct TagArea {
+}
+pub impl ElementType for TagArea
+
+pub struct TagArticle {
+}
+pub impl ElementType for TagArticle
+
+pub struct TagAside {
+}
+pub impl ElementType for TagAside
+
+pub struct TagAudio {
+}
+pub impl ElementType for TagAudio
+
+pub struct TagB {
+}
+pub impl ElementType for TagB
+
+pub struct TagBase {
+}
+pub impl ElementType for TagBase
+
+pub struct TagBdi {
+}
+pub impl ElementType for TagBdi
+
+pub struct TagBdo {
+}
+pub impl ElementType for TagBdo
+
+pub struct TagBlockquote {
+}
+pub impl ElementType for TagBlockquote
+
+pub struct TagBody {
+}
+pub impl ElementType for TagBody
+
+pub struct TagBr {
+}
+pub impl ElementType for TagBr
+
+pub struct TagButton {
+}
+pub impl ElementType for TagButton
+
+pub struct TagCanvas {
+}
+pub impl ElementType for TagCanvas
+
+pub struct TagCaption {
+}
+pub impl ElementType for TagCaption
+
+pub struct TagCite {
+}
+pub impl ElementType for TagCite
+
+pub struct TagCode {
+}
+pub impl ElementType for TagCode
+
+pub struct TagCol {
+}
+pub impl ElementType for TagCol
+
+pub struct TagColgroup {
+}
+pub impl ElementType for TagColgroup
+
+pub struct TagData {
+}
+pub impl ElementType for TagData
+
+pub struct TagDatalist {
+}
+pub impl ElementType for TagDatalist
+
+pub struct TagDd {
+}
+pub impl ElementType for TagDd
+
+pub struct TagDel {
+}
+pub impl ElementType for TagDel
+
+pub struct TagDetails {
+}
+pub impl ElementType for TagDetails
+
+pub struct TagDfn {
+}
+pub impl ElementType for TagDfn
+
+pub struct TagDialog {
+}
+pub impl ElementType for TagDialog
+
+pub struct TagDiv {
+}
+pub impl ElementType for TagDiv
+
+pub struct TagDl {
+}
+pub impl ElementType for TagDl
+
+pub struct TagDt {
+}
+pub impl ElementType for TagDt
+
+pub struct TagEm {
+}
+pub impl ElementType for TagEm
+
+pub struct TagEmbed {
+}
+pub impl ElementType for TagEmbed
+
+pub struct TagFieldset {
+}
+pub impl ElementType for TagFieldset
+
+pub struct TagFigcaption {
+}
+pub impl ElementType for TagFigcaption
+
+pub struct TagFigure {
+}
+pub impl ElementType for TagFigure
+
+pub struct TagFooter {
+}
+pub impl ElementType for TagFooter
+
+pub struct TagForm {
+}
+pub impl ElementType for TagForm
+
+pub struct TagH1 {
+}
+pub impl ElementType for TagH1
+
+pub struct TagH2 {
+}
+pub impl ElementType for TagH2
+
+pub struct TagH3 {
+}
+pub impl ElementType for TagH3
+
+pub struct TagH4 {
+}
+pub impl ElementType for TagH4
+
+pub struct TagH5 {
+}
+pub impl ElementType for TagH5
+
+pub struct TagH6 {
+}
+pub impl ElementType for TagH6
+
+pub struct TagHead {
+}
+pub impl ElementType for TagHead
+
+pub struct TagHeader {
+}
+pub impl ElementType for TagHeader
+
+pub struct TagHgroup {
+}
+pub impl ElementType for TagHgroup
+
+pub struct TagHr {
+}
+pub impl ElementType for TagHr
+
+pub struct TagHtml {
+}
+pub impl ElementType for TagHtml
+
+pub struct TagI {
+}
+pub impl ElementType for TagI
+
+pub struct TagIframe {
+}
+pub impl ElementType for TagIframe
+
+pub struct TagImg {
+}
+pub impl ElementType for TagImg
+
+pub struct TagInput {
+}
+pub impl ElementType for TagInput
+
+pub struct TagIns {
+}
+pub impl ElementType for TagIns
+
+pub struct TagKbd {
+}
+pub impl ElementType for TagKbd
+
+pub struct TagLabel {
+}
+pub impl ElementType for TagLabel
+
+pub struct TagLegend {
+}
+pub impl ElementType for TagLegend
+
+pub struct TagLi {
+}
+pub impl ElementType for TagLi
+
+pub struct TagLink {
+}
+pub impl ElementType for TagLink
+
+pub struct TagMain_ {
+}
+pub impl ElementType for TagMain_
+
+pub struct TagMap {
+}
+pub impl ElementType for TagMap
+
+pub struct TagMark {
+}
+pub impl ElementType for TagMark
+
+pub struct TagMenu {
+}
+pub impl ElementType for TagMenu
+
+pub struct TagMeta {
+}
+pub impl ElementType for TagMeta
+
+pub struct TagMeter {
+}
+pub impl ElementType for TagMeter
+
+pub struct TagNav {
+}
+pub impl ElementType for TagNav
+
+pub struct TagNoscript {
+}
+pub impl ElementType for TagNoscript
+
+pub struct TagObject {
+}
+pub impl ElementType for TagObject
+
+pub struct TagOl {
+}
+pub impl ElementType for TagOl
+
+pub struct TagOptgroup {
+}
+pub impl ElementType for TagOptgroup
+
+pub struct TagOption_ {
+}
+pub impl ElementType for TagOption_
+
+pub struct TagOutput {
+}
+pub impl ElementType for TagOutput
+
+pub struct TagP {
+}
+pub impl ElementType for TagP
+
+pub struct TagPicture {
+}
+pub impl ElementType for TagPicture
+
+pub struct TagPortal {
+}
+pub impl ElementType for TagPortal
+
+pub struct TagPre {
+}
+pub impl ElementType for TagPre
+
+pub struct TagProgress {
+}
+pub impl ElementType for TagProgress
+
+pub struct TagQ {
+}
+pub impl ElementType for TagQ
+
+pub struct TagRp {
+}
+pub impl ElementType for TagRp
+
+pub struct TagRt {
+}
+pub impl ElementType for TagRt
+
+pub struct TagRuby {
+}
+pub impl ElementType for TagRuby
+
+pub struct TagS {
+}
+pub impl ElementType for TagS
+
+pub struct TagSamp {
+}
+pub impl ElementType for TagSamp
+
+pub struct TagScript {
+}
+pub impl ElementType for TagScript
+
+pub struct TagSearch {
+}
+pub impl ElementType for TagSearch
+
+pub struct TagSection {
+}
+pub impl ElementType for TagSection
+
+pub struct TagSelect {
+}
+pub impl ElementType for TagSelect
+
+pub struct TagSlot {
+}
+pub impl ElementType for TagSlot
+
+pub struct TagSmall {
+}
+pub impl ElementType for TagSmall
+
+pub struct TagSource {
+}
+pub impl ElementType for TagSource
+
+pub struct TagSpan {
+}
+pub impl ElementType for TagSpan
+
+pub struct TagStrong {
+}
+pub impl ElementType for TagStrong
+
+pub struct TagStyle {
+}
+pub impl ElementType for TagStyle
+
+pub struct TagSub {
+}
+pub impl ElementType for TagSub
+
+pub struct TagSummary {
+}
+pub impl ElementType for TagSummary
+
+pub struct TagSup {
+}
+pub impl ElementType for TagSup
+
+pub struct TagTable {
+}
+pub impl ElementType for TagTable
+
+pub struct TagTbody {
+}
+pub impl ElementType for TagTbody
+
+pub struct TagTd {
+}
+pub impl ElementType for TagTd
+
+pub struct TagTemplate {
+}
+pub impl ElementType for TagTemplate
+
+pub struct TagTextarea {
+}
+pub impl ElementType for TagTextarea
+
+pub struct TagTfoot {
+}
+pub impl ElementType for TagTfoot
+
+pub struct TagTh {
+}
+pub impl ElementType for TagTh
+
+pub struct TagThead {
+}
+pub impl ElementType for TagThead
+
+pub struct TagTime {
+}
+pub impl ElementType for TagTime
+
+pub struct TagTitle {
+}
+pub impl ElementType for TagTitle
+
+pub struct TagTr {
+}
+pub impl ElementType for TagTr
+
+pub struct TagTrack {
+}
+pub impl ElementType for TagTrack
+
+pub struct TagU {
+}
+pub impl ElementType for TagU
+
+pub struct TagUl {
+}
+pub impl ElementType for TagUl
+
+pub struct TagVar_ {
+}
+pub impl ElementType for TagVar_
+
+pub struct TagVideo {
+}
+pub impl ElementType for TagVideo
+
+pub struct TagWbr {
+}
+pub impl ElementType for TagWbr
+
+pub struct TextNode {
+  val : String
+}
+pub impl Render for TextNode
+pub impl RenderHtml for TextNode
+pub impl View for TextNode
+
+pub struct TextState {
+  node : @ffi.Text
+}
+
+pub(all) struct Url {
+  origin : String
+  path : String
+  search : String
+  search_params : Params
+  hash : String
+} derive(Eq, @debug.Debug)
+pub fn Url::current() -> Self
+pub fn Url::to_full_path(Self) -> String
+pub impl @reactive.TypeName for Url
+
+// Type aliases
+
+// Traits
+pub trait Attribute {
+  fn html_len(Self) -> Int
+  fn to_html(Self, StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
+  fn build(Self, @ffi.Element) -> AttrState
+  fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
+  fn dry_resolve(Self) -> Unit
+  fn add_attr(Self, &Attribute) -> &Attribute
+}
+pub impl Attribute for Unit
+pub impl[A : Attribute, B : Attribute] Attribute for (A, B)
+
+pub trait AttributeKey {
+  fn get_key(Self) -> String
+}
+pub impl AttributeKey for String
+
+pub trait AttributeValue {
+  fn html_len(Self) -> Int
+  fn to_html(Self, String, StringBuilder) -> Unit
+  fn build(Self, String, @ffi.Element) -> AttrState
+  fn rebuild(Self, String, @ref.Ref[AttrState]) -> Unit
+  fn dry_resolve(Self) -> Unit
+}
+pub impl AttributeValue for Unit
+pub impl AttributeValue for Bool
+pub impl AttributeValue for String
+
+pub trait ElementType {
+  fn tag(Self) -> String
+  fn is_self_closing(Self) -> Bool
+}
+
+pub trait IntoClass {
+  fn html_len(Self) -> Int
+  fn to_html(Self, StringBuilder) -> Unit
+  fn build(Self, @ffi.Element) -> AttrState
+  fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
+  fn dry_resolve(Self) -> Unit
+}
+pub impl IntoClass for String
+
+pub trait IntoProperty {
+  fn html_len(Self) -> Int
+  fn to_html(Self, StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
+  fn build(Self, @ffi.Element, String) -> AttrState
+  fn rebuild(Self, @ref.Ref[AttrState], String) -> Unit
+  fn dry_resolve(Self) -> Unit
+}
+pub impl IntoProperty for String
+pub impl[S : Show] IntoProperty for @reactive.ReadSignal[S]
+
+pub trait IntoStyle {
+  fn html_len(Self) -> Int
+  fn to_html(Self, StringBuilder) -> Unit
+  fn build(Self, @ffi.Element) -> AttrState
+  fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
+  fn dry_resolve(Self) -> Unit
+}
+pub impl IntoStyle for String
+
+pub trait MatchNestedRoutes {
+  fn match_nested(Self, String) -> ((UInt, NestedMatch)?, String)
+}
+pub impl MatchNestedRoutes for Unit
+pub impl[T : MatchNestedRoutes] MatchNestedRoutes for T?
+pub impl[T : MatchNestedRoutes] MatchNestedRoutes for Array[T]
+
+pub trait Mountable {
+  fn unmount(Self) -> Unit
+  fn mount(Self, @ffi.Node, @ffi.Node) -> Unit
+  fn insert_before(Self, &Mountable) -> Bool
+  fn elements(Self) -> Array[@ffi.Node]
+}
+
+pub trait Render {
+  fn build(Self) -> RenderState
+  fn rebuild(Self, @ref.Ref[RenderState]) -> Unit
+}
+pub impl Render for Unit
+pub impl Render for String
+pub impl Render for Array[&View]
+
+pub trait RenderHtml : Render {
+  fn html_len(Self) -> Int
+  fn to_html(Self) -> String
+  fn to_html_with_buf(Self, StringBuilder, @ref.Ref[Position]) -> Unit
+}
+pub impl RenderHtml for Unit
+pub impl RenderHtml for String
+pub impl RenderHtml for Array[&View]
+
+pub trait View : Render + RenderHtml {
+  fn style(Self, &IntoStyle) -> &View
+}
+pub impl View for Unit
+pub impl View for String
+

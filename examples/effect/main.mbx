@@ -3,8 +3,8 @@ using @dom { trait View }
 fn app() -> &View {
   let (count, set_count) = @reactive.create_signal(0)
 
-  @reactive.create_effect(() => {
-    println("Value: \{count.get}");
+  let _ = @reactive.Effect::new((_) => {
+    println("Value: \{count.get()}");
   });
 
   <div>

@@ -1,0 +1,332 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Arcelyth/aitne/src/reactive"
+
+import {
+  "moonbitlang/core/debug",
+  "moonbitlang/core/hashmap",
+  "moonbitlang/core/hashset",
+  "moonbitlang/core/ref",
+  "tonyfettes/any",
+}
+
+// Values
+pub fn batch(() -> Unit) -> Unit
+
+pub fn[T] create_signal(T) -> (ReadSignal[T], WriteSignal[T])
+
+pub fn flush_scheduler() -> Unit
+
+pub fn on_cleanup(() -> Unit) -> Unit
+
+pub fn owner_state_of(Int) -> @ref.Ref[OwnerState]?
+
+pub fn[T : TypeName] provide_context(T) -> Unit
+
+pub fn schedule_effect(&EffectRunner) -> Unit
+
+pub let scheduler : @ref.Ref[Scheduler]
+
+pub fn[T : TypeName] use_context() -> T?
+
+// Errors
+
+// Types and methods
+pub struct ASource {
+  id : UInt
+  src : &Source?
+}
+pub impl ReactiveNode for ASource
+pub impl Source for ASource
+pub impl Eq for ASource
+pub impl Hash for ASource
+pub impl @debug.Debug for ASource
+
+pub struct ASubscriber {
+  id : UInt
+  sub : &Subscriber?
+}
+pub impl Notify for ASubscriber
+pub impl ReactiveNode for ASubscriber
+pub impl Subscriber for ASubscriber
+pub impl Eq for ASubscriber
+pub impl Hash for ASubscriber
+pub impl @debug.Debug for ASubscriber
+
+pub struct Effect[T] {
+  inner : @ref.Ref[EffectInner[T]]
+  owner : @ref.Ref[Owner]
+}
+pub fn[T] Effect::new((T?) -> T) -> Self[T]
+pub fn[T] Effect::run(Self[T]) -> Unit
+pub impl[T] EffectRunner for Effect[T]
+
+pub struct EffectInner[T] {
+  id : UInt
+  mut stale : Bool
+  cb : (T?) -> T
+  mut sources : @hashset.HashSet[ASource]
+  mut schedule : (() -> Unit)?
+}
+pub fn[T] EffectInner::new((T?) -> T) -> Self[T]
+
+pub struct Memo[T] {
+  id : UInt
+  mut value : T?
+  mut state : ReactiveNodeState
+  sources : @hashset.HashSet[ASource]
+  subscribers : @hashset.HashSet[ASubscriber]
+  mut disposed : Bool
+  owner : Owner
+  compute : (T?) -> T
+  changed : (T?, T?) -> Bool
+} derive(@debug.Debug)
+pub fn[T] Memo::dispose(Self[T]) -> Unit
+pub fn[T] Memo::get(Self[T]) -> T
+pub fn[T] Memo::get_untracked(Self[T]) -> T
+pub fn[T] Memo::has_value(Self[T]) -> Bool
+pub fn[T] Memo::is_disposed(Self[T]) -> Bool
+pub fn[T : Eq] Memo::new((T?) -> T) -> Self[T]
+pub fn[T] Memo::new_owning((T?) -> T, (T?, T?) -> Bool) -> Self[T]
+pub fn[T] Memo::new_with_compare((T?) -> T, (T?, T?) -> Bool) -> Self[T]
+pub fn[T] Memo::to_asource(Self[T]) -> ASource
+pub fn[T] Memo::to_asubscriber(Self[T]) -> ASubscriber
+pub fn[T] Memo::track(Self[T]) -> Unit
+pub fn[T] Memo::update_value(Self[T]) -> Bool
+pub fn[T, U] Memo::with_(Self[T], (T) -> U) -> U
+pub fn[T, U] Memo::with_untracked(Self[T], (T) -> U) -> U
+pub impl[T] Notify for Memo[T]
+pub impl[T] ReactiveNode for Memo[T]
+pub impl[T] Source for Memo[T]
+pub impl[T] Subscriber for Memo[T]
+pub impl[T : TypeName] TypeName for Memo[T]
+
+pub(all) struct Observer {
+}
+pub fn Observer::get() -> ASubscriber?
+pub fn Observer::replace(ASubscriber?) -> Unit
+pub fn Observer::set(ASubscriber?) -> Unit
+pub fn Observer::tobe(ASubscriber) -> Bool
+pub fn[T] Observer::with_replace(ASubscriber?, () -> T) -> T
+pub fn[T] Observer::with_take(() -> T) -> T
+pub fn[T] Observer::with_untracked(() -> T) -> T
+
+pub struct ObserverState {
+  subscriber : ASubscriber
+  untracked : Bool
+}
+
+pub struct Owner {
+  id : Int
+} derive(@debug.Debug)
+pub fn Owner::child(Self) -> Self
+pub fn Owner::cleanup(Self) -> Unit
+pub fn Owner::current() -> Self?
+pub fn Owner::current_with_default() -> Self
+pub fn Owner::new() -> Self
+pub fn[T : TypeName] Owner::provide_context(Self, T) -> Unit
+pub fn Owner::set(Self) -> Unit
+pub fn[T : TypeName] Owner::take_context(Self) -> T?
+pub fn Owner::unset(Self) -> Unit
+pub fn[T : TypeName, R] Owner::update_context(Self, (T) -> R) -> R?
+pub fn[T : TypeName] Owner::use_context(Self) -> T?
+pub fn[T : TypeName] Owner::use_context_bidirectional(Self) -> T?
+pub fn[T] Owner::with_(Self, () -> T) -> T
+pub fn[T] Owner::with_cleanup(Self, () -> T) -> T
+pub fn[T : TypeName, R] Owner::with_context(Self, (T) -> R) -> R?
+
+pub struct OwnerState {
+  parent : Int?
+  mut cleanups : Array[() -> Unit]
+  mut children : @hashset.HashSet[Int]
+  contexts : @hashmap.HashMap[String, @any.Any]
+  mut disposed : Bool
+}
+
+pub(all) enum ReactiveNodeState {
+  Clean
+  Pending
+  Stale
+} derive(Eq, @debug.Debug)
+
+pub struct ReadSignal[T] {
+  inner : @ref.Ref[SignalInner[T]]
+}
+pub fn[T] ReadSignal::get(Self[T]) -> T
+pub fn[T] ReadSignal::get_untracked(Self[T]) -> T
+pub fn[T] ReadSignal::new(T) -> Self[T]
+pub fn[T] ReadSignal::try_get(Self[T]) -> T?
+pub fn[T, U] ReadSignal::try_with(Self[T], (T) -> U) -> U?
+pub impl[T] IsDisposed for ReadSignal[T]
+pub impl[T] ReactiveNode for ReadSignal[T]
+pub impl[T] Source for ReadSignal[T]
+pub impl[T] ToASource for ReadSignal[T]
+pub impl[T] Track for ReadSignal[T]
+pub impl[T : TypeName] TypeName for ReadSignal[T]
+pub impl[T : Default] Default for ReadSignal[T]
+pub impl[T] Eq for ReadSignal[T]
+pub impl[T] Hash for ReadSignal[T]
+pub impl[T : @debug.Debug] @debug.Debug for ReadSignal[T]
+
+pub struct RenderEffect[T] {
+  mut value : T?
+  inner : @ref.Ref[EffectInner[T]]
+  owner : @ref.Ref[Owner]
+}
+pub fn[T] RenderEffect::new((T?) -> T) -> @ref.Ref[Self[T]]
+pub fn[T] RenderEffect::new_isomorphic((T?) -> T) -> @ref.Ref[Self[T]]
+pub fn[T] RenderEffect::new_with_value((T?) -> T, T?) -> @ref.Ref[Self[T]]
+pub fn[T] RenderEffect::run(Self[T]) -> Unit
+pub fn[T] RenderEffect::take_value(Self[T]) -> T?
+pub impl[T] EffectRunner for RenderEffect[T]
+
+pub struct RwSignal[T] {
+  inner : @ref.Ref[SignalInner[T]]
+}
+pub fn[T] RwSignal::get(Self[T]) -> T
+pub fn[T] RwSignal::get_untracked(Self[T]) -> T
+pub fn[T] RwSignal::new(T) -> Self[T]
+pub fn[T] RwSignal::read_only(Self[T]) -> ReadSignal[T]
+pub fn[T] RwSignal::set(Self[T], T) -> Unit
+pub fn[T] RwSignal::set_untracked(Self[T], T) -> Unit
+pub fn[T] RwSignal::split(Self[T]) -> (ReadSignal[T], WriteSignal[T])
+pub fn[T] RwSignal::try_get(Self[T]) -> T?
+pub fn[T] RwSignal::try_set(Self[T], T) -> T?
+pub fn[T] RwSignal::try_update(Self[T], (T) -> T) -> Unit?
+pub fn[T, U] RwSignal::try_with(Self[T], (T) -> U) -> U?
+pub fn[T] RwSignal::unite(ReadSignal[T], WriteSignal[T]) -> Self[T]?
+pub fn[T] RwSignal::update(Self[T], (T) -> T) -> Unit
+pub fn[T, U] RwSignal::with_val(Self[T], (T) -> U) -> U
+pub fn[T] RwSignal::write_only(Self[T]) -> WriteSignal[T]
+pub impl[T] IsDisposed for RwSignal[T]
+pub impl[T] Notify for RwSignal[T]
+pub impl[T] ReactiveNode for RwSignal[T]
+pub impl[T] Source for RwSignal[T]
+pub impl[T] ToASource for RwSignal[T]
+pub impl[T] Track for RwSignal[T]
+pub impl[T : TypeName] TypeName for RwSignal[T]
+pub impl[T : Default] Default for RwSignal[T]
+pub impl[T] Eq for RwSignal[T]
+pub impl[T] Hash for RwSignal[T]
+pub impl[T : @debug.Debug] @debug.Debug for RwSignal[T]
+
+pub struct Scheduler {
+  mut pending : Array[&EffectRunner]
+  queued : @hashset.HashSet[UInt]
+  mut flushing : Bool
+  mut batch_depth : Int
+}
+
+pub(all) struct Selector[T] {
+  subs : @hashmap.HashMap[T, RwSignal[Bool]]
+  effect : @ref.Ref[RenderEffect[T]]
+}
+pub fn[T] Selector::clear(Self[T]) -> Unit
+pub fn[T : Eq + Hash] Selector::new(() -> T) -> Self[T]
+pub fn[T : Eq + Hash] Selector::remove(Self[T], T) -> Unit
+pub fn[T : Eq + Hash] Selector::selected(Self[T], T) -> Bool
+
+pub struct SignalInner[T] {
+  id : UInt
+  mut value : T
+  subs : @hashset.HashSet[ASubscriber]
+}
+pub fn[T] SignalInner::new(T) -> @ref.Ref[Self[T]]
+
+pub struct Trigger {
+  id : UInt
+  subs : @hashset.HashSet[ASubscriber]
+} derive(@debug.Debug)
+pub fn Trigger::new() -> Self
+pub impl IsDisposed for Trigger
+pub impl Notify for Trigger
+pub impl ReactiveNode for Trigger
+pub impl Source for Trigger
+pub impl ToASource for Trigger
+pub impl Track for Trigger
+
+pub struct WriteSignal[T] {
+  inner : @ref.Ref[SignalInner[T]]
+}
+pub fn[T] WriteSignal::new(T) -> Self[T]
+pub fn[T] WriteSignal::set(Self[T], T) -> Unit
+pub fn[T] WriteSignal::set_untracked(Self[T], T) -> Unit
+pub fn[T] WriteSignal::try_set(Self[T], T) -> T?
+pub fn[T] WriteSignal::try_update(Self[T], (T) -> T) -> Unit?
+pub fn[T] WriteSignal::update(Self[T], (T) -> T) -> Unit
+pub impl[T] IsDisposed for WriteSignal[T]
+pub impl[T] Notify for WriteSignal[T]
+pub impl[T] ReactiveNode for WriteSignal[T]
+pub impl[T] Source for WriteSignal[T]
+pub impl[T] ToASource for WriteSignal[T]
+pub impl[T] Track for WriteSignal[T]
+pub impl[T : TypeName] TypeName for WriteSignal[T]
+pub impl[T : Default] Default for WriteSignal[T]
+pub impl[T] Eq for WriteSignal[T]
+pub impl[T] Hash for WriteSignal[T]
+pub impl[T : @debug.Debug] @debug.Debug for WriteSignal[T]
+
+// Type aliases
+
+// Traits
+pub trait EffectRunner {
+  fn get_id(Self) -> UInt
+  fn run_effect(Self) -> Unit
+}
+pub impl[T : EffectRunner] EffectRunner for @ref.Ref[T]
+
+pub trait IsDisposed {
+  fn is_disposed(Self) -> Bool
+}
+
+pub trait Notify {
+  fn notify(Self) -> Unit
+}
+pub impl Notify for Array[Trigger]
+pub impl Notify for @hashset.HashSet[ASubscriber]
+
+pub(open) trait ReactiveNode {
+  fn mark_stale(Self) -> Unit
+  fn mark_pending(Self) -> Unit
+  fn mark_all_pending(Self) -> Unit
+  fn update_value(Self) -> Bool
+}
+pub impl ReactiveNode for @hashset.HashSet[ASubscriber]
+pub impl[T] ReactiveNode for @ref.Ref[EffectInner[T]]
+
+pub trait Source : ReactiveNode {
+  fn add_sub(Self, ASubscriber) -> Unit
+  fn remove_sub(Self, ASubscriber) -> Unit
+  fn clear_subs(Self) -> Unit
+}
+
+pub trait Subscriber : ReactiveNode {
+  fn add_source(Self, ASource) -> Unit
+  fn clean_sources(Self, ASubscriber) -> Unit
+}
+pub impl[T] Subscriber for @ref.Ref[EffectInner[T]]
+
+pub trait ToASource : IsDisposed {
+  fn to_asource(Self) -> ASource
+}
+
+pub trait ToASubscriber {
+  fn to_asubscriber(Self) -> ASubscriber
+}
+pub impl[T] ToASubscriber for @ref.Ref[EffectInner[T]]
+
+pub trait Track : Source + ToASource {
+  fn track(Self) -> Unit
+}
+
+pub(open) trait TypeName {
+  fn get_ty() -> String
+}
+pub impl TypeName for Unit
+pub impl TypeName for Bool
+pub impl TypeName for Char
+pub impl TypeName for Int
+pub impl TypeName for String
+pub impl[T : TypeName] TypeName for T?
+pub impl[T : TypeName] TypeName for Array[T]
+pub impl[A : TypeName, B : TypeName] TypeName for (A, B)
+

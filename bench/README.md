@@ -2,5 +2,5 @@
 
 This benchmark is used in js-framework-benchmark, run `moon build examples/bench --release` to generate js code. <br>
 
-See [here](https://github.com/Arcelyth/js-framework-benchmark) to check the benchmark of aitne.
+See [here](https://github.com/aitne-dev/js-framework-benchmark) to check the benchmark of aitne.
 

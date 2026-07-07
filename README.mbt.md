@@ -2,7 +2,8 @@
 
 ![Aitne Banner](./logos/banner.svg)
 
-A lightweight and high-performance web framework with fine-grained reactivity. Inspired by [leptos](https://github.com/leptos-rs/leptos) and [solidjs](https://github.com/solidjs/solid). Support MBX (JSX-like) format to develop.
+A lightweight, high-performance web framework built for modern frontend development, featuring fine-grained reactivity and a declarative component model. Inspired by [leptos](https://github.com/leptos-rs/leptos) and [solidjs](https://github.com/solidjs/solid). <br>
+Supports MBX, a JSX-like component syntax, providing a familiar and expressive way to build reactive web applications.
 
 ## Getting Started
 
@@ -13,7 +14,7 @@ macOS/Linux:
 curl -fsSL https://raw.githubusercontent.com/Arcelyth/aitne/main/scripts/install.sh | bash
 ```
 
-*`aitne` CLI depends on async library which not support Windows now*
+*`aitne` CLI depends on moonbit async library which not supports Windows now*
 
 ### Initializing
 
@@ -57,31 +58,31 @@ fn todo_app() -> &View {
     set_todo.set(new_list)
   }
 
-  div().children([
-    h1().children([text("Todo List")]),
-    div().children([text_dyn(fn() { todo.get().length().to_string() })]),
-    div().children([
-      input()
-      .attr("type", "text")
-      .value(input_val)
-      .on(Input, ev => set_input_val.set(@ffi.event_target_value(ev))),
-      button().on(Click, add_item).children([text("Add")]),
-    ]),
-    ul().children([
-      for_node(() => todo.get(), item => { return item }, item => {
-        li().children([
-          text(item),
-          button().on(Click, _ => remove_item(item)).children([text("Delete")]),
-        ])
-      }),
-    ]),
-  ])
+  <div>
+    <h1> Todo List </h1>
+    <div>{() => todo.get().length().to_string() }</div>
+    <div>
+      <input 
+        type="text" 
+        value={input_val} 
+        on:input={ev => set_input_val.set(event_target_value(ev))} 
+      />
+      <button on:click={add_item}> Add </button>
+    </div>
+    <ul>
+      {for_node(() => todo.get(), item => {return item }, (item) => {
+        <li>
+          {() => item}
+          <button on:click={_ => remove_item(item)}> "Delete" </button>
+        </li>
+      })}
+    </ul>
+  </div>
+
 }
 ```
 
-## MBX Format (JSX-like)
-
-Simple router usage in MBX format:
+Simple router usage:
 ```mbx
 ///|
 pub fn app() -> &View {

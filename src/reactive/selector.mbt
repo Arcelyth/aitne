@@ -4,7 +4,7 @@
 ///
 /// This provides an O(1) alternative to O(n) patterns like:
 ///
-/// ```moonbit
+/// ```moonbit nocheck
 /// // O(n) — every row re-checks on every change
 /// for row in rows {
 ///   let is_selected = selected_row.get() == row.id
@@ -14,10 +14,11 @@
 /// With `Selector` each row only re-renders when its OWN selection
 /// status changes:
 ///
-/// ```moonbit
+/// ```moonbit nocheck
 /// let sel = Selector::new(fn() { selected_row.get() })
 /// // ...
-/// let is_selected = sel.selected(row.id)  // O(1), only notifies if status flips
+///
+/// let is_selected = sel.selected(row.id) // O(1), only notifies if status flips
 /// ```
 pub(all) struct Selector[T] {
   /// Per-key signals used purely for notification — their boolean
@@ -32,30 +33,26 @@ pub(all) struct Selector[T] {
 ///|
 pub fn[T : Eq + Hash] Selector::new(source : () -> T) -> Selector[T] {
   let subs : HashMap[T, RwSignal[Bool]] = HashMap([])
-  let effect = RenderEffect::new_isomorphic(
-    (prev : T?) => {
-      let next_val = source()
-      match prev {
-        Some(prev_val) => {
-          if prev_val != next_val {
-            subs.each(fn(key : T, signal : RwSignal[Bool]) {
-              if key == next_val || key == prev_val {
-                signal.update(fn(_) { true })
-              }
-            })
-          }
-        }
-        None => {
+  let effect = RenderEffect::new_isomorphic((prev : T?) => {
+    let next_val = source()
+    match prev {
+      Some(prev_val) =>
+        if prev_val != next_val {
           subs.each(fn(key : T, signal : RwSignal[Bool]) {
-            if key == next_val {
+            if key == next_val || key == prev_val {
               signal.update(fn(_) { true })
             }
           })
         }
-      }
-      next_val
-    },
-  )
+      None =>
+        subs.each(fn(key : T, signal : RwSignal[Bool]) {
+          if key == next_val {
+            signal.update(fn(_) { true })
+          }
+        })
+    }
+    next_val
+  })
   Selector::{ subs, effect }
 }
 

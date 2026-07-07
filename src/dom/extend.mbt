@@ -25,7 +25,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
   let key_fn = self.key
   let render_fn = self.render
 
-  let cache : Ref[@hashmap.HashMap[K, RenderState]] = @ref.new(HashMap([]) )
+  let cache : Ref[@hashmap.HashMap[K, RenderState]] = @ref.new(HashMap([]))
   let mounted : Ref[Bool] = @ref.new(false)
   let parent_ref : Ref[@ffi.Node?] = @ref.new(None)
 
@@ -37,7 +37,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
       None => return
     }
     let old_cache = cache.val
-    
+
     let new_cache : @hashmap.HashMap[K, RenderState] = HashMap([])
     let used_old_keys : @hashset.HashSet[K] = HashSet([])
 
@@ -49,7 +49,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
         Some(old_state) => {
           used_old_keys.add(k)
           new_cache[k] = old_state
-          
+
           let nodes = old_state.elements()
           for n in nodes {
             let is_match = match current_node_opt {
@@ -74,7 +74,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
           let child_view = render_fn(item)
           let child_state = child_view.build()
           new_cache[k] = child_state
-          
+
           match current_node_opt {
             Some(cur_n) => child_state.mount(parent, cur_n)
             None => child_state.mount(parent, end)
@@ -155,5 +155,3 @@ pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn to_html_with_buf
 pub impl[T, K : Hash + Eq] View for ForNode[T, K] with fn style(self, _s) -> &View {
   self
 }
-
-

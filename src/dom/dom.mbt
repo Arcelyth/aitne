@@ -52,7 +52,10 @@ pub fn dom_get_body() -> @ffi.Node {
 
 ///|
 /// Add a window event listener with cleanup.
-pub fn on_window_event(ev_name : String, cb : (@ffi.Event) -> Unit) -> () -> Unit {
+pub fn on_window_event(
+  ev_name : String,
+  cb : (@ffi.Event) -> Unit,
+) -> () -> Unit {
   @ffi.window_add_event_listener(ev_name, cb)
   fn() { @ffi.window_remove_event_listener(ev_name, cb) }
 }

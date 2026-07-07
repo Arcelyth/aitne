@@ -56,7 +56,7 @@ pub fn flush_scheduler() -> Unit {
       let effect = current_pending[i]
 
       scheduler.val.queued.remove(effect.get_id())
-//      Effect::run(effect)
+      //      Effect::run(effect)
       effect.run_effect()
 
       i = i + 1

@@ -89,8 +89,9 @@ pub fn[T] Observer::with_replace(observer : ASubscriber?, f : () -> T) -> T {
   result
 }
 
-pub fn Observer::replace(observer: ASubscriber?) -> Unit {
-   observer_context.val = match observer {
+///|
+pub fn Observer::replace(observer : ASubscriber?) -> Unit {
+  observer_context.val = match observer {
     Some(sub) => Some({ subscriber: sub, untracked: false })
     None => None
   }

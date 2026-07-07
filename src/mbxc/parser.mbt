@@ -13,7 +13,6 @@ pub(all) enum MbxAST {
   ElementNode(StringView, HashMap[TokenAttr, AttrValue], Array[MbxAST])
 } derive(Debug, Show, Eq)
 
-
 ///|
 pub(all) struct Parser {
   tokens : Array[Token]

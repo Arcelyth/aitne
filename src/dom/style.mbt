@@ -26,7 +26,10 @@ pub impl[S : IntoStyle] Attribute for Style[S] with fn to_html(
 }
 
 ///|
-pub impl[S : IntoStyle] Attribute for Style[S] with fn build(self, el : @ffi.Element) -> AttrState {
+pub impl[S : IntoStyle] Attribute for Style[S] with fn build(
+  self,
+  el : @ffi.Element,
+) -> AttrState {
   self.0.build(el)
 }
 

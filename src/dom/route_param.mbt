@@ -126,11 +126,11 @@ pub fn Params::iter(self : Params) -> Iter[(String, String)] {
 ///|
 pub fn to_params(tp : Array[(String, String)]) -> Params {
   let res : Array[(String, Array[String])] = []
-  
+
   for pair in tp {
     let (k, v) = pair
     let mut found_idx = -1
-    
+
     let mut i = 0
     while i < res.length() {
       if res[i].0 == k {
@@ -139,13 +139,13 @@ pub fn to_params(tp : Array[(String, String)]) -> Params {
       }
       i += 1
     }
-    
+
     if found_idx != -1 {
       res[found_idx].1.push(v)
     } else {
       res.push((k, [v]))
     }
   }
-  
+
   Params(res)
 }

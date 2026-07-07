@@ -303,4 +303,3 @@ pub fn[T] Memo::has_value(self : Memo[T]) -> Bool {
 pub impl[T : TypeName] TypeName for Memo[T] with fn get_ty() -> String {
   "Memo_" + T::get_ty()
 }
-

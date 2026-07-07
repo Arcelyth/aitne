@@ -37,7 +37,7 @@ jobs:
         run: |
           ./_build/native/release/build/cmd/aitne/aitne.exe help
 
-  test:
+  test_and_check:
     name: Test ${{ matrix.os }}
     strategy:
       matrix:
@@ -52,11 +52,21 @@ jobs:
       - name: Setup Moonbit
         uses: hustcer/setup-moonbit@v1
 
-      - name: Build native cmd binary
-        shell: bash
+      - name: post install
         run: |
-          rm -rf .mooncakes
+          moon version --all
           moon update
           moon install
-          moon test src/* 
 
+      - name: moon check
+        run: |
+          moon check src/*
+
+      - name: moon test
+        run: |
+          moon test src/*
+
+      - name: lint
+        run: |
+          moon fmt && git diff --exit-code
+          moon info && git diff --exit-code

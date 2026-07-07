@@ -71,7 +71,7 @@ async fn main {
       let mut tmp = false
       let mut help = false
       let target_dir = "."
-      let mut out_dir : String? = None 
+      let mut out_dir : String? = None
 
       if arg_len == 3 && args[2] == "help" {
         show_mbxc_help()

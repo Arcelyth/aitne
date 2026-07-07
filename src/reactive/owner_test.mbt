@@ -31,9 +31,7 @@ test "context in closure" {
   let root = Owner::new()
   let child = root.child()
 
-  let f = () => {
-    assert_eq(child.use_context(), Some("child"))
-  }
+  let f = () => assert_eq(child.use_context(), Some("child"))
 
   root.provide_context("child")
 

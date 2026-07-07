@@ -1,8 +1,8 @@
 import {
-  "Arcelyth/aitne/src/dom" @dom,
-  "Arcelyth/aitne/src/mbxc" @mbxc,
-  "Arcelyth/aitne/src/reactive" @reactive,
-  "moonbitlang/x/fs" @fs,
+  "Arcelyth/aitne/src/dom",
+  "Arcelyth/aitne/src/mbxc",
+  "Arcelyth/aitne/src/reactive",
+  "moonbitlang/x/fs",
 }
 
 options(

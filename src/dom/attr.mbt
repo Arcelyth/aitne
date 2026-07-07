@@ -130,7 +130,11 @@ pub impl AttributeValue for Bool with fn to_html(
 }
 
 ///|
-pub impl AttributeValue for Bool with fn build(self, key : String, el : @ffi.Element) -> AttrState {
+pub impl AttributeValue for Bool with fn build(
+  self,
+  key : String,
+  el : @ffi.Element,
+) -> AttrState {
   if self {
     @ffi.dom_set_attr(el, key, "")
   }

@@ -145,9 +145,7 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
       @ffi.dom_remove(s.start_anchor)
       @ffi.dom_remove(s.end_anchor)
     }
-    Router(s) => {
-      s.view.val.unmount()
-    }
+    Router(s) => s.view.val.unmount()
     None => ()
   }
 }
@@ -189,9 +187,7 @@ pub impl Mountable for RenderState with fn mount(
         None => ()
       }
     }
-    Router(s) => {
-      s.view.val.mount(parent, marker)
-    }
+    Router(s) => s.view.val.mount(parent, marker)
     None => ()
   }
 }
@@ -340,7 +336,9 @@ pub fn RemoveEventHandler::invoke(self : RemoveEventHandler) -> Unit {
 }
 
 ///|
-pub fn RemoveEventHandler::take(self : Ref[RemoveEventHandler]) -> @ffi.EventHandle? {
+pub fn RemoveEventHandler::take(
+  self : Ref[RemoveEventHandler],
+) -> @ffi.EventHandle? {
   let res = self.val.0
   self.val = RemoveEventHandler(None)
   res
@@ -376,7 +374,11 @@ pub fn clear_between(start : @ffi.Node, end : @ffi.Node) -> Unit {
 ///|
 /// Insert a node before `marker` in its parent.
 /// If `marker` is null, appends to `parent`.
-pub fn insert_at(parent : @ffi.Node, node : @ffi.Node, marker : @ffi.Node) -> Unit {
+pub fn insert_at(
+  parent : @ffi.Node,
+  node : @ffi.Node,
+  marker : @ffi.Node,
+) -> Unit {
   if @ffi.dom_is_null(marker) {
     @ffi.dom_append(parent, node)
   } else {

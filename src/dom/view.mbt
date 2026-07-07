@@ -10,6 +10,7 @@ pub impl View for Unit with fn style(_self, _i) -> &View {
   ()
 }
 
+///|
 /// String -> View
 pub impl View for String with fn style(self, _s : &IntoStyle) -> &View {
   text(self)

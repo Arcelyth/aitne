@@ -23,7 +23,9 @@ pub async fn start_server(cfg : Config) -> Unit {
         }
       } else {
         match
-          (try? @fs.read_file_to_string(join_paths(cfg.build.out_dir, cfg.app.entry_html))) {
+          (try? @fs.read_file_to_string(
+            join_paths(cfg.build.out_dir, cfg.app.entry_html),
+          )) {
           Ok(html_content) => {
             let headers = Map::from_array([
               ("Content-Type", "text/html; charset=utf-8"),

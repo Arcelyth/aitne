@@ -10,11 +10,11 @@ cat > "$target_file" << 'EOF'
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Counter Example</title>
-    <script type="module" src="./_build/js/debug/build/examples/counter_mbx/counter_mbx.js"></script>
+    <title>Route Example</title>
+    <script type="module" src="./_build/js/debug/build/examples/route/route.js"></script>
 </head>
 <body>
-    
+
 </body>
 </html>
 EOF

@@ -69,4 +69,4 @@ jobs:
       - name: lint
         run: |
           moon fmt && git diff --exit-code
-          moon info src/* && git diff --exit-code
+          moon info && git diff --exit-code

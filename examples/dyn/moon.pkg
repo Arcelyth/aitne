@@ -1,8 +1,6 @@
 import {
   "Arcelyth/aitne/src/dom",
-  "Arcelyth/aitne/src/mbxc",
   "Arcelyth/aitne/src/reactive",
-  "moonbitlang/x/fs",
 }
 
 options(

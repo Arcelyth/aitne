@@ -1,12 +1,12 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "Arcelyth/aitne/examples/page_mbx"
+package "Arcelyth/aitne/examples/counter_no_mbx"
 
 import {
   "Arcelyth/aitne/src/dom",
 }
 
 // Values
-pub fn page() -> &@dom.View
+pub fn counter() -> &@dom.View
 
 // Errors
 

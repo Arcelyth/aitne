@@ -5,5 +5,4 @@ target
 .mooncakes/
 .moonagent/
 *.html
-*.mbx.mbt
 dist/

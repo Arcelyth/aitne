@@ -3,6 +3,11 @@ exp_counter:
 	chmod +x ./examples/counter/run.sh
 	./examples/counter/run.sh
 
+exp_counter_no_mbx: 
+	moon build ./examples/counter_no_mbx
+	chmod +x ./examples/counter_no_mbx/run.sh
+	./examples/counter_no_mbx/run.sh
+
 exp_page: 
 	moon build ./examples/page
 	chmod +x ./examples/page/run.sh
@@ -18,27 +23,6 @@ exp_todo:
 	chmod +x ./examples/todo/run.sh
 	./examples/todo/run.sh
 	
-# use mbx format
-exp_counter2: 
-	moon build ./examples/counter_mbx
-	chmod +x ./examples/counter_mbx/run.sh
-	./examples/counter_mbx/run.sh
-
-exp_page2: 
-	moon build ./examples/page_mbx
-	chmod +x ./examples/page_mbx/run.sh
-	./examples/page_mbx/run.sh
-
-exp_todo2: 
-	moon build ./examples/todo_mbx
-	chmod +x ./examples/todo_mbx/run.sh
-	./examples/todo_mbx/run.sh
-
-exp_route2: 
-	moon build ./examples/route_mbx
-	chmod +x ./examples/route_mbx/run.sh
-	./examples/route_mbx/run.sh
-
 exp_dyn: 
 	moon build ./examples/dyn/
 	chmod +x ./examples/dyn/run.sh

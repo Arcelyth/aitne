@@ -33,21 +33,25 @@ fn todo_app() -> &View {
     set_todo.set(new_list)
   }
 
-  div().children([
-    h1().children([text("Todo List")]),
-    div().children([text_dyn(fn() { todo.get().length().to_string() })]),
-    div().children([
-      input()
-      .attr("type", "text")
-      .value(input_val)
-      .on(Input, ev => set_input_val.set(event_target_value(ev))),
-      button().on(Click, add_item).children([text("Add")]),
+  @Arcelyth/aitne/src/dom.div(children=[
+    @Arcelyth/aitne/src/dom.h1(children=["Todo List"]),
+    @Arcelyth/aitne/src/dom.div(children=[
+      @Arcelyth/aitne/src/dom.text_dyn(() => todo.get().length().to_string()),
     ]),
-    ul().children([
+    @Arcelyth/aitne/src/dom.div(children=[
+      @Arcelyth/aitne/src/dom.input()
+      .value(input_val)
+      .attr("type", "text")
+      .on(Input, ev => set_input_val.set(event_target_value(ev))),
+      @Arcelyth/aitne/src/dom.button(children=["Add"]).on(Click, add_item),
+    ]),
+    @Arcelyth/aitne/src/dom.ul(children=[
       for_node(() => todo.get(), item => { return item }, item => {
-        li().children([
-          text(item),
-          button().on(Click, _ => remove_item(item)).children([text("Delete")]),
+        @Arcelyth/aitne/src/dom.li(children=[
+          @Arcelyth/aitne/src/dom.text_dyn(() => item),
+          @Arcelyth/aitne/src/dom.button(children=["\"Delete\""]).on(Click, _ => {
+            remove_item(item)
+          }),
         ])
       }),
     ]),

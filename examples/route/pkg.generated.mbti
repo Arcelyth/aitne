@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "Arcelyth/aitne/examples/route_mbx"
+package "Arcelyth/aitne/examples/route"
 
 import {
   "Arcelyth/aitne/src/dom",

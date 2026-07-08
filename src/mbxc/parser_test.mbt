@@ -24,8 +24,26 @@ test "parse valid mbx node with attributes and dynamic expression" {
   let parser = Parser::new(tokens)
   let result = parser.parse()
 
-  inspect(
+  debug_inspect(
     result,
-    content="[ElementNode(div, HashMap::from_array([({ns: None, name: eat}, Expr(() => omg()))]), [RawText( ), DynamicCode([PureCode(() => ), ElementNode(div, HashMap::from_array([]), [])]), RawText( )])]",
+    content=(
+      #|[
+      #|  ElementNode(
+      #|    <StringView: "div">,
+      #|    <HashMap:
+      #|      { { ns: None, name: <StringView: "eat"> }: Expr(<StringView: "() => omg()">) }>,
+      #|    [
+      #|      RawText(<StringView: " ">),
+      #|      DynamicCode(
+      #|        [
+      #|          PureCode(<StringView: "() => ">),
+      #|          ElementNode(<StringView: "div">, <HashMap: {}>, []),
+      #|        ],
+      #|      ),
+      #|      RawText(<StringView: " ">),
+      #|    ],
+      #|  ),
+      #|]
+    ),
   )
 }

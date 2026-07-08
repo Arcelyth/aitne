@@ -13,13 +13,13 @@ pub let builtin_elements : @hashset.HashSet[String]
 pub fn from_file(String, show? : Bool, to? : String?, tmp? : Bool) -> String?
 
 // Errors
-type MbxcError derive(Show, @debug.Debug)
+type MbxcError derive(@debug.Debug)
 
 // Types and methods
 pub(all) enum AttrValue {
   Str(StringView)
   Expr(StringView)
-} derive(Eq, Show, @debug.Debug)
+} derive(Eq, @debug.Debug)
 
 pub struct CodeGen {
   buf : StringBuilder
@@ -34,7 +34,7 @@ pub fn CodeGenTmp::generate(Self) -> String
 pub fn CodeGenTmp::new(Array[MbxAST]) -> Self
 
 pub struct DocTag {
-} derive(Eq, Show, @debug.Debug)
+} derive(Eq, @debug.Debug)
 
 pub(all) struct Lexer {
   src : String
@@ -56,7 +56,7 @@ pub(all) enum MbxAST {
   RawText(StringView)
   DynamicCode(Array[MbxAST])
   ElementNode(StringView, @hashmap.HashMap[TokenAttr, AttrValue], Array[MbxAST])
-} derive(Eq, Show, @debug.Debug)
+} derive(Eq, @debug.Debug)
 
 pub(all) struct Parser {
   tokens : Array[Token]
@@ -67,17 +67,17 @@ pub fn Parser::parse(Self) -> Array[MbxAST] raise MbxcError
 
 pub(all) struct TagClose {
   tag : StringView
-} derive(Eq, Show, @debug.Debug)
+} derive(Eq, @debug.Debug)
 
 pub(all) struct TagOpen {
   tag : StringView
   attrs : @hashmap.HashMap[TokenAttr, AttrValue]
-} derive(Eq, Show, @debug.Debug)
+} derive(Eq, @debug.Debug)
 
 pub(all) struct TagSelfClose {
   tag : StringView
   attrs : @hashmap.HashMap[TokenAttr, AttrValue]
-} derive(Eq, Show, @debug.Debug)
+} derive(Eq, @debug.Debug)
 
 pub(all) enum Token {
   TagOpen(TagOpen)
@@ -90,12 +90,12 @@ pub(all) enum Token {
   BraceClose
   HashBraceOpen
   HashBraceClose
-} derive(Eq, Show, @debug.Debug)
+} derive(Eq, @debug.Debug)
 
 pub(all) struct TokenAttr {
   ns : StringView?
   name : StringView
-} derive(Eq, Hash, Show, @debug.Debug)
+} derive(Eq, Hash, @debug.Debug)
 
 // Type aliases
 

@@ -180,9 +180,9 @@ async fn main {
         Ok(cfg) =>
           match (try? @eirene.start_server(cfg)) {
             Ok(_) => ()
-            Err(err) => println("Server Error: \{err}")
+            Err(err) => debug("Server Error: \{to_repr(err)}")
           }
-        Err(err) => println("Config Error: \{err}")
+        Err(err) => debug("Config Error: \{to_repr(err)}")
       }
     }
     "init" => {

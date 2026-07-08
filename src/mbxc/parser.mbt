@@ -2,7 +2,7 @@
 suberror MbxcError {
   LexerError(String)
   ParserError(String)
-} derive(Debug, Show)
+} derive(Debug)
 
 ///|
 pub(all) enum MbxAST {
@@ -11,7 +11,7 @@ pub(all) enum MbxAST {
   DynamicCode(Array[MbxAST])
   // name, attrs, children
   ElementNode(StringView, HashMap[TokenAttr, AttrValue], Array[MbxAST])
-} derive(Debug, Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub(all) struct Parser {

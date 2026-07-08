@@ -403,7 +403,7 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
         }
         if next_c == '/' && self.peek(1) == Some('/') {
           self.cur += 2
-          try! self.scan_comment()
+          self.scan_comment()
           continue
         }
         if self.is_raw_boundary(next_c) {

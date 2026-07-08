@@ -9,19 +9,19 @@ import {
 pub fn load_config(String) -> Config raise EireneError
 
 // Errors
-type EireneError derive(Show, @debug.Debug)
+type EireneError derive(@debug.Debug)
 
 // Types and methods
 pub struct AppConfig {
   name : String
   mode : CfgMode
   entry_html : String
-} derive(Show, @debug.Debug)
+} derive(@debug.Debug)
 
 pub struct AssetsConfig {
   static_dir : String
   inject_scripts : Array[String]
-} derive(Show, @debug.Debug)
+} derive(@debug.Debug)
 
 pub struct BuildConfig {
   target : CfgTarget
@@ -31,23 +31,23 @@ pub struct BuildConfig {
   minify : Bool
   sourcemap : Bool
   experimental_wasm_gc : Bool
-} derive(Show, @debug.Debug)
+} derive(@debug.Debug)
 
 pub enum CfgMode {
   Development
   Production
-} derive(Show, @debug.Debug)
+} derive(@debug.Debug)
 
 pub enum CfgTarget {
   Js
-} derive(Show, @debug.Debug)
+} derive(@debug.Debug)
 
 pub struct Config {
   app : AppConfig
   build : BuildConfig
   server : ServerConfig
   assets : AssetsConfig
-} derive(Show, @debug.Debug)
+} derive(@debug.Debug)
 
 pub struct ServerConfig {
   host : String
@@ -57,7 +57,7 @@ pub struct ServerConfig {
   hmr_port : Int
   https_enabled : Bool
   proxy : Map[String, String]
-} derive(Show, @debug.Debug)
+} derive(@debug.Debug)
 
 // Type aliases
 

@@ -212,7 +212,7 @@ pub fn[T, C] HtmlElement::add_attr(
 ///|
 /// Shorthand: set a DOM property.
 #alias(attr)
-pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::prop(
+pub fn[T, C, P : IntoProperty] HtmlElement::prop(
   self : HtmlElement[T, C],
   key : String,
   value : P,
@@ -221,7 +221,7 @@ pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::prop(
 }
 
 ///|
-pub fn[T : ElementType, C : Render, Cl : IntoClass] HtmlElement::class(
+pub fn[T, C, Cl : IntoClass] HtmlElement::class(
   self : HtmlElement[T, C],
   class : Cl,
 ) -> HtmlElement[T, C] {
@@ -230,7 +230,7 @@ pub fn[T : ElementType, C : Render, Cl : IntoClass] HtmlElement::class(
 
 ///|
 /// Shorthand: bind a reactive value to the "value" property.
-pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::value(
+pub fn[T, C, P : IntoProperty] HtmlElement::value(
   self : HtmlElement[T, C],
   getter : P,
 ) -> HtmlElement[T, C] {
@@ -239,7 +239,7 @@ pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::value(
 
 ///|
 /// Attach an event listener.
-pub fn[T : ElementType, C : Render] HtmlElement::on(
+pub fn[T, C] HtmlElement::on(
   self : HtmlElement[T, C],
   ev : EventType,
   fun : (@ffi.Event) -> Unit,
@@ -250,7 +250,7 @@ pub fn[T : ElementType, C : Render] HtmlElement::on(
 
 ///|
 /// Set inline styles.
-pub fn[T : ElementType, C : Render, S : IntoStyle] HtmlElement::style(
+pub fn[T, C, S : IntoStyle] HtmlElement::style(
   self : HtmlElement[T, C],
   s : S,
 ) -> HtmlElement[T, C] {

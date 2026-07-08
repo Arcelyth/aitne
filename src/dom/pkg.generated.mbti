@@ -404,12 +404,12 @@ pub(all) struct HtmlElement[T, C] {
 }
 pub fn[T, C] HtmlElement::add_attr(Self[T, C], &Attribute) -> Self[T, C]
 pub fn[T, C] HtmlElement::children(Self[T, C], Array[&View]) -> Self[T, Array[&View]]
-pub fn[T : ElementType, C : Render, Cl : IntoClass] HtmlElement::class(Self[T, C], Cl) -> Self[T, C]
-pub fn[T : ElementType, C : Render] HtmlElement::on(Self[T, C], EventType, (@ffi.Event) -> Unit) -> Self[T, C]
+pub fn[T, C, Cl : IntoClass] HtmlElement::class(Self[T, C], Cl) -> Self[T, C]
+pub fn[T, C] HtmlElement::on(Self[T, C], EventType, (@ffi.Event) -> Unit) -> Self[T, C]
 #alias(attr)
-pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::prop(Self[T, C], String, P) -> Self[T, C]
-pub fn[T : ElementType, C : Render, S : IntoStyle] HtmlElement::style(Self[T, C], S) -> Self[T, C]
-pub fn[T : ElementType, C : Render, P : IntoProperty] HtmlElement::value(Self[T, C], P) -> Self[T, C]
+pub fn[T, C, P : IntoProperty] HtmlElement::prop(Self[T, C], String, P) -> Self[T, C]
+pub fn[T, C, S : IntoStyle] HtmlElement::style(Self[T, C], S) -> Self[T, C]
+pub fn[T, C, P : IntoProperty] HtmlElement::value(Self[T, C], P) -> Self[T, C]
 pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C]
 pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C]
 pub impl[T : ElementType, C : Render + RenderHtml] View for HtmlElement[T, C]

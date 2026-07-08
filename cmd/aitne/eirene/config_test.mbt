@@ -31,31 +31,68 @@ test "load config" {
     #| inject_scripts = ["https://cdn.com/a.js", "https://cdn.com/b.js"]
 
   let config = try! load_config(toml_content)
-  inspect(config.app.name, content="cyber-dashboard")
-  inspect(config.app.mode, content="Production")
-  inspect(config.app.entry_html, content="main.html")
-
-  inspect(config.build.target, content="Js")
-  inspect(config.build.src_dir, content="source")
-  inspect(config.build.out_dir, content="build")
-  inspect(config.build.public_path, content="/assets/")
-  inspect(config.build.minify, content="true")
-  inspect(config.build.sourcemap, content="false")
-  inspect(config.build.experimental_wasm_gc, content="true")
-
-  inspect(config.server.host, content="0.0.0.0")
-  inspect(config.server.port, content="3000")
-  inspect(config.server.spa_fallback, content="false")
-  inspect(config.server.hmr_enabled, content="false")
-  inspect(config.server.hmr_port, content="9999")
-  inspect(config.server.https_enabled, content="true")
-  inspect(
-    config.server.proxy.get("/api"),
-    content="Some(http://backend-service)",
+  debug_inspect(
+    config.app.name,
+    content=(
+      #|"cyber-dashboard"
+    ),
+  )
+  debug_inspect(config.app.mode, content="Production")
+  debug_inspect(
+    config.app.entry_html,
+    content=(
+      #|"main.html"
+    ),
   )
 
-  inspect(config.assets.static_dir, content="static")
-  inspect(config.assets.inject_scripts.length(), content="2")
+  debug_inspect(config.build.target, content="Js")
+  debug_inspect(
+    config.build.src_dir,
+    content=(
+      #|"source"
+    ),
+  )
+  debug_inspect(
+    config.build.out_dir,
+    content=(
+      #|"build"
+    ),
+  )
+  debug_inspect(
+    config.build.public_path,
+    content=(
+      #|"/assets/"
+    ),
+  )
+  debug_inspect(config.build.minify, content="true")
+  debug_inspect(config.build.sourcemap, content="false")
+  debug_inspect(config.build.experimental_wasm_gc, content="true")
+
+  debug_inspect(
+    config.server.host,
+    content=(
+      #|"0.0.0.0"
+    ),
+  )
+  debug_inspect(config.server.port, content="3000")
+  debug_inspect(config.server.spa_fallback, content="false")
+  debug_inspect(config.server.hmr_enabled, content="false")
+  debug_inspect(config.server.hmr_port, content="9999")
+  debug_inspect(config.server.https_enabled, content="true")
+  debug_inspect(
+    config.server.proxy.get("/api"),
+    content=(
+      #|Some("http://backend-service")
+    ),
+  )
+
+  debug_inspect(
+    config.assets.static_dir,
+    content=(
+      #|"static"
+    ),
+  )
+  debug_inspect(config.assets.inject_scripts.length(), content="2")
 }
 
 ///|
@@ -65,18 +102,43 @@ test "load minimal config" {
     #| name = "minimal-app"
 
   let config = try! load_config(toml_content)
-  inspect(config.app.name, content="minimal-app")
+  debug_inspect(
+    config.app.name,
+    content=(
+      #|"minimal-app"
+    ),
+  )
 
-  inspect(config.app.mode, content="Development")
-  inspect(config.app.entry_html, content="index.html")
+  debug_inspect(config.app.mode, content="Development")
+  debug_inspect(
+    config.app.entry_html,
+    content=(
+      #|"index.html"
+    ),
+  )
 
-  inspect(config.build.target, content="Js")
-  inspect(config.build.src_dir, content="src")
-  inspect(config.build.out_dir, content="dist")
-  inspect(config.build.minify, content="false")
+  debug_inspect(config.build.target, content="Js")
+  debug_inspect(
+    config.build.src_dir,
+    content=(
+      #|"src"
+    ),
+  )
+  debug_inspect(
+    config.build.out_dir,
+    content=(
+      #|"dist"
+    ),
+  )
+  debug_inspect(config.build.minify, content="false")
 
-  inspect(config.server.host, content="127.0.0.1")
-  inspect(config.server.port, content="8000")
-  inspect(config.server.spa_fallback, content="true")
-  inspect(config.server.proxy.length(), content="0")
+  debug_inspect(
+    config.server.host,
+    content=(
+      #|"127.0.0.1"
+    ),
+  )
+  debug_inspect(config.server.port, content="8000")
+  debug_inspect(config.server.spa_fallback, content="true")
+  debug_inspect(config.server.proxy.length(), content="0")
 }

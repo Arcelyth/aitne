@@ -1,25 +1,25 @@
 ///|
 suberror EireneError {
   TomlError(String)
-} derive(Debug, Show)
+} derive(Debug)
 
 ///|
 pub enum CfgTarget {
   Js
-} derive(Debug, Show)
+} derive(Debug)
 
 ///|
 pub enum CfgMode {
   Development
   Production
-} derive(Debug, Show)
+} derive(Debug)
 
 ///|
 pub struct AppConfig {
   name : String
   mode : CfgMode
   entry_html : String
-} derive(Debug, Show)
+} derive(Debug)
 
 ///|
 pub struct BuildConfig {
@@ -30,7 +30,7 @@ pub struct BuildConfig {
   minify : Bool
   sourcemap : Bool
   experimental_wasm_gc : Bool
-} derive(Debug, Show)
+} derive(Debug)
 
 ///|
 pub struct ServerConfig {
@@ -41,13 +41,13 @@ pub struct ServerConfig {
   hmr_port : Int
   https_enabled : Bool
   proxy : Map[String, String]
-} derive(Debug, Show)
+} derive(Debug)
 
 ///|
 pub struct AssetsConfig {
   static_dir : String
   inject_scripts : Array[String]
-} derive(Debug, Show)
+} derive(Debug)
 
 ///|
 /// Local server configuration, some fields are not used.
@@ -56,12 +56,12 @@ pub struct Config {
   build : BuildConfig
   server : ServerConfig
   assets : AssetsConfig
-} derive(Debug, Show)
+} derive(Debug)
 
 ///|
 pub fn load_config(toml_content : String) -> Config raise EireneError {
   let root_ast = @toml.parse(toml_content) catch {
-    err => raise TomlError("Failed to parse toml file: \{err}.")
+    err => raise TomlError("Failed to parse toml file \{to_repr(err)}.")
   }
 
   let root = match root_ast {

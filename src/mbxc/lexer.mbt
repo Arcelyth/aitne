@@ -5,31 +5,31 @@ using @hashmap {type HashMap}
 pub(all) struct TokenAttr {
   ns : StringView?
   name : StringView
-} derive(Debug, Eq, Hash, Show)
+} derive(Debug, Eq, Hash)
 
 ///|
 /// <div style="">
 pub(all) struct TagOpen {
   tag : StringView
   attrs : HashMap[TokenAttr, AttrValue]
-} derive(Debug, Eq, Show)
+} derive(Debug, Eq)
 
 ///|
 /// </div>
 pub(all) struct TagClose {
   tag : StringView
-} derive(Debug, Eq, Show)
+} derive(Debug, Eq)
 
 ///|
 /// <div />
 pub(all) struct TagSelfClose {
   tag : StringView
   attrs : HashMap[TokenAttr, AttrValue]
-} derive(Debug, Eq, Show)
+} derive(Debug, Eq)
 
 ///|
 /// <!
-pub struct DocTag {} derive(Debug, Eq, Show)
+pub struct DocTag {} derive(Debug, Eq)
 
 ///|
 pub(all) enum Token {
@@ -43,13 +43,13 @@ pub(all) enum Token {
   BraceClose // }
   HashBraceOpen // #{
   HashBraceClose // }#
-} derive(Debug, Eq, Show)
+} derive(Debug, Eq)
 
 ///|
 pub(all) enum AttrValue {
   Str(StringView)
   Expr(StringView)
-} derive(Debug, Show, Eq)
+} derive(Debug, Eq)
 
 ///|
 pub(all) struct Lexer {
@@ -403,7 +403,7 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
         }
         if next_c == '/' && self.peek(1) == Some('/') {
           self.cur += 2
-          try! self.scan_comment()
+          self.scan_comment()
           continue
         }
         if self.is_raw_boundary(next_c) {

@@ -55,6 +55,7 @@ pub enum RenderState {
   Text(TextState)
   Fragment(FragmentState)
   MultiBlock(MultiBlockState)
+  KeyedState(KeyedState)
   Router(RouterState)
 }
 
@@ -123,6 +124,14 @@ pub struct RouterState {
   outer_owner : Ref[Owner]
 }
 
+///|
+pub struct KeyedState {
+  parent : @ffi.Element?
+  marker : @ffi.Comment 
+  keys : @utils.IndexSet[&Hash]
+  rendered_items : Array[((UInt)->Unit, RenderState)?]
+}
+
 // ----- Mountable implementations -----
 
 ///|
@@ -147,6 +156,7 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
     }
     Router(s) => s.view.val.unmount()
     None => ()
+    _ => ()
   }
 }
 
@@ -189,6 +199,7 @@ pub impl Mountable for RenderState with fn mount(
     }
     Router(s) => s.view.val.mount(parent, marker)
     None => ()
+    _ => ()
   }
 }
 
@@ -265,6 +276,7 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[@ffi.Node] {
       s.view.val.elements()
     }
     None => []
+    _ => []
   }
 }
 

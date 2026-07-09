@@ -1,0 +1,10 @@
+import {
+  "moonbitlang/core/hashset",
+  "moonbitlang/core/hashmap",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/ref",
+}
+
+options(
+  supported_targets: "js",
+)

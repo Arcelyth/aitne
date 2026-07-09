@@ -155,3 +155,10 @@ pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn to_html_with_buf
 pub impl[T, K : Hash + Eq] View for ForNode[T, K] with fn style(self, _s) -> &View {
   self
 }
+
+///|
+pub(all) struct Keyed[T, K, V] {
+  item : T
+  key_fn : (T) -> K
+  view_fn : (UInt, T) -> ((UInt) -> Unit, V)
+}

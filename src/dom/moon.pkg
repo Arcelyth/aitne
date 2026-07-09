@@ -1,6 +1,7 @@
 import {
   "Arcelyth/aitne/src/reactive",
   "Arcelyth/aitne/src/ffi",
+  "Arcelyth/aitne/src/utils",
   "Arcelyth/html_escape" @escape,
   "moonbitlang/core/hashmap",
   "moonbitlang/core/hashset",

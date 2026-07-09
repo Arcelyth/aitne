@@ -156,9 +156,3 @@ pub impl[T, K : Hash + Eq] View for ForNode[T, K] with fn style(self, _s) -> &Vi
   self
 }
 
-///|
-pub(all) struct Keyed[T, K, V] {
-  item : T
-  key_fn : (T) -> K
-  view_fn : (UInt, T) -> ((UInt) -> Unit, V)
-}

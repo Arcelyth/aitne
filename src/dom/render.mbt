@@ -127,9 +127,9 @@ pub struct RouterState {
 ///|
 pub struct KeyedState {
   parent : @ffi.Element?
-  marker : @ffi.Comment 
-  keys : @utils.IndexSet[&Hash]
-  rendered_items : Array[((UInt)->Unit, RenderState)?]
+  marker : @ffi.Node
+  mut keys : Ref[@utils.IndexSet[String]]
+  rendered_items : Array[((Int) -> Unit, RenderState)?]
 }
 
 // ----- Mountable implementations -----

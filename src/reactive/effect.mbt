@@ -156,22 +156,6 @@ pub fn[T] RenderEffect::run(effect : RenderEffect[T]) -> Unit {
 }
 
 ///|
-pub fn[T] Effect::run(effect : Effect[T]) -> Unit {
-  let e = effect
-  let inner = e.inner
-
-  inner.val.stale = false
-
-  let sub : ASubscriber = { id: inner.val.id, sub: Some(inner as &Subscriber) }
-
-  let subscriber_trait = inner as &Subscriber
-  subscriber_trait.clean_sources(sub)
-  e.owner.val.with_cleanup(() => {
-    Observer::with_replace(Some(sub), fn() { let _ = (inner.val.cb)(None) })
-  })
-}
-
-///|
 pub struct Effect[T] {
   inner : Ref[EffectInner[T]]
   owner : Ref[Owner]
@@ -186,6 +170,22 @@ pub fn[T] Effect::new(cb : (T?) -> T) -> Effect[T] {
   inner.val.schedule = Some(() => schedule_effect(ref_e as &EffectRunner))
   schedule_effect(ref_e as &EffectRunner)
   e
+}
+
+///|
+pub fn[T] Effect::run(effect : Effect[T]) -> Unit {
+  let e = effect
+  let inner = e.inner
+
+  inner.val.stale = false
+
+  let sub : ASubscriber = { id: inner.val.id, sub: Some(inner as &Subscriber) }
+
+  let subscriber_trait = inner as &Subscriber
+  subscriber_trait.clean_sources(sub)
+  e.owner.val.with_cleanup(() => {
+    Observer::with_replace(Some(sub), fn() { let _ = (inner.val.cb)(None) })
+  })
 }
 
 ///|
@@ -222,4 +222,14 @@ pub impl[T] EffectRunner for RenderEffect[T] with fn get_id(self) -> UInt {
 ///|
 pub impl[T] EffectRunner for RenderEffect[T] with fn run_effect(self) -> Unit {
   RenderEffect::run(self)
+}
+
+///|
+pub fn[T] create_effect(cb : (T?) -> T) -> Unit {
+  let inner = Ref(EffectInner::new(cb))
+  let owner = Ref(Owner::new())
+  let e = Effect::{ inner, owner }
+  let ref_e = Ref(e)
+  inner.val.schedule = Some(() => schedule_effect(ref_e as &EffectRunner))
+  schedule_effect(ref_e as &EffectRunner)
 }

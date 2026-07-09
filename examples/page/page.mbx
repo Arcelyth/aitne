@@ -11,9 +11,10 @@ pub fn page() -> &View {
 }
 
 fn header_section() -> &View {
+  let title = "Aitne"
   <div class="header_section">
     <h1 style="font-size: 2.25rem; font-weight: 800; background: linear-gradient(to right, #2dd4bf, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 0.75rem 0; tracking-content: -0.025em;">
-      Aitne
+      {title}
     </h1>
     <p style="color: #94a3b8; font-size: 0.875rem; margin: 0; line-height: 1.5;">
       Build lightweight, high-performance reactive web application.

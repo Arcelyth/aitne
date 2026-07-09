@@ -103,16 +103,25 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
         }
       }
 
-      if contains_element {
-        for child in local_children {
-          self.gen_node(child)
+      let mut is_dyn_text = false
+      if !contains_element && local_children.length() > 0 {
+        match local_children[0] {
+          MbxAST::PureCode(s) | MbxAST::RawText(s) =>
+            is_dyn_text = is_code_closure(s)
+          _ => ()
         }
-      } else {
+      }
+
+      if is_dyn_text {
         self.buf.write("\{package_path}/dom.text_dyn(\n        ")
         for child in local_children {
           self.gen_node(child)
         }
         self.buf.write("\n      )")
+      } else {
+        for child in local_children {
+          self.gen_node(child)
+        }
       }
     }
     MbxAST::ElementNode(tag, attrs, children) => {
@@ -316,6 +325,60 @@ fn to_camelcase(s : String) -> String {
 }
 
 ///|
+fn is_code_closure(s : StringView) -> Bool {
+  let mut i = 0
+  let len = s.length()
+
+  fn skip_space() {
+    while i < len {
+      let c = s[i]
+      if c == ' ' || c == '\t' || c == '\n' || c == '\r' {
+        i += 1
+      } else {
+        break
+      }
+    }
+  }
+
+  skip_space()
+
+  // fn (...) {}
+  if i + 2 <= len && s[i:i + 2] == "fn" {
+    i += 2
+    skip_space()
+
+    if i < len && s[i] == '(' {
+      return true
+    }
+  }
+
+  // (...) =>
+  if i < len && s[i] == '(' {
+    let mut depth = 1
+    i += 1
+
+    while i < len && depth > 0 {
+      if s[i] == '(' {
+        depth += 1
+      } else if s[i] == ')' {
+        depth -= 1
+      }
+      i += 1
+    }
+
+    if depth == 0 {
+      skip_space()
+
+      if i + 2 <= len && s[i:i + 2] == "=>" {
+        return true
+      }
+    }
+  }
+
+  false
+}
+
+///|
 fn to_snakecase(s : String) -> String {
   let b = StringBuilder::new()
   let mut is_first = true
@@ -345,7 +408,7 @@ fn to_snakecase(s : String) -> String {
 }
 
 ///|
-test "to_snakecase_test" {
+test "to snakecase test" {
   inspect(to_snakecase("UserPage"), content="user_page")
   inspect(
     to_snakecase("AitneReactiveFramework"),
@@ -355,11 +418,21 @@ test "to_snakecase_test" {
 }
 
 ///|
-test "snake_to_camel_test" {
+test "snake to camel test" {
   inspect(to_camelcase("user_page"), content="UserPage")
   inspect(
     to_camelcase("aitne_reactive_framework"),
     content="AitneReactiveFramework",
   )
   inspect(to_camelcase("_inside_route_"), content="InsideRoute")
+}
+
+///|
+test "is code closure test" {
+  inspect(is_code_closure("()  => {}"), content="true")
+  inspect(is_code_closure("(a, b)=> {}"), content="true")
+  inspect(is_code_closure("fn()"), content="true")
+  inspect(is_code_closure("fn  ()"), content="true")
+  inspect(is_code_closure("()"), content="false")
+  inspect(is_code_closure("content"), content="false")
 }

@@ -12,6 +12,8 @@ import {
 // Values
 pub fn batch(() -> Unit) -> Unit
 
+pub fn[T] create_effect((T?) -> T) -> Unit
+
 pub fn[T] create_signal(T) -> (ReadSignal[T], WriteSignal[T])
 
 pub fn flush_scheduler() -> Unit

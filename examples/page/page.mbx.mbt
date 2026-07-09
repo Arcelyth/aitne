@@ -16,8 +16,9 @@ pub fn page() -> &View {
 
 ///|
 fn header_section() -> &View {
+  let title = "Aitne"
   @Arcelyth/aitne/src/dom.div(children=[
-    @Arcelyth/aitne/src/dom.h1(children=["Aitne"]).attr(
+    @Arcelyth/aitne/src/dom.h1(children=[title]).attr(
       "style", "font-size: 2.25rem; font-weight: 800; background: linear-gradient(to right, #2dd4bf, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0 0 0.75rem 0; tracking-content: -0.025em;",
     ),
     @Arcelyth/aitne/src/dom.p(children=[

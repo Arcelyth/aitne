@@ -5,7 +5,7 @@ using @dom {trait View}
 fn app() -> &View {
   let (count, set_count) = @reactive.create_signal(0)
 
-  let _ = @reactive.Effect::new(_ => println("Value: \{count.get()}"))
+  @reactive.create_effect(_ => println("Value: \{count.get()}"))
 
   @Arcelyth/aitne/src/dom.div(children=[
     @Arcelyth/aitne/src/dom.h1(children=["Counter"]),

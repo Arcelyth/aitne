@@ -133,6 +133,18 @@ fn Lexer::read_code_block(self : Lexer) -> StringView raise MbxcError {
   while !self.is_end() && self.brace_depth > 0 {
     let c = self.src[self.cur]
 
+    // Handle MoonBit multiline strings (#| and $|) inside code blocks
+    if (c == '#' || c == '$') && self.peek(1) == Some('|') {
+      self.cur += 2
+      while !self.is_end() && self.src[self.cur] != '\n' {
+        self.cur += 1
+      }
+      if !self.is_end() {
+        self.cur += 1
+      }
+      continue
+    }
+
     if c == '\"' || c == '\'' {
       let quote = c
       self.cur += 1
@@ -396,6 +408,19 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
     _ => {
       while !self.is_end() {
         let next_c = self.src[self.cur]
+
+        // Handle MoonBit multiline strings (#| and $|) in general RawText
+        if (next_c == '#' || next_c == '$') && self.peek(1) == Some('|') {
+          self.cur += 2
+          while !self.is_end() && self.src[self.cur] != '\n' {
+            self.cur += 1
+          }
+          if !self.is_end() {
+            self.cur += 1
+          }
+          continue
+        }
+
         if next_c == '"' {
           self.cur += 1
           try! self.scan_string()

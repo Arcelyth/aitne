@@ -4,11 +4,16 @@ let package_path = "@Arcelyth/aitne/src"
 ///|
 pub struct CodeGen {
   buf : StringBuilder
+  path : String
+  style_root : Array[String]
 }
 
 ///|
-pub fn CodeGen::new() -> CodeGen {
-  { buf: StringBuilder::new() }
+pub fn CodeGen::new(
+  path? : String = "",
+  style_root? : Array[String] = [],
+) -> CodeGen {
+  { buf: StringBuilder::new(), path, style_root }
 }
 
 ///|
@@ -268,6 +273,8 @@ fn CodeGen::gen_attr(self : CodeGen, attr : TokenAttr, val : AttrValue) -> Unit 
         self.buf.write(")")
       }
       AttrValue::Str(s) => {
+        // TODO        
+        //        let scoped_classes = scope_class_string(s.to_owned(), self.path, self.style_root)
         self.buf.write("\"")
         self.buf.write(escape_moonbit_str(s.to_owned()))
         self.buf.write("\"")

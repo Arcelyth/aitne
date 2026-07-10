@@ -10,6 +10,7 @@ test "load config" {
     #| target = "js"
     #| src_dir = "source"
     #| out_dir = "build"
+    #| style_root = ["./public", "./src"]
     #| public_path = "/assets/"
     #| minify = true
     #| sourcemap = false
@@ -58,6 +59,20 @@ test "load config" {
       #|"build"
     ),
   )
+  debug_inspect(config.build.style_root.length(), content="2")
+  debug_inspect(
+    config.build.style_root[0],
+    content=(
+      #|"./public"
+    ),
+  )
+  debug_inspect(
+    config.build.style_root[1],
+    content=(
+      #|"./src"
+    ),
+  )
+
   debug_inspect(
     config.build.public_path,
     content=(

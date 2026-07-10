@@ -1,9 +1,10 @@
 ///|
-fn compile_file(
+fn compile_mbx_file(
   path : String,
   show : Bool,
   tmp : Bool,
   out_dir : String?,
+  style_root : Array[String],
 ) -> Unit {
   if path.has_suffix(".mbx") {
     let target = match out_dir {
@@ -23,8 +24,33 @@ fn compile_file(
       }
       None => path + ".mbt"
     }
-    let _ = @mbxc.from_file(path, show~, to=Some(target), tmp~)
+    let _ = @mbxc.from_file(path, show~, to=Some(target), tmp~, style_root~)
   }
+}
+
+///|
+fn compile_style_file(
+  path : String,
+  show : Bool,
+  tmp : Bool,
+  style_dir : String,
+  style_root : Array[String],
+) -> Unit {
+  guard path.has_suffix(".css") else { return }
+
+  let mut last_slash = -1
+  for i = 0; i < path.length(); i = i + 1 {
+    if path[i] == '/' || path[i] == '\\' {
+      last_slash = i
+    }
+  }
+  let filename = if last_slash == -1 {
+    path
+  } else {
+    path[last_slash:path.length()].to_owned()
+  }
+  let target = style_dir + filename
+  let _ = @mbxc.from_css_file(path, show~, to=Some(target), tmp~, style_root)
 }
 
 ///|
@@ -33,6 +59,8 @@ pub fn walk_and_compile(
   show? : Bool = false,
   tmp? : Bool = false,
   out_dir : String?,
+  style_dir : String,
+  style_root : Array[String],
 ) -> Unit raise @fs.IOError {
   let entries = try? @fs.read_dir(dir)
   match entries {
@@ -45,9 +73,11 @@ pub fn walk_and_compile(
         let path = dir + "/" + file
 
         if @fs.is_dir(path) {
-          walk_and_compile(path, show~, tmp~, out_dir)
+          walk_and_compile(path, show~, tmp~, out_dir, style_dir, style_root)
+        } else if path.has_suffix(".mbx") {
+          compile_mbx_file(path, show, tmp, out_dir, style_root)
         } else {
-          compile_file(path, show, tmp, out_dir)
+          compile_style_file(path, show, tmp, style_dir, style_root)
         }
       }
     Err(e) => debug(e)
@@ -67,11 +97,21 @@ async fn main {
   match cmd {
     "help" => show_main_help()
     "mbxc" => {
+      let mut style_root = []
+      let content = match get_config(target_file) {
+        Some(c) => c
+        None => return
+      }
+      match (try? @eirene.load_config(content)) {
+        Ok(cfg) => style_root = cfg.build.style_root
+        Err(err) => debug("Config Error: \{to_repr(err)}")
+      }
       let mut show = false
       let mut tmp = false
       let mut help = false
       let target_dir = "."
       let mut out_dir : String? = None
+      let mut style_dir = "./dist"
 
       if arg_len == 3 && args[2] == "help" {
         show_mbxc_help()
@@ -90,6 +130,14 @@ async fn main {
               step = 2
             } else {
               println("Error: Missing path for --out-dir/-o option")
+              return
+            }
+          "--style-dir" =>
+            if i + 1 < args.length() {
+              style_dir = args[i + 1]
+              step = 2
+            } else {
+              println("Error: Missing path for --style-dir option")
               return
             }
           "--file" | "-f" =>
@@ -119,10 +167,28 @@ async fn main {
         None => ()
       }
 
+      if !@fs.path_exists(style_dir) {
+        let create_res = try? @fs.create_dir(style_dir)
+        match create_res {
+          Ok(_) => ()
+          Err(e) => {
+            println("Error: Failed to create output directory '\{style_dir}'")
+            return
+          }
+        }
+      }
+
       match target_file {
-        Some(file) => compile_file(file, show, tmp, out_dir)
+        Some(file) => compile_mbx_file(file, show, tmp, out_dir, style_root)
         None => {
-          let res = try? walk_and_compile(target_dir, show~, tmp~, out_dir)
+          let res = try? walk_and_compile(
+            target_dir,
+            show~,
+            tmp~,
+            out_dir,
+            style_dir,
+            style_root,
+          )
           match res {
             Ok(_) => ()
             Err(e) => debug(e)
@@ -152,28 +218,9 @@ async fn main {
         }
       }
 
-      let content = match target_file {
-        Some(file) =>
-          match (try? @fs.read_file_to_string("file")) {
-            Ok(f) => f
-            Err(_) => {
-              println("Failed to read file \{file}")
-              return
-            }
-          }
-        None =>
-          if @fs.path_exists("./eirene.toml") {
-            match (try? @fs.read_file_to_string("./eirene.toml")) {
-              Ok(f) => f
-              Err(err) => {
-                println("Failed to read file ./eirene.toml")
-                return
-              }
-            }
-          } else {
-            println("Error: Cannot find 'eirene.toml' at the current folder")
-            return
-          }
+      let content = match get_config(target_file) {
+        Some(c) => c
+        None => return
       }
 
       match (try? @eirene.load_config(content)) {
@@ -272,10 +319,11 @@ fn show_mbxc_help() -> Unit {
     #|Usage: aitne mbxc [options]
     #| 
     #|options: 
-    #|  --show, -s            output the compile process information
-    #|  --template, -t        use template mode [WIP]
-    #|  --out-dir, -o <path>  the output path
-    #|  --file, -f <file>     compile a specific MBX file
+    #|  --show, -s              output the compile process information
+    #|  --template, -t          use template mode [WIP]
+    #|  --out-dir, -o <path>    the output path
+    #|  --style-dir <path>      the style's path
+    #|  --file, -f <file>       compile a specific MBX file
 
   println(content)
 }
@@ -286,7 +334,7 @@ fn show_run_help() -> Unit {
     #|Usage: aitne mbxc [options]
     #| 
     #|options: 
-    #|  --file, -f <file>     specify an eirene.toml file
+    #|  --file, -f <file>       specify an eirene.toml file
 
   println(content)
 }
@@ -302,4 +350,31 @@ fn show_init_help() -> Unit {
     #|  --list-remote, -lr        list all the usable templates from github
 
   println(content)
+}
+
+///|
+fn get_config(target_file : String?) -> String? {
+  match target_file {
+    Some(file) =>
+      match (try? @fs.read_file_to_string("file")) {
+        Ok(f) => Some(f)
+        Err(_) => {
+          println("Failed to read file \{file}")
+          return None
+        }
+      }
+    None =>
+      if @fs.path_exists("./eirene.toml") {
+        match (try? @fs.read_file_to_string("./eirene.toml")) {
+          Ok(f) => Some(f)
+          Err(err) => {
+            println("Failed to read file ./eirene.toml")
+            return None
+          }
+        }
+      } else {
+        println("Error: Cannot find 'eirene.toml' at the current folder")
+        return None
+      }
+  }
 }

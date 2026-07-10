@@ -57,3 +57,9 @@ mbxc_test:
 
 mbxc_run: 
 	moon run cmd/aitne --target=native -- mbxc
+
+build_cmd: 
+	moon build cmd/aitne --target=native
+	
+build_cmd_r: 
+	moon build cmd/aitne --target=native --release

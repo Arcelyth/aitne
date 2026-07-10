@@ -27,6 +27,7 @@ pub struct BuildConfig {
   target : CfgTarget
   src_dir : String
   out_dir : String
+  style_root : Array[String]
   public_path : String
   minify : Bool
   sourcemap : Bool

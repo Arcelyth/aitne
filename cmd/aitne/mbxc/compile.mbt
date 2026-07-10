@@ -7,6 +7,7 @@ pub fn from_file(
   show? : Bool = false,
   to? : String? = None,
   tmp? : Bool = false,
+  style_root? : Array[String] = [],
 ) -> String? {
   let res = try? @fs.read_file_to_string(path)
   match res {
@@ -33,7 +34,7 @@ pub fn from_file(
         let codegen = CodeGenTmp::new(asts)
         codegen.generate()
       } else {
-        let codegen = CodeGen::new()
+        let codegen = CodeGen::new(path~, style_root~)
         codegen.generate(asts)
       }
       match to {

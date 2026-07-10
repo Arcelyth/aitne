@@ -26,6 +26,7 @@ pub struct BuildConfig {
   target : CfgTarget
   src_dir : String
   out_dir : String
+  style_root : Array[String]
   public_path : String
   minify : Bool
   sourcemap : Bool
@@ -98,6 +99,7 @@ pub fn load_config(toml_content : String) -> Config raise EireneError {
     target,
     src_dir: get_string(build_table, "src_dir", "src"),
     out_dir: get_string(build_table, "out_dir", "dist"),
+    style_root: get_string_array(build_table, "style_root"),
     public_path: get_string(build_table, "public_path", "/"),
     minify: get_bool(build_table, "minify", false),
     sourcemap: get_bool(build_table, "sourcemap", true),

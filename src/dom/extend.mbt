@@ -156,3 +156,90 @@ pub impl[T, K : Hash + Eq] View for ForNode[T, K] with fn style(self, _s) -> &Vi
   self
 }
 
+///|
+pub struct ForEach[T] {
+  each : () -> Iter[T]
+  key : (T) -> String
+  render : (T) -> &View
+}
+
+///|
+pub fn[T] for_each(
+  each~ : () -> Iter[T],
+  key~ : (T) -> String,
+  render~ : (T) -> &View,
+) -> &View {
+  ForEach::{ each, key, render }
+}
+
+///|
+pub impl[T] Render for ForEach[T] with fn build(self) -> RenderState {
+  let each_fn = self.each
+  let key_fn = self.key
+  let render_fn = self.render
+
+  let owner = match Owner::current() {
+    Some(o) => o
+    None => panic()
+  }
+  let c = (_, child) => {
+    let child_owner = owner.with_(Owner::new)
+    let view = child_owner.with_(() => render_fn(child))
+    let dispose = _ => child_owner.cleanup()
+    (dispose, OwnedView::new_with_owner(child_owner, view))
+  }
+  let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c }
+  let state_ref : Ref[RenderState] = Ref(keyed.build())
+
+  let do_reconcile = fn(_) {
+    let _items = each_fn()
+    match state_ref.val {
+      RenderState::KeyedState(_) => {
+        let c = (_, child) => {
+          let child_owner = owner.with_(Owner::new)
+          let view = child_owner.with_(() => render_fn(child))
+          let dispose = _ => child_owner.cleanup()
+          (dispose, OwnedView::new_with_owner(child_owner, view))
+        }
+        let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c }
+        keyed.rebuild(state_ref)
+      }
+      _ => ()
+    }
+  }
+
+  let _ = @reactive.Effect::new(do_reconcile)
+
+  state_ref.val
+}
+
+///|
+pub impl[T] Render for ForEach[T] with fn rebuild(
+  _self,
+  _state : Ref[RenderState],
+) -> Unit {
+
+}
+
+///|
+pub impl[T] RenderHtml for ForEach[T] with fn html_len(self) -> Int {
+  let mut len = 0
+  let items = (self.each)()
+  for item in items {
+    len += (self.render)(item).html_len()
+  }
+  len
+}
+
+///|
+pub impl[T] RenderHtml for ForEach[T] with fn to_html_with_buf(self, buf, pos) -> Unit {
+  let items = (self.each)()
+  for item in items {
+    (self.render)(item).to_html_with_buf(buf, pos)
+  }
+}
+
+///|
+pub impl[T] View for ForEach[T] with fn style(self, _s) -> &View {
+  self
+}

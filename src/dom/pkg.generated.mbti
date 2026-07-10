@@ -4,6 +4,7 @@ package "Arcelyth/aitne/src/dom"
 import {
   "Arcelyth/aitne/src/ffi",
   "Arcelyth/aitne/src/reactive",
+  "Arcelyth/aitne/src/utils",
   "moonbitlang/core/debug",
   "moonbitlang/core/ref",
 }
@@ -20,6 +21,8 @@ pub fn add_event_listener_capture(@ffi.Element, String, (@ffi.Event) -> Unit) ->
 pub fn address(children? : Array[&View]) -> HtmlElement[TagAddress, Array[&View]]
 
 pub fn anchor(href~ : String, children~ : Array[&View]) -> &View
+
+pub fn[T, V : Render] apply_diff(@ffi.Element?, @ffi.Node, Diff, Array[((Int) -> Unit, RenderState)?], (Int, T) -> ((Int) -> Unit, V), Array[T?]) -> Unit
 
 pub fn area(children? : Array[&View]) -> HtmlElement[TagArea, Array[&View]]
 
@@ -77,6 +80,8 @@ pub fn dfn(children? : Array[&View]) -> HtmlElement[TagDfn, Array[&View]]
 
 pub fn dialog(children? : Array[&View]) -> HtmlElement[TagDialog, Array[&View]]
 
+pub fn diff(@utils.IndexSet[String], @utils.IndexSet[String]) -> Diff
+
 pub fn div(children? : Array[&View]) -> HtmlElement[TagDiv, Array[&View]]
 
 pub fn dl(children? : Array[&View]) -> HtmlElement[TagDl, Array[&View]]
@@ -106,6 +111,8 @@ pub fn figcaption(children? : Array[&View]) -> HtmlElement[TagFigcaption, Array[
 pub fn figure(children? : Array[&View]) -> HtmlElement[TagFigure, Array[&View]]
 
 pub fn footer(children? : Array[&View]) -> HtmlElement[TagFooter, Array[&View]]
+
+pub fn[T] for_each(each~ : () -> Iter[T], key~ : (T) -> String, render~ : (T) -> &View) -> &View
 
 pub fn[T, K : Hash + Eq] for_node(() -> Array[T], (T) -> K, (T) -> &View) -> &View
 
@@ -350,6 +357,35 @@ pub impl @reactive.TypeName for BrowserUrl
 pub(all) struct Class[C](C)
 pub impl[C : IntoClass] Attribute for Class[C]
 
+pub struct Diff {
+  removed : Array[DiffOpRemove]
+  moved : Array[DiffOpMove]
+  added : Array[DiffOpAdd]
+  items_to_move : Int
+  clear : Bool
+}
+
+pub struct DiffOpAdd {
+  at : Int
+  mode : DiffOpAddMode
+}
+
+pub enum DiffOpAddMode {
+  Normal
+  Append
+} derive(Eq)
+
+pub struct DiffOpMove {
+  from : Int
+  to : Int
+  mut len : Int
+  move_in_dom : Bool
+}
+
+pub struct DiffOpRemove {
+  at : Int
+}
+
 pub struct DomCache {
   mut window : @ffi.Window?
   mut document : @ffi.Document?
@@ -384,6 +420,15 @@ pub(all) enum EventType {
 }
 pub fn EventType::to_string(Self) -> String
 
+pub struct ForEach[T] {
+  each : () -> Iter[T]
+  key : (T) -> String
+  render : (T) -> &View
+}
+pub impl[T] Render for ForEach[T]
+pub impl[T] RenderHtml for ForEach[T]
+pub impl[T] View for ForEach[T]
+
 pub struct ForNode[T, K] {
   each : () -> Array[T]
   key : (T) -> K
@@ -413,6 +458,22 @@ pub fn[T, C, P : IntoProperty] HtmlElement::value(Self[T, C], P) -> Self[T, C]
 pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C]
 pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C]
 pub impl[T : ElementType, C : Render + RenderHtml] View for HtmlElement[T, C]
+
+pub(all) struct Keyed[T, V] {
+  items : () -> Iter[T]
+  key_fn : (T) -> String
+  view_fn : (Int, T) -> ((Int) -> Unit, V)
+}
+pub impl[T, V : Render] Render for Keyed[T, V]
+pub impl[T, V : Render] RenderHtml for Keyed[T, V]
+pub impl[T, V : Render] View for Keyed[T, V]
+
+pub struct KeyedState {
+  mut parent : @ffi.Element?
+  marker : @ffi.Node
+  mut keys : @ref.Ref[@utils.IndexSet[String]]
+  rendered_items : Array[((Int) -> Unit, RenderState)?]
+}
 
 pub(all) struct Location {
   pathname : @reactive.Memo[String]
@@ -492,6 +553,22 @@ pub impl Render for OutletView
 pub impl RenderHtml for OutletView
 pub impl View for OutletView
 
+pub struct OwnedView[T] {
+  owner : @reactive.Owner
+  view : T
+}
+pub fn[T] OwnedView::new(T) -> Self[T]
+pub fn[T] OwnedView::new_with_owner(@reactive.Owner, T) -> Self[T]
+pub impl[T : Render] Render for OwnedView[T]
+pub impl[T : RenderHtml] RenderHtml for OwnedView[T]
+
+pub struct OwnedViewState {
+  state : @ref.Ref[RenderState]
+  owner : @reactive.Owner
+}
+pub fn OwnedViewState::new(RenderState, @reactive.Owner) -> Self
+pub impl Mountable for OwnedViewState
+
 pub struct Params(Array[(String, Array[String])]) derive(Eq, @debug.Debug)
 pub fn Params::add(Self, String, String) -> Unit
 pub fn Params::contains(Self, String) -> Bool
@@ -529,7 +606,9 @@ pub enum RenderState {
   Text(TextState)
   Fragment(FragmentState)
   MultiBlock(MultiBlockState)
+  KeyedState(KeyedState)
   Router(RouterState)
+  OwnedViewState(OwnedViewState)
 }
 pub impl Mountable for RenderState
 

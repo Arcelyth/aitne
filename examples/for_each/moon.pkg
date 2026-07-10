@@ -1,0 +1,10 @@
+import {
+  "Arcelyth/aitne/src/dom",
+  "Arcelyth/aitne/src/ffi",
+  "Arcelyth/aitne/src/reactive",
+}
+
+options(
+  "is-main": true,
+  supported_targets: "js",
+)

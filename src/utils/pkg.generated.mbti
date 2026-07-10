@@ -1,0 +1,32 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Arcelyth/aitne/src/utils"
+
+import {
+  "moonbitlang/core/hashmap",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct IndexSet[K] {
+  keys : Array[K]
+  key_index : @hashmap.HashMap[K, Int]
+}
+pub fn[K] IndexSet::clear(Self[K]) -> Unit
+pub fn[K : Hash + Eq] IndexSet::contains(Self[K], K) -> Bool
+pub fn[K] IndexSet::get(Self[K], Int) -> K?
+pub fn[K : Hash + Eq] IndexSet::get_index(Self[K], K) -> Int?
+pub fn[K : Hash + Eq] IndexSet::insert(Self[K], K) -> Bool
+pub fn[K] IndexSet::is_empty(Self[K]) -> Bool
+pub fn[K] IndexSet::iter(Self[K]) -> Iter[K]
+pub fn[K] IndexSet::length(Self[K]) -> Int
+pub fn[K : Hash + Eq] IndexSet::new() -> Self[K]
+pub fn[K : Hash + Eq] IndexSet::shift_remove(Self[K], K) -> Bool
+pub fn[K : Hash + Eq] IndexSet::swap_remove(Self[K], K) -> Bool
+
+// Type aliases
+
+// Traits
+

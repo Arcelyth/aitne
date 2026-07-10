@@ -1,13 +1,13 @@
 ///|
 pub(all) struct Keyed[T, V] {
-  items : Iter[T]
+  items : () -> Iter[T]
   key_fn : (T) -> String
   view_fn : (Int, T) -> ((Int) -> Unit, V)
 }
 
 ///|
 pub impl[T, V : Render] Render for Keyed[T, V] with fn build(self) -> RenderState {
-  let items = self.items
+  let items = (self.items)()
   let keys = Ref(@utils.IndexSet::new())
   let rendered_items = []
   items.eachi((idx, item) => {
@@ -30,7 +30,7 @@ pub impl[T, V : Render] Render for Keyed[T, V] with fn rebuild(
 ) -> Unit {
   match state.val {
     RenderState::KeyedState({ parent, marker, keys, rendered_items }) => {
-      let new_items = self.items
+      let new_items = (self.items)()
       let new_keys = @utils.IndexSet::new()
       let items = []
 
@@ -45,6 +45,27 @@ pub impl[T, V : Render] Render for Keyed[T, V] with fn rebuild(
     }
     _ => ()
   }
+}
+
+///|
+pub impl[T, V : Render] View for Keyed[T, V] with fn style(_s, _d) {
+
+}
+
+///|
+pub impl[T, V : Render] RenderHtml for Keyed[T, V] with fn html_len(_self) -> Int {
+  // TODO
+  0
+}
+
+///|
+pub impl[T, V : Render] RenderHtml for Keyed[T, V] with fn to_html_with_buf(
+  _self,
+  _buf,
+  _position,
+) -> Unit {
+  // TODO
+  ()
 }
 
 ///|
@@ -320,4 +341,12 @@ pub fn[T, V : Render] apply_diff(
       Some(_) => k = k + 1
     }
   }
+}
+
+///|
+pub struct KeyedState {
+  mut parent : @ffi.Element?
+  marker : @ffi.Node
+  mut keys : Ref[@utils.IndexSet[String]]
+  rendered_items : Array[((Int) -> Unit, RenderState)?]
 }

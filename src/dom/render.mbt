@@ -57,6 +57,7 @@ pub enum RenderState {
   MultiBlock(MultiBlockState)
   KeyedState(KeyedState)
   Router(RouterState)
+  OwnedViewState(OwnedViewState)
 }
 
 ///|
@@ -124,14 +125,6 @@ pub struct RouterState {
   outer_owner : Ref[Owner]
 }
 
-///|
-pub struct KeyedState {
-  parent : @ffi.Element?
-  marker : @ffi.Node
-  mut keys : Ref[@utils.IndexSet[String]]
-  rendered_items : Array[((Int) -> Unit, RenderState)?]
-}
-
 // ----- Mountable implementations -----
 
 ///|
@@ -155,8 +148,17 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
       @ffi.dom_remove(s.end_anchor)
     }
     Router(s) => s.view.val.unmount()
+    KeyedState(s) => {
+      @ffi.dom_remove(s.marker)
+      for child in s.rendered_items {
+        match child {
+          Some((_, child_state)) => child_state.unmount()
+          None => ()
+        }
+      }
+    }
+    OwnedViewState(s) => s.unmount()
     None => ()
-    _ => ()
   }
 }
 
@@ -198,8 +200,18 @@ pub impl Mountable for RenderState with fn mount(
       }
     }
     Router(s) => s.view.val.mount(parent, marker)
+    KeyedState(s) => {
+      s.parent = Some(@ffi.node_as_element(parent))
+      @ffi.dom_insert_before(parent, s.marker, marker)
+      for child in s.rendered_items {
+        match child {
+          Some((_, child_state)) => child_state.mount(parent, s.marker)
+          None => ()
+        }
+      }
+    }
+    OwnedViewState(s) => s.mount(parent, marker)
     None => ()
-    _ => ()
   }
 }
 

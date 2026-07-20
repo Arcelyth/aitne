@@ -3,7 +3,8 @@ import {
   "Arcelyth/aitne/src/reactive",
 }
 
+pkgtype(kind: "executable")
+
 options(
-  "is-main": true,
   supported_targets: "js",
 )

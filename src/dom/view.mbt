@@ -15,3 +15,9 @@ pub impl View for Unit with fn style(_self, _i) -> &View {
 pub impl View for String with fn style(self, _s : &IntoStyle) -> &View {
   text(self)
 }
+
+///|
+pub extend &View with Render::{build, rebuild}
+
+///|
+pub extend &View with RenderHtml::{html_len, to_html, to_html_with_buf}

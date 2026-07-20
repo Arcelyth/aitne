@@ -6,6 +6,14 @@ pub trait Source: ReactiveNode {
 }
 
 ///|
+pub extend &Source with ReactiveNode::{
+  mark_stale,
+  mark_pending,
+  mark_all_pending,
+  update_value,
+}
+
+///|
 pub struct ASource {
   id : UInt
   src : &Source?

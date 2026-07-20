@@ -5,6 +5,14 @@ pub trait Subscriber: ReactiveNode {
 }
 
 ///|
+pub extend &Subscriber with ReactiveNode::{
+  mark_stale,
+  mark_pending,
+  mark_all_pending,
+  update_value,
+}
+
+///|
 pub struct ASubscriber {
   id : UInt
   sub : &Subscriber?

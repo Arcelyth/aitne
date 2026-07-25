@@ -4,6 +4,7 @@ let package_path = "@Arcelyth/aitne/src"
 ///|
 pub struct CodeGen {
   buf : StringBuilder
+  style : StringBuilder
   path : String
   style_root : Array[String]
 }
@@ -13,7 +14,7 @@ pub fn CodeGen::new(
   path? : String = "",
   style_root? : Array[String] = [],
 ) -> CodeGen {
-  { buf: StringBuilder::new(), path, style_root }
+  { buf: StringBuilder::new(), style: StringBuilder::new(), path, style_root }
 }
 
 ///|
@@ -229,6 +230,7 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
         self.buf.write(")")
       }
     }
+    MbxAST::StyleNode(styles) => self.gen_style(styles)
   }
 }
 
@@ -300,6 +302,11 @@ fn CodeGen::gen_attr(self : CodeGen, attr : TokenAttr, val : AttrValue) -> Unit 
     }
     self.buf.write(")")
   }
+}
+
+///|
+fn CodeGen::gen_style(self : CodeGen, style : StringView) -> Unit {
+
 }
 
 ///|

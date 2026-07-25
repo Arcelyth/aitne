@@ -47,3 +47,32 @@ test "parse valid mbx node with attributes and dynamic expression" {
     ),
   )
 }
+
+///|
+test "parse style block" {
+  let src =
+    #|let style = ${
+    #|  .btn {
+    #|    color: red;
+    #|  }
+    #|}$
+    #|let external = ${ !"./style.css" }$
+
+  let lexer = Lexer::new(src)
+  let tokens = try! lexer.tokenizer()
+
+  let parser = Parser::new(tokens)
+  let result = try! parser.parse()
+
+  debug_inspect(
+    result,
+    content=(
+      #|[
+      #|  PureCode(<StringView: "let style = ">),
+      #|  StyleNode(<StringView: "\n  .btn {\n    color: red;\n  }\n">),
+      #|  PureCode(<StringView: "\nlet external = ">),
+      #|  StyleNode(<StringView: " !\"./style.css\" ">),
+      #|]
+    ),
+  )
+}

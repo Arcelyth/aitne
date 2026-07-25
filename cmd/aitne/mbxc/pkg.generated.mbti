@@ -5,16 +5,17 @@ import {
   "moonbitlang/core/debug",
   "moonbitlang/core/hashmap",
   "moonbitlang/core/hashset",
+  "moonbitlang/core/ref",
 }
 
 // Values
 pub let builtin_elements : @hashset.HashSet[String]
 
-pub fn compile_css(String, String, Array[String]) -> String
-
-pub fn from_css_file(String, show? : Bool, to? : String?, tmp? : Bool, Array[String]) -> String?
+pub fn compile_css(String, String, @ref.Ref[StringBuilder], @ref.Ref[StringBuilder]) -> Unit
 
 pub fn from_file(String, show? : Bool, to? : String?, tmp? : Bool, style_root? : Array[String]) -> String?
+
+pub fn gen_style_struct(Array[String], String, @ref.Ref[StringBuilder], struct_name? : String) -> Unit
 
 // Errors
 type MbxcError derive(@debug.Debug)
@@ -27,6 +28,7 @@ pub(all) enum AttrValue {
 
 pub struct CodeGen {
   buf : StringBuilder
+  style : StringBuilder
   path : String
   style_root : Array[String]
 }
@@ -62,6 +64,7 @@ pub(all) enum MbxAST {
   RawText(StringView)
   DynamicCode(Array[MbxAST])
   ElementNode(StringView, @hashmap.HashMap[TokenAttr, AttrValue], Array[MbxAST])
+  StyleNode(StringView)
 } derive(Eq, @debug.Debug)
 
 pub(all) struct Parser {
@@ -94,8 +97,7 @@ pub(all) enum Token {
   CodeBlock(StringView)
   BraceOpen
   BraceClose
-  HashBraceOpen
-  HashBraceClose
+  CSSBlock(StringView)
 } derive(Eq, @debug.Debug)
 
 pub(all) struct TokenAttr {

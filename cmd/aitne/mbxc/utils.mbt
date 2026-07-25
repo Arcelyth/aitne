@@ -54,36 +54,28 @@ fn normalize_dir(dir : String) -> String {
 }
 
 ///|
-/// Convert a normalized directory string into a clean single-underscore isolated suffix.
+/// Convert a normalized directory string into a clean hash-based isolated suffix (FNV-1a 32-bit).
 fn make_suffix_from_dir(dir : String) -> String {
-  let sb = StringBuilder::new()
+  let mut hash : UInt = 0x811c9dc5
+  let prime : UInt = 0x01000193
+
   let len = dir.length()
   let mut i = 0
-  let mut last_was_underscore = false
-
   while i < len {
-    let c = dir[i].unsafe_to_char()
-    if ('a' <= c && c <= 'z') ||
-      ('A' <= c && c <= 'Z') ||
-      ('0' <= c && c <= '9') {
-      sb.write_char(c)
-      last_was_underscore = false
-    } else if c == '/' || c == '\\' || c == '.' || c == '-' || c == '_' {
-      if !last_was_underscore && i > 0 && i < len - 1 {
-        sb.write_char('_')
-        last_was_underscore = true
-      }
-    }
+    let c = dir[i].unsafe_to_char().to_int().reinterpret_as_uint()
+    hash = (hash ^ c) * prime
     i += 1
   }
 
-  let res = sb.to_string()
-  let res_len = res.length()
-  if res_len > 0 && res[res_len - 1].unsafe_to_char() == '_' {
-    res[0:res_len - 1].to_owned()
-  } else {
-    res
+  let hex_digits = "0123456789abcdef"
+  let sb = StringBuilder::new()
+  let mut shift = 28
+  while shift >= 0 {
+    let digit = ((hash >> shift) & 0xF).reinterpret_as_int()
+    sb.write_char(hex_digits[digit].unsafe_to_char())
+    shift -= 4
   }
+  sb.to_string()
 }
 
 ///|

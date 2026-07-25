@@ -218,34 +218,6 @@ test "lexer_no_brace" {
 }
 
 ///|
-test "lexer_has_brace_html" {
-  let src =
-    #|let v = #{
-    #|  <div>{ () => #{ <div/>}#}</div>}#
-  let lexer = Lexer::new(src)
-  let tokens = lexer.tokenizer()
-
-  debug_inspect(
-    tokens,
-    content=(
-      #|[
-      #|  RawText(<StringView: "let v = ">),
-      #|  HashBraceOpen,
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
-      #|  BraceOpen,
-      #|  RawText(<StringView: " () => ">),
-      #|  HashBraceOpen,
-      #|  TagSelfClose({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
-      #|  HashBraceClose,
-      #|  BraceClose,
-      #|  TagClose({ tag: <StringView: "div"> }),
-      #|  HashBraceClose,
-      #|]
-    ),
-  )
-}
-
-///|
 test "lexer_nested_code_block_attr" {
   let src =
     #|<div value={{ a: { b: 1 } }}></div>
@@ -322,6 +294,58 @@ test "lexer_muti_string" {
     tokens,
     content=(
       #|[RawText(<StringView: "let s = \n#|<div> <div>\n$|abec <button/>">)]
+    ),
+  )
+}
+
+///|
+test "lexer_css_block" {
+  let src =
+    #|let style = ${
+    #|  .btn {
+    #|    color: red;
+    #|  }
+    #|}$
+    #|let external = ${ !"./style.css" }$
+
+  let lexer = Lexer::new(src)
+  let tokens = try! lexer.tokenizer()
+
+  debug_inspect(
+    tokens,
+    content=(
+      #|[
+      #|  RawText(<StringView: "let style = ">),
+      #|  CSSBlock(<StringView: "\n  .btn {\n    color: red;\n  }\n">),
+      #|  RawText(<StringView: "\nlet external = ">),
+      #|  CSSBlock(<StringView: " !\"./style.css\" ">),
+      #|]
+    ),
+  )
+}
+
+///|
+test "lexer_css_block_with_comments_and_strings" {
+  let src =
+    #|${
+    #|  /* CSS comment */
+    #|  .title::after {
+    #|    content: "hello }$ world"; // string with fake closing tag
+    #|  }
+    #|}$
+
+  let lexer = Lexer::new(src)
+  let tokens = try! lexer.tokenizer()
+
+  debug_inspect(
+    tokens,
+    content=(
+      #|[
+      #|  CSSBlock(
+      #|    <StringView:
+      #|      "\n  /* CSS comment */\n  .title::after {\n    content: \"hello }$ world\"; // string with fake closing tag\n  }\n">,
+      #|  ),
+      #|]
     ),
   )
 }

@@ -34,31 +34,6 @@ async fn handle_build() -> Unit {
   })
 }
 
-/////|
-//async fn handle_build() -> Unit {
-//  let _ = @async.with_task_group(async fn(group) {
-//    println("aitne mbxc")
-//    match (try? @process.spawn(group, "aitne", ["mbxc"])) {
-//      Ok(process) => {
-//        let _status = process.wait()
-//        println("aitne mbxc done")
-//        match (try? @process.spawn(group, "moon", ["build"])) {
-//          Ok(process) => {
-//            let _status = process.wait()
-//            println("moon build done")
-//            match (try? delete_gen_mbt()) {
-//              Ok(_) => ()
-//              Err(e) => println("Failed to delete temporary files")
-//            }
-//          }
-//          Err(_) => println("Failed to build.")
-//        }
-//      }
-//      Err(_) => println("Failed to build.")
-//    }
-//  })
-//}
-
 ///|
 pub fn delete_gen_mbt(dir? : String = ".") -> Unit raise @fs.IOError {
   let entries = try? @fs.read_dir(dir)

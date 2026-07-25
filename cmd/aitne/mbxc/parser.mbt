@@ -11,6 +11,7 @@ pub(all) enum MbxAST {
   DynamicCode(Array[MbxAST])
   // name, attrs, children
   ElementNode(StringView, HashMap[TokenAttr, AttrValue], Array[MbxAST])
+  StyleNode(StringView)
 } derive(Debug, Eq)
 
 ///|
@@ -154,6 +155,10 @@ fn Parser::parse_node(self : Parser) -> MbxAST? raise MbxcError {
       }
 
       Some(MbxAST::ElementNode(tag_name, attrs, children))
+    }
+    Token::CSSBlock(cb) => {
+      self.advance()
+      Some(MbxAST::StyleNode(cb))
     }
     _ => {
       self.advance()

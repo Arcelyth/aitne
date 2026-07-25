@@ -1,28 +1,109 @@
 ///|
-pub fn compile_css(
-  content : String,
-  path : String,
-  style_root : Array[String],
-) -> String {
-  let current_dir = normalize_dir(get_dir(path))
+fn sanitize_field_name(cls : String) -> String {
+  let sb = StringBuilder::new()
+  let len = cls.length()
+  let mut i = 0
+  while i < len {
+    let c = cls[i].unsafe_to_char()
+    if (c >= 'a' && c <= 'z') ||
+      (c >= 'A' && c <= 'Z') ||
+      (c >= '0' && c <= '9') ||
+      c == '_' {
+      sb.write_char(c)
+    } else if c == '-' {
+      sb.write_char('_')
+    }
+    i += 1
+  }
+  let res = sb.to_string()
+  if res.length() == 0 {
+    "_class"
+  } else {
+    let first = res[0].unsafe_to_char()
+    if (first >= '0' && first <= '9') || (first >= 'A' && first <= 'Z') {
+      "_" + res
+    } else {
+      res
+    }
+  }
+}
 
-  // Exact directory validation matching (subdirectories are NOT excluded)
-  let mut skip_scoping = false
-  for root in style_root {
-    if current_dir == normalize_dir(root) {
-      skip_scoping = true
-      break
+///|
+pub fn gen_style_struct(
+  classes : Array[String],
+  suffix : String,
+  struct_name : String,
+  code : Ref[StringBuilder],
+  def_code : Ref[StringBuilder],
+) -> Unit {
+  let code_sb = code.val
+  let def_sb = def_code.val
+
+  let unique_classes = []
+  let seen_classes = HashMap([])
+  for cls in classes {
+    if !seen_classes.contains(cls) {
+      seen_classes.set(cls, true)
+      unique_classes.push(cls)
     }
   }
 
-  if skip_scoping {
-    return content
+  let fields : Array[(String, String)] = []
+  let seen_fields = HashMap([])
+
+  for cls in unique_classes {
+    let base_field = sanitize_field_name(cls)
+    let mut field = base_field
+    let mut count = 1
+    while seen_fields.contains(field) {
+      count += 1
+      field = base_field + "_" + count.to_string()
+    }
+    seen_fields.set(field, true)
+
+    let val = if suffix != "" { cls + "_" + suffix } else { cls }
+    fields.push((field, val))
   }
 
-  let suffix = make_suffix_from_dir(current_dir)
-  let sb = StringBuilder::new()
+  def_sb.write_string("struct ")
+  def_sb.write_string(struct_name)
+  def_sb.write_string(" {\n")
+  for item in fields {
+    let (f_name, _) = item
+    def_sb.write_string("  ")
+    def_sb.write_string(f_name)
+    def_sb.write_string(" : String\n")
+  }
+  def_sb.write_string("}\n\n")
+
+  code_sb.write_string(struct_name)
+  code_sb.write_string("::{\n")
+  for item in fields {
+    let (f_name, f_val) = item
+    code_sb.write_string("  ")
+    code_sb.write_string(f_name)
+    code_sb.write_string(": \"")
+    code_sb.write_string(f_val)
+    code_sb.write_string("\",\n")
+  }
+  code_sb.write_string("}")
+}
+
+///|
+pub fn compile_css(
+  content : String,
+  path : String,
+  style : Ref[StringBuilder],
+  code : Ref[StringBuilder],
+  def_code : Ref[StringBuilder],
+) -> Unit {
+  let current_dir = normalize_dir(get_dir(path))
+  let suffix = hash_string(current_dir)
+  let sb = style.val
   let mut i = 0
   let len = content.length()
+
+  let classes : Array[String] = []
 
   let mut in_block = false
   let mut in_pseudo = false
@@ -112,7 +193,6 @@ pub fn compile_css(
       continue
     }
 
-    // Bare tags are skipped here entirely and hit the final else fallback
     if c == '.' {
       sb.write_char('.')
       i += 1
@@ -122,6 +202,7 @@ pub fn compile_css(
         i += 1
       }
       if ident != "" {
+        classes.push(ident)
         if suffix != "" {
           sb.write_string(ident + "_" + suffix)
         } else {
@@ -149,42 +230,46 @@ pub fn compile_css(
     }
   }
 
-  sb.to_string()
+  let struct_hash = hash_string(path + ":" + content)
+  let struct_name = "Style_" + struct_hash
+
+  gen_style_struct(classes, suffix, struct_name, code, def_code)
 }
 
 ///|
 /// Read a CSS file, validates it against `style_root` parameters, and generates output.
-pub fn from_css_file(
-  path : String,
-  show? : Bool = false,
-  to? : String? = None,
-  tmp? : Bool = false,
-  style_root : Array[String],
-) -> String? {
-  let res = try? @fs.read_file_to_string(path)
-  match res {
-    Ok(content) => {
-      let gen = compile_css(content, path, style_root)
-      if show {
-        println(gen)
-      }
-      match to {
-        Some(target) => {
-          let res2 = try? @fs.write_string_to_file(target, gen)
-          match res2 {
-            Ok(_) => Some(gen)
-            Err(e) => {
-              debug(e)
-              None
-            }
-          }
-        }
-        None => Some(gen)
-      }
-    }
-    Err(e) => {
-      debug(e)
-      None
-    }
-  }
-}
+//pub fn from_css_file(
+//  path : String,
+//  show? : Bool = false,
+//  to? : String? = None,
+//  tmp? : Bool = false,
+//  style_root : Array[String],
+//) -> String? {
+//  let res = try? @fs.read_file_to_string(path)
+//  match res {
+//    Ok(content) => {
+//      let gen = compile_css(content, path, )
+//      if show {
+//        println(gen)
+//      }
+//      match to {
+//        Some(target) => {
+//          let res2 = try? @fs.write_string_to_file(target, gen)
+//          match res2 {
+//            Ok(_) => Some(gen)
+//            Err(e) => {
+//              debug(e)
+//              None
+//            }
+//          }
+//        }
+//        None => Some(gen)
+//      }
+//    }
+//    Err(e) => {
+//      debug(e)
+//      None
+//    }
+//  }
+//}
+//

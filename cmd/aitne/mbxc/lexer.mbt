@@ -41,8 +41,9 @@ pub(all) enum Token {
   CodeBlock(StringView)
   BraceOpen // {
   BraceClose // }
-  HashBraceOpen // #{
-  HashBraceClose // }#
+  // ${ !"./style.css" }$
+  // ${ .btn {...} }$
+  CSSBlock(StringView)
 } derive(Debug, Eq)
 
 ///|
@@ -97,9 +98,10 @@ fn is_tag_start_char(c : UInt16) -> Bool {
 
 ///|
 fn Lexer::is_raw_boundary(self : Lexer, c : UInt16) -> Bool {
-  if c == '#' && self.peek(1) == Some('{') {
+  if c == '$' && self.peek(1) == Some('{') {
     return true
   }
+
   if c == '}' && self.peek(1) == Some('#') {
     return true
   }
@@ -197,6 +199,75 @@ fn Lexer::read_code_block(self : Lexer) -> StringView raise MbxcError {
 }
 
 ///|
+fn Lexer::read_css_block(self : Lexer) -> StringView raise MbxcError {
+  if self.cur + 1 >= self.src.length() ||
+    self.src[self.cur] != '$' ||
+    self.src[self.cur + 1] != '{' {
+    raise LexerError("read_css_block expects '${' at current position")
+  }
+
+  self.cur += 2
+  let start = self.cur
+
+  while !self.is_end() {
+    let c = self.src[self.cur]
+
+    if c == '}' && self.peek(1) == Some('$') {
+      let end = self.cur
+      self.cur += 2
+      return self.src[start:end]
+    }
+
+    // CSS string.
+    if c == '"' || c == '\'' {
+      let quote = c
+      self.cur += 1
+      while !self.is_end() && self.src[self.cur] != quote {
+        if self.src[self.cur] == '\\' && self.cur + 1 < self.src.length() {
+          self.cur += 2
+        } else {
+          self.cur += 1
+        }
+      }
+      if self.is_end() {
+        raise LexerError("Unclosed string literal in CSS block")
+      }
+      self.cur += 1
+      continue
+    }
+
+    // CSS comment /*...*/
+    if c == '/' && self.peek(1) == Some('*') {
+      self.cur += 2
+      while !self.is_end() {
+        if self.src[self.cur] == '*' && self.peek(1) == Some('/') {
+          self.cur += 2
+          break
+        }
+        self.cur += 1
+      }
+      continue
+    }
+
+    // CSS comment // ...
+    if c == '/' && self.peek(1) == Some('/') {
+      self.cur += 2
+      while !self.is_end() && self.src[self.cur] != '\n' {
+        self.cur += 1
+      }
+      if !self.is_end() {
+        self.cur += 1
+      }
+      continue
+    }
+
+    self.cur += 1
+  }
+
+  raise LexerError("Unclosed CSS block: expected '}$'")
+}
+
+///|
 fn is_space(c : UInt16) -> Bool {
   match c {
     ' ' | '\n' | '\r' | '\t' => true
@@ -232,26 +303,14 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
 
   let start = self.cur
   match self.src[self.cur] {
-    // #{ 
-    '#' if self.peek(1) == Some('{') => {
-      self.cur += 2
-      while !self.is_end() && self.src[self.cur] != '<' {
-        self.cur += 1
-      }
-      if self.is_end() {
-        raise LexerError("Expected match tag in #{}#")
-      }
-      return Some(Token::HashBraceOpen)
+    '$' if self.peek(1) == Some('{') => {
+      let css_content = try! self.read_css_block()
+      return Some(Token::CSSBlock(css_content))
     }
     '{' if self.tag_depth > 0 => {
       self.cur += 1
       self.brace_depth += 1
       return Some(Token::BraceOpen)
-    }
-    // }# 
-    '}' if self.peek(1) == Some('#') => {
-      self.cur += 2
-      return Some(Token::HashBraceClose)
     }
     '}' if self.tag_depth > 0 => {
       self.cur += 1

@@ -4,7 +4,7 @@ fn compile_mbx_file(
   show : Bool,
   tmp : Bool,
   out_dir : String?,
-  style_root : Array[String],
+  style_buffer : Ref[StringBuilder],
 ) -> Unit {
   if path.has_suffix(".mbx") {
     let target = match out_dir {
@@ -24,33 +24,8 @@ fn compile_mbx_file(
       }
       None => path + ".mbt"
     }
-    let _ = @mbxc.from_file(path, show~, to=Some(target), tmp~, style_root~)
+    let _ = @mbxc.from_file(path, show~, to=Some(target), tmp~, style_buffer)
   }
-}
-
-///|
-fn compile_style_file(
-  path : String,
-  show : Bool,
-  tmp : Bool,
-  style_dir : String,
-  style_root : Array[String],
-) -> Unit {
-  guard path.has_suffix(".css") else { return }
-
-  let mut last_slash = -1
-  for i = 0; i < path.length(); i = i + 1 {
-    if path[i] == '/' || path[i] == '\\' {
-      last_slash = i
-    }
-  }
-  let filename = if last_slash == -1 {
-    path
-  } else {
-    path[last_slash:path.length()].to_owned()
-  }
-  let target = style_dir + filename
-  let _ = @mbxc.from_css_file(path, show~, to=Some(target), tmp~, style_root)
 }
 
 ///|
@@ -59,7 +34,7 @@ pub fn walk_and_compile(
   show? : Bool = false,
   tmp? : Bool = false,
   out_dir : String?,
-  style_dir : String,
+  style_buffer : Ref[StringBuilder],
   style_root : Array[String],
 ) -> Unit raise @fs.IOError {
   let entries = try? @fs.read_dir(dir)
@@ -73,11 +48,9 @@ pub fn walk_and_compile(
         let path = dir + "/" + file
 
         if @fs.is_dir(path) {
-          walk_and_compile(path, show~, tmp~, out_dir, style_dir, style_root)
+          walk_and_compile(path, show~, tmp~, out_dir, style_buffer, style_root)
         } else if path.has_suffix(".mbx") {
-          compile_mbx_file(path, show, tmp, out_dir, style_root)
-        } else {
-          compile_style_file(path, show, tmp, style_dir, style_root)
+          compile_mbx_file(path, show, tmp, out_dir, style_buffer)
         }
       }
     Err(e) => debug(e)
@@ -112,6 +85,7 @@ async fn main {
       let target_dir = "."
       let mut out_dir : String? = None
       let mut style_dir = "./dist"
+      let style_buffer = StringBuilder::new()
 
       if arg_len == 3 && args[2] == "help" {
         show_mbxc_help()
@@ -167,26 +141,16 @@ async fn main {
         None => ()
       }
 
-      if !@fs.path_exists(style_dir) {
-        let create_res = try? @fs.create_dir(style_dir)
-        match create_res {
-          Ok(_) => ()
-          Err(e) => {
-            println("Error: Failed to create output directory '\{style_dir}'")
-            return
-          }
-        }
-      }
-
       match target_file {
-        Some(file) => compile_mbx_file(file, show, tmp, out_dir, style_root)
+        Some(file) =>
+          compile_mbx_file(file, show, tmp, out_dir, Ref(style_buffer))
         None => {
           let res = try? walk_and_compile(
             target_dir,
             show~,
             tmp~,
             out_dir,
-            style_dir,
+            Ref(style_buffer),
             style_root,
           )
           match res {
@@ -194,6 +158,23 @@ async fn main {
             Err(e) => debug(e)
           }
         }
+      }
+
+      if !@fs.path_exists(style_dir) {
+        let _ = try? @fs.create_dir(style_dir)
+      }
+      let css_path = if style_dir.has_suffix("/") || style_dir.has_suffix("\\") {
+        style_dir + "style.css"
+      } else {
+        style_dir + "/style.css"
+      }
+      let write_res = try? @fs.write_string_to_file(
+        css_path,
+        style_buffer.to_string(),
+      )
+      match write_res {
+        Ok(_) => ()
+        Err(_) => println("Error: Failed to write style file '\{css_path}'")
       }
     }
     "run" => {
@@ -331,7 +312,7 @@ fn show_mbxc_help() -> Unit {
 ///|
 fn show_run_help() -> Unit {
   let content =
-    #|Usage: aitne mbxc [options]
+    #|Usage: aitne run [options]
     #| 
     #|options: 
     #|  --file, -f <file>       specify an eirene.toml file
@@ -356,7 +337,7 @@ fn show_init_help() -> Unit {
 fn get_config(target_file : String?) -> String? {
   match target_file {
     Some(file) =>
-      match (try? @fs.read_file_to_string("file")) {
+      match (try? @fs.read_file_to_string(file)) {
         Ok(f) => Some(f)
         Err(_) => {
           println("Failed to read file \{file}")

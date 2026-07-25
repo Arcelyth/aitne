@@ -12,10 +12,28 @@ async fn handle_build() -> Unit {
   }
 
   let style_dir = "./dist"
-  let res = try? walk_and_compile(".", None, style_dir, style_root)
+  let style_buffer = StringBuilder::new()
+  let res = try? walk_and_compile(".", None, Ref(style_buffer), style_root)
   match res {
     Ok(_) => ()
     Err(e) => debug(e)
+  }
+
+  if !@fs.path_exists(style_dir) {
+    let _ = try? @fs.create_dir(style_dir)
+  }
+  let css_path = if style_dir.has_suffix("/") || style_dir.has_suffix("\\") {
+    style_dir + "style.css"
+  } else {
+    style_dir + "/style.css"
+  }
+  let write_res = try? @fs.write_string_to_file(
+    css_path,
+    style_buffer.to_string(),
+  )
+  match write_res {
+    Ok(_) => ()
+    Err(_) => println("Error: Failed to write style file '\{css_path}'")
   }
 
   println("aitne mbxc done")

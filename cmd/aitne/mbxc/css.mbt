@@ -32,10 +32,12 @@ fn sanitize_field_name(cls : String) -> String {
 pub fn gen_style_struct(
   classes : Array[String],
   suffix : String,
+  struct_name : String,
   code : Ref[StringBuilder],
-  struct_name? : String = "Style",
+  def_code : Ref[StringBuilder],
 ) -> Unit {
   let code_sb = code.val
+  let def_sb = def_code.val
 
   let unique_classes = []
   let seen_classes = HashMap([])
@@ -63,38 +65,28 @@ pub fn gen_style_struct(
     fields.push((field, val))
   }
 
-  code_sb.write_string("pub(all) struct ")
-  code_sb.write_string(struct_name)
-  code_sb.write_string(" {\n")
-
+  def_sb.write_string("struct ")
+  def_sb.write_string(struct_name)
+  def_sb.write_string(" {\n")
   for item in fields {
     let (f_name, _) = item
-    code_sb.write_string("  ")
-    code_sb.write_string(f_name)
-    code_sb.write_string(" : String\n")
+    def_sb.write_string("  ")
+    def_sb.write_string(f_name)
+    def_sb.write_string(" : String\n")
   }
-  code_sb.write_string("}\n\n")
+  def_sb.write_string("}\n\n")
 
-  code_sb.write_string("pub fn ")
-  code_sb.write_string(struct_name)
-  code_sb.write_string("::new() -> ")
-  code_sb.write_string(struct_name)
-  code_sb.write_string(" {\n")
-  code_sb.write_string("  ")
   code_sb.write_string(struct_name)
   code_sb.write_string("::{\n")
-
   for item in fields {
     let (f_name, f_val) = item
-    code_sb.write_string("    ")
+    code_sb.write_string("  ")
     code_sb.write_string(f_name)
     code_sb.write_string(": \"")
     code_sb.write_string(f_val)
     code_sb.write_string("\",\n")
   }
-
-  code_sb.write_string("  }\n")
-  code_sb.write_string("}\n")
+  code_sb.write_string("}")
 }
 
 ///|
@@ -103,9 +95,10 @@ pub fn compile_css(
   path : String,
   style : Ref[StringBuilder],
   code : Ref[StringBuilder],
+  def_code : Ref[StringBuilder],
 ) -> Unit {
   let current_dir = normalize_dir(get_dir(path))
-  let suffix = make_suffix_from_dir(current_dir)
+  let suffix = hash_string(current_dir)
   let sb = style.val
   let mut i = 0
   let len = content.length()
@@ -237,7 +230,10 @@ pub fn compile_css(
     }
   }
 
-  gen_style_struct(classes, suffix, code)
+  let struct_hash = hash_string(path + ":" + content)
+  let struct_name = "Style_" + struct_hash
+
+  gen_style_struct(classes, suffix, struct_name, code, def_code)
 }
 
 ///|
@@ -276,3 +272,4 @@ pub fn compile_css(
 //    }
 //  }
 //}
+//

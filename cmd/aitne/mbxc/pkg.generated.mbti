@@ -11,11 +11,11 @@ import {
 // Values
 pub let builtin_elements : @hashset.HashSet[String]
 
-pub fn compile_css(String, String, @ref.Ref[StringBuilder], @ref.Ref[StringBuilder]) -> Unit
+pub fn compile_css(String, String, @ref.Ref[StringBuilder], @ref.Ref[StringBuilder], @ref.Ref[StringBuilder]) -> Unit
 
-pub fn from_file(String, show? : Bool, to? : String?, tmp? : Bool, style_root? : Array[String]) -> String?
+pub fn from_file(String, show? : Bool, to? : String?, tmp? : Bool, @ref.Ref[StringBuilder]) -> String?
 
-pub fn gen_style_struct(Array[String], String, @ref.Ref[StringBuilder], struct_name? : String) -> Unit
+pub fn gen_style_struct(Array[String], String, String, @ref.Ref[StringBuilder], @ref.Ref[StringBuilder]) -> Unit
 
 // Errors
 type MbxcError derive(@debug.Debug)
@@ -29,11 +29,12 @@ pub(all) enum AttrValue {
 pub struct CodeGen {
   buf : StringBuilder
   style : StringBuilder
+  last_buf : StringBuilder
   path : String
-  style_root : Array[String]
 }
 pub fn CodeGen::generate(Self, Array[MbxAST]) -> String
-pub fn CodeGen::new(path? : String, style_root? : Array[String]) -> Self
+pub fn CodeGen::new(path? : String) -> Self
+pub fn CodeGen::output_style(Self) -> String
 
 pub(all) struct CodeGenTmp {
   ast : Array[MbxAST]

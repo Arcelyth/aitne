@@ -55,7 +55,7 @@ fn normalize_dir(dir : String) -> String {
 
 ///|
 /// Convert a normalized directory string into a clean hash-based isolated suffix (FNV-1a 32-bit).
-fn make_suffix_from_dir(dir : String) -> String {
+fn hash_string(dir : String) -> String {
   let mut hash : UInt = 0x811c9dc5
   let prime : UInt = 0x01000193
 
@@ -98,7 +98,7 @@ fn scope_class_string(
     return s
   }
 
-  let suffix = make_suffix_from_dir(current_dir)
+  let suffix = hash_string(current_dir)
   if suffix == "" {
     return s
   }

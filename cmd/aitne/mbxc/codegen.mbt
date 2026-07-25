@@ -5,16 +5,19 @@ let package_path = "@Arcelyth/aitne/src"
 pub struct CodeGen {
   buf : StringBuilder
   style : StringBuilder
+  last_buf : StringBuilder
   path : String
-  style_root : Array[String]
+  //  style_root : Array[String]
 }
 
 ///|
-pub fn CodeGen::new(
-  path? : String = "",
-  style_root? : Array[String] = [],
-) -> CodeGen {
-  { buf: StringBuilder::new(), style: StringBuilder::new(), path, style_root }
+pub fn CodeGen::new(path? : String = "") -> CodeGen {
+  {
+    buf: StringBuilder::new(),
+    style: StringBuilder::new(),
+    last_buf: StringBuilder::new(),
+    path,
+  }
 }
 
 ///|
@@ -22,7 +25,13 @@ pub fn CodeGen::generate(self : CodeGen, ast_nodes : Array[MbxAST]) -> String {
   for i = 0; i < ast_nodes.length(); i = i + 1 {
     self.gen_node(ast_nodes[i])
   }
+  self.buf.write_string(self.last_buf.to_string())
   self.buf.to_string()
+}
+
+///|
+pub fn CodeGen::output_style(self : CodeGen) -> String {
+  self.style.to_string()
 }
 
 ///|
@@ -275,8 +284,6 @@ fn CodeGen::gen_attr(self : CodeGen, attr : TokenAttr, val : AttrValue) -> Unit 
         self.buf.write(")")
       }
       AttrValue::Str(s) => {
-        // TODO        
-        //        let scoped_classes = scope_class_string(s.to_owned(), self.path, self.style_root)
         self.buf.write("\"")
         self.buf.write(escape_moonbit_str(s.to_owned()))
         self.buf.write("\"")
@@ -306,7 +313,13 @@ fn CodeGen::gen_attr(self : CodeGen, attr : TokenAttr, val : AttrValue) -> Unit 
 
 ///|
 fn CodeGen::gen_style(self : CodeGen, style : StringView) -> Unit {
-
+  compile_css(
+    style.to_owned(),
+    self.path,
+    Ref(self.style),
+    Ref(self.buf),
+    Ref(self.last_buf),
+  )
 }
 
 ///|

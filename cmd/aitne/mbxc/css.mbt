@@ -237,39 +237,190 @@ pub fn compile_css(
 }
 
 ///|
-/// Read a CSS file, validates it against `style_root` parameters, and generates output.
-//pub fn from_css_file(
-//  path : String,
-//  show? : Bool = false,
-//  to? : String? = None,
-//  tmp? : Bool = false,
-//  style_root : Array[String],
-//) -> String? {
-//  let res = try? @fs.read_file_to_string(path)
-//  match res {
-//    Ok(content) => {
-//      let gen = compile_css(content, path, )
-//      if show {
-//        println(gen)
-//      }
-//      match to {
-//        Some(target) => {
-//          let res2 = try? @fs.write_string_to_file(target, gen)
-//          match res2 {
-//            Ok(_) => Some(gen)
-//            Err(e) => {
-//              debug(e)
-//              None
-//            }
-//          }
-//        }
-//        None => Some(gen)
-//      }
-//    }
-//    Err(e) => {
-//      debug(e)
-//      None
-//    }
-//  }
-//}
-//
+fn slice_string(s : String, start : Int, end : Int) -> String {
+  let buf = StringBuilder::new()
+  for i = start; i < end; i = i + 1 {
+    match s[i].to_char() {
+      Some(a) => buf.write_char(a)
+      _ => ()
+    }
+  }
+  buf.to_string()
+}
+
+///|
+fn dirname(path : String) -> String {
+  let mut last_slash = -1
+  let len = path.length()
+  for i = 0; i < len; i = i + 1 {
+    if path[i] == '/' || path[i] == '\\' {
+      last_slash = i
+    }
+  }
+  if last_slash == -1 {
+    ""
+  } else {
+    slice_string(path, 0, last_slash)
+  }
+}
+
+///|
+fn resolve_path(base_file_path : String, rel_path : String) -> String {
+  let is_abs = rel_path.length() > 0 &&
+    (rel_path[0] == '/' || rel_path[0] == '\\')
+  let dir = if is_abs { "" } else { dirname(base_file_path) }
+
+  let combined = if dir.length() == 0 { rel_path } else { dir + "/" + rel_path }
+
+  let parts : Array[String] = []
+  let mut start = 0
+  let clen = combined.length()
+
+  for i = 0; i <= clen; i = i + 1 {
+    if i == clen || combined[i] == '/' || combined[i] == '\\' {
+      if i > start {
+        let part = slice_string(combined, start, i)
+        if part == "." {
+
+        } else if part == ".." {
+          if parts.length() > 0 && parts[parts.length() - 1] != ".." {
+            ignore(parts.pop())
+          } else if !is_abs {
+            parts.push("..")
+          }
+        } else {
+          parts.push(part)
+        }
+      }
+      start = i + 1
+    }
+  }
+
+  let res = StringBuilder::new()
+  if is_abs {
+    res.write_string("/")
+  }
+  for i = 0; i < parts.length(); i = i + 1 {
+    if i > 0 {
+      res.write_string("/")
+    }
+    res.write_string(parts[i])
+  }
+  res.to_string()
+}
+
+///|
+fn read_file(file_path : String) -> String {
+  @fs.read_file_to_string(file_path) catch {
+    _ => ""
+  }
+}
+
+///|
+/// Replace !"path.css" or !'path.css' with the content of the file .
+pub fn expand_css(orig : String, path : String) -> String {
+  let buf = StringBuilder::new()
+  let len = orig.length()
+  let mut i = 0
+
+  while i < len {
+    let c = orig[i]
+
+    if c == '/' && i + 1 < len && orig[i + 1] == '*' {
+      buf.write_char('/')
+      buf.write_char('*')
+      i += 2
+      while i < len {
+        if orig[i] == '*' && i + 1 < len && orig[i + 1] == '/' {
+          buf.write_char('*')
+          buf.write_char('/')
+          i += 2
+          break
+        }
+        match orig[i].to_char() {
+          Some(c) => buf.write_char(c)
+          None => ()
+        }
+        i += 1
+      }
+    } else if c == '!' &&
+      i + 1 < len &&
+      (orig[i + 1] == '"' || orig[i + 1] == '\'') {
+      let quote = orig[i + 1]
+      i += 2
+
+      let path_buf = StringBuilder::new()
+      while i < len {
+        let ch = orig[i]
+        if ch == '\\' && i + 1 < len {
+          match orig[i + 1].to_char() {
+            Some(c) => path_buf.write_char(c)
+            None => ()
+          }
+          i += 2
+        } else if ch == quote {
+          i += 1
+          break
+        } else {
+          match ch.to_char() {
+            Some(c) => path_buf.write_char(c)
+            None => ()
+          }
+
+          i += 1
+        }
+      }
+
+      let rel_import_path = path_buf.to_string()
+      let resolved_path = resolve_path(path, rel_import_path)
+
+      let file_content = read_file(resolved_path)
+
+      let expanded_content = expand_css(file_content, resolved_path)
+      buf.write_string(expanded_content)
+    } else if c == '"' || c == '\'' {
+      let quote = c
+      match quote.to_char() {
+        Some(c) => buf.write_char(c)
+        None => ()
+      }
+
+      i += 1
+
+      while i < len {
+        let ch = orig[i]
+        if ch == '\\' && i + 1 < len {
+          buf.write_char('\\')
+          match orig[i + 1].to_char() {
+            Some(c) => buf.write_char(c)
+            None => ()
+          }
+
+          i += 2
+        } else if ch == quote {
+          match quote.to_char() {
+            Some(c) => buf.write_char(c)
+            None => ()
+          }
+          i += 1
+          break
+        } else {
+          match ch.to_char() {
+            Some(c) => buf.write_char(c)
+            None => ()
+          }
+          i += 1
+        }
+      }
+    } else {
+      match c.to_char() {
+        Some(c) => buf.write_char(c)
+        None => ()
+      }
+
+      i += 1
+    }
+  }
+
+  buf.to_string()
+}

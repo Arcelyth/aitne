@@ -109,6 +109,25 @@ fn main {
 }
 ```
 
+## Style 
+
+Aitne provides first-class support for component-scoped CSS directly inside your `mbx` source files using `${ ... }$` CSS blocks. <br>
+You can write inline CSS rules, import external stylesheets use **expand** syntax `!"path.css"`/`!'path.css'`, assign styles to variables and reference class names safely inside your component bindings.
+```mbx
+pub fn counter_btn(incr?: Int = 1) -> &View {
+    let style = ${ 
+        !"./counter_btn.module.css"
+        .btn {
+            background-color: #000000;
+        }
+    }$ 
+    let (count, set_count) = @reactive.create_signal(0)
+    <button on:click={(_) => { set_count.update((v) => { v + incr }) }} class={()=>style.btn}>
+        Click me:  {() => count.get().to_string()}
+    </button>
+}
+```
+
 ## Editor Support
 - [Neovim](https://github.com/aitne-dev/mbx.nvim)
 - [Zed](https://github.com/aitne-dev/mbx-zed)

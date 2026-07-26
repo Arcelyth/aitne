@@ -313,8 +313,9 @@ fn CodeGen::gen_attr(self : CodeGen, attr : TokenAttr, val : AttrValue) -> Unit 
 
 ///|
 fn CodeGen::gen_style(self : CodeGen, style : StringView) -> Unit {
+  let expanded = expand_css(style.to_owned(), self.path)
   compile_css(
-    style.to_owned(),
+    expanded,
     self.path,
     Ref(self.style),
     Ref(self.buf),

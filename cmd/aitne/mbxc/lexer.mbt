@@ -102,7 +102,7 @@ fn Lexer::is_raw_boundary(self : Lexer, c : UInt16) -> Bool {
     return true
   }
 
-  if c == '}' && self.peek(1) == Some('#') {
+  if c == '}' && self.peek(1) == Some('$') {
     return true
   }
 

@@ -1,5 +1,5 @@
 ///|
-using @dom {trait View, for_node}
+using @dom {trait View, for_node, for_each}
 
 ///|
 let adjectives : Array[String] = [
@@ -123,38 +123,42 @@ fn app() -> &View {
     ]).class("jumbotron"),
     @Arcelyth/aitne/src/dom.table(children=[
       @Arcelyth/aitne/src/dom.tbody(children=[
-        for_node(() => data.get(), row => { return row.id.to_string() }, row => {
-          let row_id = row.id
-          @Arcelyth/aitne/src/dom.tr(children=[
-            @Arcelyth/aitne/src/dom.td(children=[
-              @Arcelyth/aitne/src/dom.text_dyn(() => row_id.to_string()),
-            ]).class("col-md-1"),
-            @Arcelyth/aitne/src/dom.td(children=[
-              @Arcelyth/aitne/src/dom.a(children=[
-                @Arcelyth/aitne/src/dom.text_dyn(() => row.label.get()),
-              ]).on(Click, _ => set_selected.set(row_id)),
-            ]).class("col-md-4"),
-            @Arcelyth/aitne/src/dom.td(children=[
-              @Arcelyth/aitne/src/dom.a(children=[
-                @Arcelyth/aitne/src/dom.span()
-                .class("glyphicon glyphicon-remove")
-                .attr("aria-hidden", "true"),
-              ]).on(Click, _ => {
-                let filtered = data.get().filter(fn(r) { r.id != row_id })
-                set_data.set(filtered)
+        for_each(
+          each=() => data.get().iter(),
+          key=row => { return row.id.to_string() },
+          render=row => {
+            let row_id = row.id
+            @Arcelyth/aitne/src/dom.tr(children=[
+              @Arcelyth/aitne/src/dom.td(children=[
+                @Arcelyth/aitne/src/dom.text_dyn(() => row_id.to_string()),
+              ]).class("col-md-1"),
+              @Arcelyth/aitne/src/dom.td(children=[
+                @Arcelyth/aitne/src/dom.a(children=[
+                  @Arcelyth/aitne/src/dom.text_dyn(() => row.label.get()),
+                ]).on(Click, _ => set_selected.set(row_id)),
+              ]).class("col-md-4"),
+              @Arcelyth/aitne/src/dom.td(children=[
+                @Arcelyth/aitne/src/dom.a(children=[
+                  @Arcelyth/aitne/src/dom.span()
+                  .class("glyphicon glyphicon-remove")
+                  .attr("aria-hidden", "true"),
+                ]).on(Click, _ => {
+                  let filtered = data.get().filter(fn(r) { r.id != row_id })
+                  set_data.set(filtered)
+                }),
+              ]).class("col-md-1"),
+              @Arcelyth/aitne/src/dom.td().class("col-md-6"),
+            ]).class(
+              @Arcelyth/aitne/src/dom.rx_class(() => {
+                if selector.selected(row_id) {
+                  "danger"
+                } else {
+                  ""
+                }
               }),
-            ]).class("col-md-1"),
-            @Arcelyth/aitne/src/dom.td().class("col-md-6"),
-          ]).class(
-            @Arcelyth/aitne/src/dom.rx_class(() => {
-              if selector.selected(row_id) {
-                "danger"
-              } else {
-                ""
-              }
-            }),
-          )
-        }),
+            )
+          },
+        ),
       ]),
     ]).class("table table-hover table-striped test-data"),
     @Arcelyth/aitne/src/dom.span()

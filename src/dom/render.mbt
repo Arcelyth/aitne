@@ -249,7 +249,23 @@ pub impl Mountable for RenderState with fn insert_before(
       }
     }
     Router(s) => s.view.val.insert_before(child)
-    _ => false
+    OwnedViewState(s) => s.insert_before(child)
+    KeyedState(s) => {
+      let parent = @ffi.dom_parent(s.marker)
+      if @ffi.dom_is_null(parent) {
+        false
+      } else {
+        child.mount(parent, s.marker)
+        true
+      }
+    }
+    Fragment(s) =>
+      if s.children.is_empty() {
+        false
+      } else {
+        s.children[0].insert_before(child)
+      }
+    None => false
   }
 }
 

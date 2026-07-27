@@ -1,17 +1,4 @@
-using @dom {
-  trait View,
-  div,
-  h1,
-  button,
-  table,
-  tbody,
-  tr,
-  td,
-  a,
-  span,
-  for_node,
-  rx_class,
-}
+using @dom {trait View, for_node, for_each}
 
 let adjectives : Array[String] = ["pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean", "elegant", "easy", "angry", "crazy", "helpful", "mushy", "odd", "unsightly", "adorable", "important", "inexpensive", "cheap", "expensive", "fancy"]
 
@@ -106,7 +93,7 @@ fn app() -> &View {
   .class("row")])
   .class("col-md-6")])
   .class("row")])
-  .class("jumbotron"), @Arcelyth/aitne/src/dom.table(children=[@Arcelyth/aitne/src/dom.tbody(children=[for_node(() => data.get(), row => { return row.id.to_string() }, row => {
+  .class("jumbotron"), @Arcelyth/aitne/src/dom.table(children=[@Arcelyth/aitne/src/dom.tbody(children=[for_each(each=() => data.get().iter(), key=(row) => { return row.id.to_string() }, render=(row) => {
           let row_id = row.id
           @Arcelyth/aitne/src/dom.tr(children=[@Arcelyth/aitne/src/dom.td(children=[@Arcelyth/aitne/src/dom.text_dyn(
         () => row_id.to_string()

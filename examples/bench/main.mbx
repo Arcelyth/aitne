@@ -1,4 +1,4 @@
-using @dom {trait View, for_node}
+using @dom {trait View, for_node, for_each}
 
 let adjectives : Array[String] = ["pretty", "large", "big", "small", "tall", "short", "long", "handsome", "plain", "quaint", "clean", "elegant", "easy", "angry", "crazy", "helpful", "mushy", "odd", "unsightly", "adorable", "important", "inexpensive", "cheap", "expensive", "fancy"]
 
@@ -105,7 +105,7 @@ fn app() -> &View {
     </div>
     <table class="table table-hover table-striped test-data">
       <tbody>
-        {for_node(() => data.get(), row => { return row.id.to_string() }, row => {
+        {for_each(each=() => data.get().iter(), key=(row) => { return row.id.to_string() }, render=(row) => {
           let row_id = row.id
           <tr class={() => if selector.selected(row_id) {"danger"} else {""}}>
             <td class="col-md-1"> {() => row_id.to_string()} </td>

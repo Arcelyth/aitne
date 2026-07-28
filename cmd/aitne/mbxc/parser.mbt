@@ -10,7 +10,7 @@ pub(all) enum MbxAST {
   RawText(StringView)
   DynamicCode(Array[MbxAST])
   // name, attrs, children
-  ElementNode(StringView, HashMap[TokenAttr, AttrValue], Array[MbxAST])
+  ElementNode(StringView, Array[(TokenAttr, AttrValue)], Array[MbxAST])
   StyleNode(StringView)
 } derive(Debug, Eq)
 

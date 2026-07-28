@@ -1,7 +1,4 @@
 ///|
-using @hashmap {type HashMap}
-
-///|
 pub(all) struct TokenAttr {
   ns : StringView?
   name : StringView
@@ -11,7 +8,7 @@ pub(all) struct TokenAttr {
 /// <div style="">
 pub(all) struct TagOpen {
   tag : StringView
-  attrs : HashMap[TokenAttr, AttrValue]
+  attrs : Array[(TokenAttr, AttrValue)]
 } derive(Debug, Eq)
 
 ///|
@@ -24,7 +21,7 @@ pub(all) struct TagClose {
 /// <div />
 pub(all) struct TagSelfClose {
   tag : StringView
-  attrs : HashMap[TokenAttr, AttrValue]
+  attrs : Array[(TokenAttr, AttrValue)]
 } derive(Debug, Eq)
 
 ///|
@@ -365,7 +362,7 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
           }
           let tag = self.src[tag_start:self.cur]
 
-          let attrs : HashMap[TokenAttr, AttrValue] = HashMap([])
+          let attrs : Array[(TokenAttr, AttrValue)] = []
 
           while !self.is_end() {
             while !self.is_end() && is_space(self.src[self.cur]) {
@@ -444,7 +441,7 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
               }
             }
 
-            attrs.set(TokenAttr::{ ns, name }, val_attr)
+            attrs.push((TokenAttr::{ ns, name }, val_attr))
           }
 
           if !self.is_end() && self.src[self.cur] == '/' {

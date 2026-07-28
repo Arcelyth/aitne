@@ -1,12 +1,8 @@
 ///|
-using @hashmap {type HashMap}
-
-///|
 test "parse valid mbx node with attributes and dynamic expression" {
-  let div_attrs = HashMap([])
-  div_attrs.set(
-    TokenAttr::{ ns: None, name: "eat" },
-    AttrValue::Expr("() => omg()"),
+  let div_attrs = []
+  div_attrs.push(
+    (TokenAttr::{ ns: None, name: "eat" }, AttrValue::Expr("() => omg()")),
   )
 
   let tokens = [
@@ -15,7 +11,7 @@ test "parse valid mbx node with attributes and dynamic expression" {
     Token::RawText(" "),
     Token::BraceOpen,
     Token::RawText("() => "),
-    Token::TagSelfClose({ tag: "div", attrs: HashMap([]) }),
+    Token::TagSelfClose({ tag: "div", attrs: [] }),
     Token::BraceClose,
     Token::RawText(" "),
     Token::TagClose({ tag: "div" }),
@@ -30,14 +26,18 @@ test "parse valid mbx node with attributes and dynamic expression" {
       #|[
       #|  ElementNode(
       #|    <StringView: "div">,
-      #|    <HashMap:
-      #|      { { ns: None, name: <StringView: "eat"> }: Expr(<StringView: "() => omg()">) }>,
+      #|    [
+      #|      (
+      #|        { ns: None, name: <StringView: "eat"> },
+      #|        Expr(<StringView: "() => omg()">),
+      #|      ),
+      #|    ],
       #|    [
       #|      RawText(<StringView: " ">),
       #|      DynamicCode(
       #|        [
       #|          PureCode(<StringView: "() => ">),
-      #|          ElementNode(<StringView: "div">, <HashMap: {}>, []),
+      #|          ElementNode(<StringView: "div">, [], []),
       #|        ],
       #|      ),
       #|      RawText(<StringView: " ">),
@@ -81,11 +81,11 @@ test "parse style block" {
 test "parse nested tag in children" {
   let tokens = [
     // <div>{() => {<li>{()=>name.get()}</li>}}</div>
-    Token::TagOpen({ tag: "div", attrs: HashMap([]) }),
+    Token::TagOpen({ tag: "div", attrs: [] }),
     Token::BraceOpen,
     Token::RawText("() => "),
     Token::BraceOpen,
-    Token::TagOpen({ tag: "li", attrs: HashMap([]) }),
+    Token::TagOpen({ tag: "li", attrs: [] }),
     Token::BraceOpen,
     Token::RawText("()=>name.get()"),
     Token::BraceClose,
@@ -104,14 +104,14 @@ test "parse nested tag in children" {
       #|[
       #|  ElementNode(
       #|    <StringView: "div">,
-      #|    <HashMap: {}>,
+      #|    [],
       #|    [
       #|      DynamicCode(
       #|        [
       #|          PureCode(<StringView: "() => {">),
       #|          ElementNode(
       #|            <StringView: "li">,
-      #|            <HashMap: {}>,
+      #|            [],
       #|            [DynamicCode([PureCode(<StringView: "()=>name.get()">)])],
       #|          ),
       #|          PureCode(<StringView: "}">),
@@ -126,11 +126,13 @@ test "parse nested tag in children" {
 
 ///|
 test "parse deeply nested tag" {
-  let attrs = HashMap([])
-  attrs.set(
-    TokenAttr::{ ns: None, name: "data" },
-    AttrValue::Expr(
-      "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}",
+  let attrs = []
+  attrs.push(
+    (
+      TokenAttr::{ ns: None, name: "data" },
+      AttrValue::Expr(
+        "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}",
+      ),
     ),
   )
 
@@ -148,13 +150,15 @@ test "parse deeply nested tag" {
       #|[
       #|  ElementNode(
       #|    <StringView: "Outer">,
-      #|    <HashMap:
-      #|      {
-      #|        { ns: None, name: <StringView: "data"> }: Expr(
+      #|    [
+      #|      (
+      #|        { ns: None, name: <StringView: "data"> },
+      #|        Expr(
       #|          <StringView:
       #|            "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}">,
       #|        ),
-      #|      }>,
+      #|      ),
+      #|    ],
       #|    [],
       #|  ),
       #|]
@@ -166,7 +170,7 @@ test "parse deeply nested tag" {
 test "parse sibling brace expressions" {
   let tokens = [
     // <div>{a}{b}</div>
-    Token::TagOpen({ tag: "div", attrs: HashMap([]) }),
+    Token::TagOpen({ tag: "div", attrs: [] }),
     Token::BraceOpen,
     Token::RawText("a"),
     Token::BraceClose,
@@ -185,7 +189,7 @@ test "parse sibling brace expressions" {
       #|[
       #|  ElementNode(
       #|    <StringView: "div">,
-      #|    <HashMap: {}>,
+      #|    [],
       #|    [
       #|      DynamicCode([PureCode(<StringView: "a">)]),
       #|      DynamicCode([PureCode(<StringView: "b">)]),

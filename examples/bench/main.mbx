@@ -105,24 +105,28 @@ fn app() -> &View {
     </div>
     <table class="table table-hover table-striped test-data">
       <tbody>
-        {for_each(each=() => data.get().iter(), key=(row) => { return row.id.to_string() }, children=(row) => {
-          let row_id = row.id
-          <tr class={() => if selector.selected(row_id) {"danger"} else {""}}>
-            <td class="col-md-1"> {() => row_id.to_string()} </td>
-            <td class="col-md-4">
-              <a on:click={_ => set_selected.set(row_id)}> {() => row.label.get()} </a>
-            </td>
-            <td class="col-md-1">
-              <a on:click={_ => {
-                let filtered = data.get().filter(fn(r) { r.id != row_id })
-                set_data.set(filtered)
-              }}>
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-              </a>
-            </td>
-            <td class="col-md-6"></td>
-          </tr>
-        })}
+        <ForEach 
+          each={()=>data.get().iter()}
+          key={(row)=>{return row.id.to_string()}}
+          children={(row)=>{
+            let row_id = row.id
+            <tr class={() => if selector.selected(row_id) {"danger"} else {""}}>
+              <td class="col-md-1"> {() => row_id.to_string()} </td>
+              <td class="col-md-4">
+                <a on:click={_ => set_selected.set(row_id)}> {() => row.label.get()} </a>
+              </td>
+              <td class="col-md-1">
+                <a on:click={_ => {
+                  let filtered = data.get().filter(fn(r) { r.id != row_id })
+                  set_data.set(filtered)
+                }}>
+                  <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                </a>
+              </td>
+              <td class="col-md-6"></td>
+            </tr>
+          }}
+        />
       </tbody>
     </table>
     <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span>

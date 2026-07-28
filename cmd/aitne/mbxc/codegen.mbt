@@ -244,7 +244,10 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
 
         self.buf.write(")")
 
-        attrs.each((attr, val) => self.gen_attr(attr, val))
+        for i = 0; i < attrs.length(); i = i + 1 {
+          let (attr, val) = attrs[i]
+          self.gen_attr(attr, val)
+        }
       } else {
         let snake_tag = to_snakecase(tag_name)
         self.buf.write(snake_tag)
@@ -252,7 +255,8 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
 
         let mut need_comma = false
 
-        attrs.each((attr, val) => {
+        for i = 0; i < attrs.length(); i = i + 1 {
+          let (attr, val) = attrs[i]
           if need_comma {
             self.buf.write(", ")
           }
@@ -279,7 +283,7 @@ fn CodeGen::gen_node(self : CodeGen, node : MbxAST) -> Unit {
               self.buf.write("\"")
             }
           }
-        })
+        }
 
         if valid_children.length() > 0 {
           if need_comma {

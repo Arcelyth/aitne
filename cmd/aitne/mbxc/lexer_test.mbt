@@ -9,7 +9,7 @@ test "lexer basic html" {
     tokens,
     content=(
       #|[
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  RawText(<StringView: "hello">),
       #|  TagClose({ tag: <StringView: "div"> }),
       #|]
@@ -30,7 +30,7 @@ test "lexer string handle" {
     content=(
       #|[
       #|  RawText(<StringView: "let a = \"<div>\"\n">),
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  RawText(<StringView: "\"<div>\"">),
       #|  TagClose({ tag: <StringView: "div"> }),
       #|]
@@ -51,7 +51,7 @@ test "lexer < handle outside" {
     content=(
       #|[
       #|  RawText(<StringView: "if a < b\n">),
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  RawText(<StringView: "\"<div>\"">),
       #|  TagClose({ tag: <StringView: "div"> }),
       #|]
@@ -70,7 +70,7 @@ test "lexer < handle inside" {
     tokens,
     content=(
       #|[
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  RawText(<StringView: "a < b">),
       #|  TagClose({ tag: <StringView: "div"> }),
       #|]
@@ -92,8 +92,7 @@ test "lexer attributes" {
       #|  TagOpen(
       #|    {
       #|      tag: <StringView: "div">,
-      #|      attrs: <HashMap:
-      #|        { { ns: None, name: <StringView: "id"> }: Str(<StringView: "app">) }>,
+      #|      attrs: [({ ns: None, name: <StringView: "id"> }, Str(<StringView: "app">))],
       #|    },
       #|  ),
       #|  TagClose({ tag: <StringView: "div"> }),
@@ -116,8 +115,12 @@ test "lexer event attribute" {
       #|  TagOpen(
       #|    {
       #|      tag: <StringView: "button">,
-      #|      attrs: <HashMap:
-      #|        { { ns: Some(<StringView: "on">), name: <StringView: "click"> }: Expr(<StringView: "() => 1">) }>,
+      #|      attrs: [
+      #|        (
+      #|          { ns: Some(<StringView: "on">), name: <StringView: "click"> },
+      #|          Expr(<StringView: "() => 1">),
+      #|        ),
+      #|      ],
       #|    },
       #|  ),
       #|  RawText(<StringView: "+">),
@@ -141,8 +144,7 @@ test "lexer self closing str" {
       #|  TagSelfClose(
       #|    {
       #|      tag: <StringView: "img">,
-      #|      attrs: <HashMap:
-      #|        { { ns: None, name: <StringView: "src"> }: Str(<StringView: "a.png">) }>,
+      #|      attrs: [({ ns: None, name: <StringView: "src"> }, Str(<StringView: "a.png">))],
       #|    },
       #|  ),
       #|]
@@ -164,8 +166,12 @@ test "lexer self closing expr" {
       #|  TagSelfClose(
       #|    {
       #|      tag: <StringView: "button">,
-      #|      attrs: <HashMap:
-      #|        { { ns: Some(<StringView: "on">), name: <StringView: "click"> }: Expr(<StringView: "() => a">) }>,
+      #|      attrs: [
+      #|        (
+      #|          { ns: Some(<StringView: "on">), name: <StringView: "click"> },
+      #|          Expr(<StringView: "() => a">),
+      #|        ),
+      #|      ],
       #|    },
       #|  ),
       #|]
@@ -186,7 +192,7 @@ test "lexer code then html" {
     content=(
       #|[
       #|  RawText(<StringView: "let a = 1\n">),
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  BraceOpen,
       #|  RawText(<StringView: "() => a">),
       #|  BraceClose,
@@ -209,7 +215,7 @@ test "lexer no brace" {
     content=(
       #|[
       #|  RawText(<StringView: "let a = 1\n">),
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  RawText(<StringView: "() => a">),
       #|  TagClose({ tag: <StringView: "div"> }),
       #|]
@@ -231,8 +237,12 @@ test "lexer nested code block attr" {
       #|  TagOpen(
       #|    {
       #|      tag: <StringView: "div">,
-      #|      attrs: <HashMap:
-      #|        { { ns: None, name: <StringView: "value"> }: Expr(<StringView: "{ a: { b: 1 } }">) }>,
+      #|      attrs: [
+      #|        (
+      #|          { ns: None, name: <StringView: "value"> },
+      #|          Expr(<StringView: "{ a: { b: 1 } }">),
+      #|        ),
+      #|      ],
       #|    },
       #|  ),
       #|  TagClose({ tag: <StringView: "div"> }),
@@ -251,7 +261,7 @@ test "custom component" {
   debug_inspect(
     tokens,
     content=(
-      #|[TagSelfClose({ tag: <StringView: "What">, attrs: <HashMap: {}> })]
+      #|[TagSelfClose({ tag: <StringView: "What">, attrs: [] })]
     ),
   )
 }
@@ -270,8 +280,12 @@ test "lexer mixed attributes" {
       #|  TagOpen(
       #|    {
       #|      tag: <StringView: "div">,
-      #|      attrs: <HashMap:
-      #|        { { ns: None, name: <StringView: "data-count"> }: Expr(<StringView: "123">) }>,
+      #|      attrs: [
+      #|        (
+      #|          { ns: None, name: <StringView: "data-count"> },
+      #|          Expr(<StringView: "123">),
+      #|        ),
+      #|      ],
       #|    },
       #|  ),
       #|  TagClose({ tag: <StringView: "div"> }),
@@ -365,8 +379,12 @@ test "lexer nested tag in attribute expression" {
       #|  TagSelfClose(
       #|    {
       #|      tag: <StringView: "Apple">,
-      #|      attrs: <HashMap:
-      #|        { { ns: None, name: <StringView: "eat"> }: Expr(<StringView: "() => {<li>{()=>name.get()}</li>}">) }>,
+      #|      attrs: [
+      #|        (
+      #|          { ns: None, name: <StringView: "eat"> },
+      #|          Expr(<StringView: "() => {<li>{()=>name.get()}</li>}">),
+      #|        ),
+      #|      ],
       #|    },
       #|  ),
       #|]
@@ -386,11 +404,11 @@ test "lexer nested tag in children expression" {
     tokens,
     content=(
       #|[
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  BraceOpen,
       #|  RawText(<StringView: "() => ">),
       #|  BraceOpen,
-      #|  TagOpen({ tag: <StringView: "li">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "li">, attrs: [] }),
       #|  BraceOpen,
       #|  RawText(<StringView: "()=>name.get()">),
       #|  BraceClose,
@@ -418,13 +436,15 @@ test "lexer deeply nested tag in attribute" {
       #|  TagSelfClose(
       #|    {
       #|      tag: <StringView: "Outer">,
-      #|      attrs: <HashMap:
-      #|        {
-      #|          { ns: None, name: <StringView: "data"> }: Expr(
+      #|      attrs: [
+      #|        (
+      #|          { ns: None, name: <StringView: "data"> },
+      #|          Expr(
       #|            <StringView:
       #|              "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}">,
       #|          ),
-      #|        }>,
+      #|        ),
+      #|      ],
       #|    },
       #|  ),
       #|]
@@ -444,11 +464,11 @@ test "lexer nested tag with method call" {
     tokens,
     content=(
       #|[
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  BraceOpen,
       #|  RawText(<StringView: "items.map(() => ">),
       #|  BraceOpen,
-      #|  TagOpen({ tag: <StringView: "li">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "li">, attrs: [] }),
       #|  BraceOpen,
       #|  RawText(<StringView: "()=>name.get()">),
       #|  BraceClose,

@@ -16,7 +16,7 @@ test "generate dynamic code block" {
 }
 
 ///|
-test "output_style" {
+test "output style" {
   let cg = CodeGen::new(path="index.mbx")
   let ast : Array[MbxAST] = [MbxAST::StyleNode(".btn { color: red; }")]
 
@@ -26,10 +26,12 @@ test "output_style" {
 
 ///|
 test "generate nested tag in attribute expression" {
-  let attrs = HashMap([])
-  attrs.set(
-    TokenAttr::{ ns: None, name: "eat" },
-    AttrValue::Expr("() => {<li>{()=>name.get()}</li>}"),
+  let attrs = []
+  attrs.push(
+    (
+      TokenAttr::{ ns: None, name: "eat" },
+      AttrValue::Expr("() => {<li>{()=>name.get()}</li>}"),
+    ),
   )
 
   let ast : Array[MbxAST] = [MbxAST::ElementNode("Apple", attrs, [])]
@@ -48,13 +50,11 @@ test "generate nested tag in attribute expression" {
 ///|
 test "generate nested tag in children" {
   // <div>{() => {<li>{()=>name.get()}</li>}}</div>
-  // The parser merges function body braces into PureCode text,
-  // so the DynamicCode contains PureCode + ElementNode + PureCode
   let ast : Array[MbxAST] = [
-    MbxAST::ElementNode("div", HashMap([]), [
+    MbxAST::ElementNode("div", [], [
       MbxAST::DynamicCode([
         MbxAST::PureCode("() => {"),
-        MbxAST::ElementNode("li", HashMap([]), [
+        MbxAST::ElementNode("li", [], [
           MbxAST::DynamicCode([MbxAST::PureCode("()=>name.get()")]),
         ]),
         MbxAST::PureCode("}"),
@@ -75,11 +75,13 @@ test "generate nested tag in children" {
 
 ///|
 test "generate deeply nested tag" {
-  let attrs = HashMap([])
-  attrs.set(
-    TokenAttr::{ ns: None, name: "data" },
-    AttrValue::Expr(
-      "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}",
+  let attrs = []
+  attrs.push(
+    (
+      TokenAttr::{ ns: None, name: "data" },
+      AttrValue::Expr(
+        "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}",
+      ),
     ),
   )
 
@@ -100,10 +102,10 @@ test "generate deeply nested tag" {
 test "generate nested tag with method call" {
   // <div>{items.map(() => {<li>{()=>name.get()}</li>})}</div>
   let ast : Array[MbxAST] = [
-    MbxAST::ElementNode("div", HashMap([]), [
+    MbxAST::ElementNode("div", [], [
       MbxAST::DynamicCode([
         MbxAST::PureCode("items.map(() => {"),
-        MbxAST::ElementNode("li", HashMap([]), [
+        MbxAST::ElementNode("li", [], [
           MbxAST::DynamicCode([MbxAST::PureCode("()=>name.get()")]),
         ]),
         MbxAST::PureCode("})"),
@@ -126,7 +128,7 @@ test "generate nested tag with method call" {
 test "generate sibling brace expressions" {
   // <div>{a}{b}</div>
   let ast : Array[MbxAST] = [
-    MbxAST::ElementNode("div", HashMap([]), [
+    MbxAST::ElementNode("div", [], [
       MbxAST::DynamicCode([MbxAST::PureCode("a")]),
       MbxAST::DynamicCode([MbxAST::PureCode("b")]),
     ]),
@@ -145,14 +147,14 @@ test "generate sibling brace expressions" {
 test "generate conditional with nested tags" {
   // <div>{condition ? <span>{()=>x.get()}</span> : <em>static</em>}</div>
   let ast : Array[MbxAST] = [
-    MbxAST::ElementNode("div", HashMap([]), [
+    MbxAST::ElementNode("div", [], [
       MbxAST::DynamicCode([
         MbxAST::PureCode("condition ? "),
-        MbxAST::ElementNode("span", HashMap([]), [
+        MbxAST::ElementNode("span", [], [
           MbxAST::DynamicCode([MbxAST::PureCode("()=>x.get()")]),
         ]),
         MbxAST::PureCode(" : "),
-        MbxAST::ElementNode("em", HashMap([]), [MbxAST::RawText("static")]),
+        MbxAST::ElementNode("em", [], [MbxAST::RawText("static")]),
       ]),
     ]),
   ]

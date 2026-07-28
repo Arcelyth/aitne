@@ -1,5 +1,5 @@
 ///|
-test "lexer_basic_html" {
+test "lexer basic html" {
   let src =
     #|<div>hello</div>
   let lexer = Lexer::new(src)
@@ -9,7 +9,7 @@ test "lexer_basic_html" {
     tokens,
     content=(
       #|[
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  RawText(<StringView: "hello">),
       #|  TagClose({ tag: <StringView: "div"> }),
       #|]
@@ -18,7 +18,7 @@ test "lexer_basic_html" {
 }
 
 ///|
-test "lexer_string_handle" {
+test "lexer string handle" {
   let src =
     #|let a = "<div>"
     #|<div>"<div>"</div>
@@ -30,7 +30,7 @@ test "lexer_string_handle" {
     content=(
       #|[
       #|  RawText(<StringView: "let a = \"<div>\"\n">),
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  RawText(<StringView: "\"<div>\"">),
       #|  TagClose({ tag: <StringView: "div"> }),
       #|]
@@ -39,7 +39,7 @@ test "lexer_string_handle" {
 }
 
 ///|
-test "lexer_<_handle_outside" {
+test "lexer < handle outside" {
   let src =
     #|if a < b
     #|<div>"<div>"</div>
@@ -51,7 +51,7 @@ test "lexer_<_handle_outside" {
     content=(
       #|[
       #|  RawText(<StringView: "if a < b\n">),
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  RawText(<StringView: "\"<div>\"">),
       #|  TagClose({ tag: <StringView: "div"> }),
       #|]
@@ -60,7 +60,7 @@ test "lexer_<_handle_outside" {
 }
 
 ///|
-test "lexer_<_handle_inside" {
+test "lexer < handle inside" {
   let src =
     #|<div>a < b</div>
   let lexer = Lexer::new(src)
@@ -70,7 +70,7 @@ test "lexer_<_handle_inside" {
     tokens,
     content=(
       #|[
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  RawText(<StringView: "a < b">),
       #|  TagClose({ tag: <StringView: "div"> }),
       #|]
@@ -79,7 +79,7 @@ test "lexer_<_handle_inside" {
 }
 
 ///|
-test "lexer_attributes" {
+test "lexer attributes" {
   let src =
     #|<div id="app"></div>
   let lexer = Lexer::new(src)
@@ -92,8 +92,7 @@ test "lexer_attributes" {
       #|  TagOpen(
       #|    {
       #|      tag: <StringView: "div">,
-      #|      attrs: <HashMap:
-      #|        { { ns: None, name: <StringView: "id"> }: Str(<StringView: "app">) }>,
+      #|      attrs: [({ ns: None, name: <StringView: "id"> }, Str(<StringView: "app">))],
       #|    },
       #|  ),
       #|  TagClose({ tag: <StringView: "div"> }),
@@ -103,7 +102,7 @@ test "lexer_attributes" {
 }
 
 ///|
-test "lexer_event_attribute" {
+test "lexer event attribute" {
   let src =
     #|<button on:click={() => 1}>+</button>
   let lexer = Lexer::new(src)
@@ -116,8 +115,12 @@ test "lexer_event_attribute" {
       #|  TagOpen(
       #|    {
       #|      tag: <StringView: "button">,
-      #|      attrs: <HashMap:
-      #|        { { ns: Some(<StringView: "on">), name: <StringView: "click"> }: Expr(<StringView: "() => 1">) }>,
+      #|      attrs: [
+      #|        (
+      #|          { ns: Some(<StringView: "on">), name: <StringView: "click"> },
+      #|          Expr(<StringView: "() => 1">),
+      #|        ),
+      #|      ],
       #|    },
       #|  ),
       #|  RawText(<StringView: "+">),
@@ -128,7 +131,7 @@ test "lexer_event_attribute" {
 }
 
 ///|
-test "lexer_self_closing_str" {
+test "lexer self closing str" {
   let src =
     #|<img src="a.png"/>
   let lexer = Lexer::new(src)
@@ -141,8 +144,7 @@ test "lexer_self_closing_str" {
       #|  TagSelfClose(
       #|    {
       #|      tag: <StringView: "img">,
-      #|      attrs: <HashMap:
-      #|        { { ns: None, name: <StringView: "src"> }: Str(<StringView: "a.png">) }>,
+      #|      attrs: [({ ns: None, name: <StringView: "src"> }, Str(<StringView: "a.png">))],
       #|    },
       #|  ),
       #|]
@@ -151,7 +153,7 @@ test "lexer_self_closing_str" {
 }
 
 ///|
-test "lexer_self_closing_expr" {
+test "lexer self closing expr" {
   let src =
     #|<button on:click={() => a}/>
   let lexer = Lexer::new(src)
@@ -164,8 +166,12 @@ test "lexer_self_closing_expr" {
       #|  TagSelfClose(
       #|    {
       #|      tag: <StringView: "button">,
-      #|      attrs: <HashMap:
-      #|        { { ns: Some(<StringView: "on">), name: <StringView: "click"> }: Expr(<StringView: "() => a">) }>,
+      #|      attrs: [
+      #|        (
+      #|          { ns: Some(<StringView: "on">), name: <StringView: "click"> },
+      #|          Expr(<StringView: "() => a">),
+      #|        ),
+      #|      ],
       #|    },
       #|  ),
       #|]
@@ -174,7 +180,7 @@ test "lexer_self_closing_expr" {
 }
 
 ///|
-test "lexer_code_then_html" {
+test "lexer code then html" {
   let src =
     #|let a = 1
     #|<div>{() => a}</div>
@@ -186,7 +192,7 @@ test "lexer_code_then_html" {
     content=(
       #|[
       #|  RawText(<StringView: "let a = 1\n">),
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  BraceOpen,
       #|  RawText(<StringView: "() => a">),
       #|  BraceClose,
@@ -197,7 +203,7 @@ test "lexer_code_then_html" {
 }
 
 ///|
-test "lexer_no_brace" {
+test "lexer no brace" {
   let src =
     #|let a = 1
     #|<div>() => a</div>
@@ -209,7 +215,7 @@ test "lexer_no_brace" {
     content=(
       #|[
       #|  RawText(<StringView: "let a = 1\n">),
-      #|  TagOpen({ tag: <StringView: "div">, attrs: <HashMap: {}> }),
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
       #|  RawText(<StringView: "() => a">),
       #|  TagClose({ tag: <StringView: "div"> }),
       #|]
@@ -218,7 +224,7 @@ test "lexer_no_brace" {
 }
 
 ///|
-test "lexer_nested_code_block_attr" {
+test "lexer nested code block attr" {
   let src =
     #|<div value={{ a: { b: 1 } }}></div>
   let lexer = Lexer::new(src)
@@ -231,8 +237,12 @@ test "lexer_nested_code_block_attr" {
       #|  TagOpen(
       #|    {
       #|      tag: <StringView: "div">,
-      #|      attrs: <HashMap:
-      #|        { { ns: None, name: <StringView: "value"> }: Expr(<StringView: "{ a: { b: 1 } }">) }>,
+      #|      attrs: [
+      #|        (
+      #|          { ns: None, name: <StringView: "value"> },
+      #|          Expr(<StringView: "{ a: { b: 1 } }">),
+      #|        ),
+      #|      ],
       #|    },
       #|  ),
       #|  TagClose({ tag: <StringView: "div"> }),
@@ -242,7 +252,7 @@ test "lexer_nested_code_block_attr" {
 }
 
 ///|
-test "custom_component" {
+test "custom component" {
   let src =
     #|<What />
   let lexer = Lexer::new(src)
@@ -251,13 +261,13 @@ test "custom_component" {
   debug_inspect(
     tokens,
     content=(
-      #|[TagSelfClose({ tag: <StringView: "What">, attrs: <HashMap: {}> })]
+      #|[TagSelfClose({ tag: <StringView: "What">, attrs: [] })]
     ),
   )
 }
 
 ///|
-test "lexer_mixed_attributes" {
+test "lexer mixed attributes" {
   let src =
     #|<div data-count={123}></div>
   let lexer = Lexer::new(src)
@@ -270,8 +280,12 @@ test "lexer_mixed_attributes" {
       #|  TagOpen(
       #|    {
       #|      tag: <StringView: "div">,
-      #|      attrs: <HashMap:
-      #|        { { ns: None, name: <StringView: "data-count"> }: Expr(<StringView: "123">) }>,
+      #|      attrs: [
+      #|        (
+      #|          { ns: None, name: <StringView: "data-count"> },
+      #|          Expr(<StringView: "123">),
+      #|        ),
+      #|      ],
       #|    },
       #|  ),
       #|  TagClose({ tag: <StringView: "div"> }),
@@ -281,7 +295,7 @@ test "lexer_mixed_attributes" {
 }
 
 ///|
-test "lexer_muti_string" {
+test "lexer muti string" {
   let src =
     #|let s = 
     #|#|<div> <div>
@@ -299,7 +313,7 @@ test "lexer_muti_string" {
 }
 
 ///|
-test "lexer_css_block" {
+test "lexer css block" {
   let src =
     #|let style = ${
     #|  .btn {
@@ -325,7 +339,7 @@ test "lexer_css_block" {
 }
 
 ///|
-test "lexer_css_block_with_comments_and_strings" {
+test "lexer css block with comments and strings" {
   let src =
     #|${
     #|  /* CSS comment */
@@ -345,6 +359,124 @@ test "lexer_css_block_with_comments_and_strings" {
       #|    <StringView:
       #|      "\n  /* CSS comment */\n  .title::after {\n    content: \"hello }$ world\"; // string with fake closing tag\n  }\n">,
       #|  ),
+      #|]
+    ),
+  )
+}
+
+///|
+test "lexer nested tag in attribute expression" {
+  // <Apple eat={() => {<li>{()=>name.get()}</li>}}/>
+  let src =
+    #|<Apple eat={() => {<li>{()=>name.get()}</li>}}/>
+  let lexer = Lexer::new(src)
+  let tokens = lexer.tokenizer()
+
+  debug_inspect(
+    tokens,
+    content=(
+      #|[
+      #|  TagSelfClose(
+      #|    {
+      #|      tag: <StringView: "Apple">,
+      #|      attrs: [
+      #|        (
+      #|          { ns: None, name: <StringView: "eat"> },
+      #|          Expr(<StringView: "() => {<li>{()=>name.get()}</li>}">),
+      #|        ),
+      #|      ],
+      #|    },
+      #|  ),
+      #|]
+    ),
+  )
+}
+
+///|
+test "lexer nested tag in children expression" {
+  // <div>{() => {<li>{()=>name.get()}</li>}}</div>
+  let src =
+    #|<div>{() => {<li>{()=>name.get()}</li>}}</div>
+  let lexer = Lexer::new(src)
+  let tokens = lexer.tokenizer()
+
+  debug_inspect(
+    tokens,
+    content=(
+      #|[
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
+      #|  BraceOpen,
+      #|  RawText(<StringView: "() => ">),
+      #|  BraceOpen,
+      #|  TagOpen({ tag: <StringView: "li">, attrs: [] }),
+      #|  BraceOpen,
+      #|  RawText(<StringView: "()=>name.get()">),
+      #|  BraceClose,
+      #|  TagClose({ tag: <StringView: "li"> }),
+      #|  BraceClose,
+      #|  BraceClose,
+      #|  TagClose({ tag: <StringView: "div"> }),
+      #|]
+    ),
+  )
+}
+
+///|
+test "lexer deeply nested tag in attribute" {
+  // <Outer data={() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}}/>
+  let src =
+    #|<Outer data={() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}}/>
+  let lexer = Lexer::new(src)
+  let tokens = lexer.tokenizer()
+
+  debug_inspect(
+    tokens,
+    content=(
+      #|[
+      #|  TagSelfClose(
+      #|    {
+      #|      tag: <StringView: "Outer">,
+      #|      attrs: [
+      #|        (
+      #|          { ns: None, name: <StringView: "data"> },
+      #|          Expr(
+      #|            <StringView:
+      #|              "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}">,
+      #|          ),
+      #|        ),
+      #|      ],
+      #|    },
+      #|  ),
+      #|]
+    ),
+  )
+}
+
+///|
+test "lexer nested tag with method call" {
+  // <div>{items.map(() => {<li>{()=>name.get()}</li>})}</div>
+  let src =
+    #|<div>{items.map(() => {<li>{()=>name.get()}</li>})}</div>
+  let lexer = Lexer::new(src)
+  let tokens = lexer.tokenizer()
+
+  debug_inspect(
+    tokens,
+    content=(
+      #|[
+      #|  TagOpen({ tag: <StringView: "div">, attrs: [] }),
+      #|  BraceOpen,
+      #|  RawText(<StringView: "items.map(() => ">),
+      #|  BraceOpen,
+      #|  TagOpen({ tag: <StringView: "li">, attrs: [] }),
+      #|  BraceOpen,
+      #|  RawText(<StringView: "()=>name.get()">),
+      #|  BraceClose,
+      #|  TagClose({ tag: <StringView: "li"> }),
+      #|  BraceClose,
+      #|  RawText(<StringView: ")">),
+      #|  BraceClose,
+      #|  TagClose({ tag: <StringView: "div"> }),
       #|]
     ),
   )

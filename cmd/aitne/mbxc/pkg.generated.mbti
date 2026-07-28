@@ -3,7 +3,6 @@ package "Arcelyth/aitne/cmd/aitne/mbxc"
 
 import {
   "moonbitlang/core/debug",
-  "moonbitlang/core/hashmap",
   "moonbitlang/core/hashset",
   "moonbitlang/core/ref",
 }
@@ -66,7 +65,7 @@ pub(all) enum MbxAST {
   PureCode(StringView)
   RawText(StringView)
   DynamicCode(Array[MbxAST])
-  ElementNode(StringView, @hashmap.HashMap[TokenAttr, AttrValue], Array[MbxAST])
+  ElementNode(StringView, Array[(TokenAttr, AttrValue)], Array[MbxAST])
   StyleNode(StringView)
 } derive(Eq, @debug.Debug)
 
@@ -83,12 +82,12 @@ pub(all) struct TagClose {
 
 pub(all) struct TagOpen {
   tag : StringView
-  attrs : @hashmap.HashMap[TokenAttr, AttrValue]
+  attrs : Array[(TokenAttr, AttrValue)]
 } derive(Eq, @debug.Debug)
 
 pub(all) struct TagSelfClose {
   tag : StringView
-  attrs : @hashmap.HashMap[TokenAttr, AttrValue]
+  attrs : Array[(TokenAttr, AttrValue)]
 } derive(Eq, @debug.Debug)
 
 pub(all) enum Token {

@@ -60,10 +60,10 @@ fn btn(id~ : String, text~ : String, on_click~ : (@ffi.Event) -> Unit) -> &View 
     @Arcelyth/aitne/src/dom.button(children=[
       @Arcelyth/aitne/src/dom.text_dyn(() => text),
     ])
-    .on(Click, on_click)
-    .attr("type", "button")
+    .attr("id", id)
     .class("btn btn-primary btn-block")
-    .attr("id", id),
+    .attr("type", "button")
+    .on(Click, on_click),
   ]).class("col-sm-6 smallpad")
 }
 
@@ -111,12 +111,12 @@ fn app() -> &View {
         ]).class("col-md-6"),
         @Arcelyth/aitne/src/dom.div(children=[
           @Arcelyth/aitne/src/dom.div(children=[
-            btn(text="Create 1,000 rows", on_click=run, id="run"),
-            btn(text="Create 10,000 rows", on_click=run_lots, id="runlots"),
-            btn(text="Append 1,000 rows", on_click=add, id="add"),
-            btn(text="Update every 10th row", on_click=update, id="update"),
-            btn(text="Clear", on_click=clear, id="clear"),
-            btn(text="Swap Rows", on_click=swap_rows, id="swaprows"),
+            btn(id="run", text="Create 1,000 rows", on_click=run),
+            btn(id="runlots", text="Create 10,000 rows", on_click=run_lots),
+            btn(id="add", text="Append 1,000 rows", on_click=add),
+            btn(id="update", text="Update every 10th row", on_click=update),
+            btn(id="clear", text="Clear", on_click=clear),
+            btn(id="swaprows", text="Swap Rows", on_click=swap_rows),
           ]).class("row"),
         ]).class("col-md-6"),
       ]).class("row"),

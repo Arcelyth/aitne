@@ -1,4 +1,7 @@
 ///|
+using @hashmap {type HashMap}
+
+///|
 fn sanitize_field_name(cls : String) -> String {
   let sb = StringBuilder::new()
   let len = cls.length()

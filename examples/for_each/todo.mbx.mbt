@@ -29,8 +29,8 @@ fn todo_app() -> &View {
     ]),
     @Arcelyth/aitne/src/dom.div(children=[
       @Arcelyth/aitne/src/dom.input()
-      .value(input_val)
       .attr("type", "text")
+      .value(input_val)
       .on(Input, ev => set_input_val.set(event_target_value(ev))),
       @Arcelyth/aitne/src/dom.button(children=["Add"]).on(Click, add_item),
     ]),
@@ -38,7 +38,7 @@ fn todo_app() -> &View {
       for_each(each=() => todo.get().iter(), key=x => { return x }, children=item => {
         @Arcelyth/aitne/src/dom.li(children=[
           @Arcelyth/aitne/src/dom.text_dyn(() => item),
-          @Arcelyth/aitne/src/dom.button(children=["\"Delete\""]).on(Click, _ => {
+          @Arcelyth/aitne/src/dom.button(children=["Delete"]).on(Click, _ => {
             remove_item(item)
           }),
         ])

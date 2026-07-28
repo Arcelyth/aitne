@@ -126,7 +126,7 @@ fn app() -> &View {
         for_each(
           each=() => data.get().iter(),
           key=row => { return row.id.to_string() },
-          render=row => {
+          children=row => {
             let row_id = row.id
             @Arcelyth/aitne/src/dom.tr(children=[
               @Arcelyth/aitne/src/dom.td(children=[

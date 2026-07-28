@@ -3,7 +3,7 @@
 pub struct ForNode[T, K] {
   each : () -> Array[T]
   key : (T) -> K
-  render : (T) -> &View
+  children : (T) -> &View
 }
 
 ///|
@@ -11,9 +11,9 @@ pub struct ForNode[T, K] {
 pub fn[T, K : Hash + Eq] for_node(
   each : () -> Array[T],
   key : (T) -> K,
-  render : (T) -> &View,
+  children : (T) -> &View,
 ) -> &View {
-  ForNode::{ each, key, render }
+  ForNode::{ each, key, children }
 }
 
 ///|
@@ -23,7 +23,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
 
   let each = self.each
   let key_fn = self.key
-  let render_fn = self.render
+  let render_fn = self.children
 
   let cache : Ref[@hashmap.HashMap[K, RenderState]] = @ref.new(HashMap([]))
   let mounted : Ref[Bool] = @ref.new(false)
@@ -134,7 +134,7 @@ pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn html_len(self) -
   let mut len = 0
   let items = (self.each)()
   for item in items {
-    len += (self.render)(item).html_len()
+    len += (self.children)(item).html_len()
   }
   len
 }
@@ -147,7 +147,7 @@ pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn to_html_with_buf
 ) -> Unit {
   let items = (self.each)()
   for item in items {
-    (self.render)(item).to_html_with_buf(buf, pos)
+    (self.children)(item).to_html_with_buf(buf, pos)
   }
 }
 
@@ -160,23 +160,23 @@ pub impl[T, K : Hash + Eq] View for ForNode[T, K] with fn style(self, _s) -> &Vi
 pub struct ForEach[T] {
   each : () -> Iter[T]
   key : (T) -> String
-  render : (T) -> &View
+  children : (T) -> &View
 }
 
 ///|
 pub fn[T] for_each(
   each~ : () -> Iter[T],
   key~ : (T) -> String,
-  render~ : (T) -> &View,
+  children~ : (T) -> &View,
 ) -> &View {
-  ForEach::{ each, key, render }
+  ForEach::{ each, key, children }
 }
 
 ///|
 pub impl[T] Render for ForEach[T] with fn build(self) -> RenderState {
   let each_fn = self.each
   let key_fn = self.key
-  let render_fn = self.render
+  let render_fn = self.children
 
   let owner = match Owner::current() {
     Some(o) => o
@@ -226,7 +226,7 @@ pub impl[T] RenderHtml for ForEach[T] with fn html_len(self) -> Int {
   let mut len = 0
   let items = (self.each)()
   for item in items {
-    len += (self.render)(item).html_len()
+    len += (self.children)(item).html_len()
   }
   len
 }
@@ -235,7 +235,7 @@ pub impl[T] RenderHtml for ForEach[T] with fn html_len(self) -> Int {
 pub impl[T] RenderHtml for ForEach[T] with fn to_html_with_buf(self, buf, pos) -> Unit {
   let items = (self.each)()
   for item in items {
-    (self.render)(item).to_html_with_buf(buf, pos)
+    (self.children)(item).to_html_with_buf(buf, pos)
   }
 }
 

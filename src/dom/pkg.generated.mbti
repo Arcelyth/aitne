@@ -112,7 +112,7 @@ pub fn figure(children? : Array[&View]) -> HtmlElement[TagFigure, Array[&View]]
 
 pub fn footer(children? : Array[&View]) -> HtmlElement[TagFooter, Array[&View]]
 
-pub fn[T] for_each(each~ : () -> Iter[T], key~ : (T) -> String, render~ : (T) -> &View) -> &View
+pub fn[T] for_each(each~ : () -> Iter[T], key~ : (T) -> String, children~ : (T) -> &View) -> &View
 
 pub fn[T, K : Hash + Eq] for_node(() -> Array[T], (T) -> K, (T) -> &View) -> &View
 
@@ -423,7 +423,7 @@ pub fn EventType::to_string(Self) -> String
 pub struct ForEach[T] {
   each : () -> Iter[T]
   key : (T) -> String
-  render : (T) -> &View
+  children : (T) -> &View
 }
 pub impl[T] Render for ForEach[T]
 pub impl[T] RenderHtml for ForEach[T]
@@ -432,7 +432,7 @@ pub impl[T] View for ForEach[T]
 pub struct ForNode[T, K] {
   each : () -> Array[T]
   key : (T) -> K
-  render : (T) -> &View
+  children : (T) -> &View
 }
 pub impl[T, K : Hash + Eq] Render for ForNode[T, K]
 pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K]

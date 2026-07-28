@@ -114,6 +114,7 @@ pub fn footer(children? : Array[&View]) -> HtmlElement[TagFooter, Array[&View]]
 
 pub fn[T] for_each(each~ : () -> Iter[T], key~ : (T) -> String, children~ : (T) -> &View) -> &View
 
+#deprecated
 pub fn[T, K : Hash + Eq] for_node(() -> Array[T], (T) -> K, (T) -> &View) -> &View
 
 pub fn form(children? : Array[&View]) -> HtmlElement[TagForm, Array[&View]]

@@ -44,5 +44,4 @@ fn todo_app() -> &View {
       />
     </ul>
   </div>
-
 }

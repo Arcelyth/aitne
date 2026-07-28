@@ -8,6 +8,7 @@ pub struct ForNode[T, K] {
 
 ///|
 /// Create a keyed dynamic list node.
+#deprecated("Use <ForEach> instead.")
 pub fn[T, K : Hash + Eq] for_node(
   each : () -> Array[T],
   key : (T) -> K,

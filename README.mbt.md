@@ -21,6 +21,7 @@ curl -fsSL https://raw.githubusercontent.com/Arcelyth/aitne/main/scripts/install
 ```bash
 aitne init your_project
 cd your_project
+moon update
 ```
 
 Build your project:
@@ -40,7 +41,6 @@ This will start a web server on `http://localhost:8000` by default which depends
 
 Todo list: 
 ```moonbit
-///|
 fn todo_app() -> &View {
   let (input_val, set_input_val) = @reactive.create_signal("")
   let (todo, set_todo) = @reactive.create_signal(["Example."])
@@ -70,15 +70,18 @@ fn todo_app() -> &View {
       <button on:click={add_item}> Add </button>
     </div>
     <ul>
-      {for_node(() => todo.get(), item => {return item }, (item) => {
-        <li>
-          {() => item}
-          <button on:click={_ => remove_item(item)}> "Delete" </button>
-        </li>
-      })}
+      <ForEach 
+        each={()=>todo.get().iter()}
+        key={(x)=>{return x}}
+        children={(item) => {
+          <li>
+            {() => item}
+            <button on:click={_ => remove_item(item)}> "Delete" </button>
+          </li>
+        }}
+      />
     </ul>
   </div>
-
 }
 ```
 

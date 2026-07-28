@@ -35,10 +35,10 @@ fn todo_app() -> &View {
       @Arcelyth/aitne/src/dom.button(children=["Add"]).on(Click, add_item),
     ]),
     @Arcelyth/aitne/src/dom.ul(children=[
-      for_each(each=() => todo.get().iter(), key=x => { return x }, children=item => {
+      for_each(key=x => { return x }, each=() => todo.get().iter(), children=item => {
         @Arcelyth/aitne/src/dom.li(children=[
           @Arcelyth/aitne/src/dom.text_dyn(() => item),
-          @Arcelyth/aitne/src/dom.button(children=["\"Delete\""]).on(Click, _ => {
+          @Arcelyth/aitne/src/dom.button(children=["Delete"]).on(Click, _ => {
             remove_item(item)
           }),
         ])

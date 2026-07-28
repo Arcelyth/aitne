@@ -65,6 +65,72 @@ fn CodeGen::gen_expr_code(self : CodeGen, expr_str : StringView) -> Unit {
       let tok = tokens[idx[0]]
       match tok {
         Token::TagClose(_) => break
+        Token::BraceOpen => {
+          idx[0] += 1
+          let mut brace_depth = 1
+          let local_children = []
+          let code_buf = StringBuilder::new()
+
+          while brace_depth > 0 && idx[0] < len {
+            match tokens[idx[0]] {
+              Token::BraceOpen => {
+                brace_depth += 1
+                code_buf.write("{")
+                idx[0] += 1
+              }
+              Token::BraceClose => {
+                brace_depth -= 1
+                if brace_depth > 0 {
+                  code_buf.write("}")
+                }
+                idx[0] += 1
+              }
+              Token::TagOpen(_) | Token::TagSelfClose(_) => {
+                let code_str = code_buf.to_string()
+                if code_str.length() > 0 {
+                  local_children.push(MbxAST::PureCode(code_str))
+                }
+                code_buf.reset()
+
+                let tag_tok = tokens[idx[0]]
+                idx[0] += 1
+                match tag_tok {
+                  Token::TagSelfClose(t) =>
+                    local_children.push(MbxAST::ElementNode(t.tag, t.attrs, []))
+                  Token::TagOpen(t) => {
+                    let children = parse_nodes()
+                    if idx[0] < len {
+                      match tokens[idx[0]] {
+                        Token::TagClose(c) => if c.tag == t.tag { idx[0] += 1 }
+                        _ => ()
+                      }
+                    }
+                    local_children.push(
+                      MbxAST::ElementNode(t.tag, t.attrs, children),
+                    )
+                  }
+                  _ => ()
+                }
+              }
+              Token::RawText(text) => {
+                code_buf.write(text.to_owned())
+                idx[0] += 1
+              }
+              Token::CodeBlock(code) => {
+                code_buf.write(code.to_owned())
+                idx[0] += 1
+              }
+              _ => idx[0] += 1
+            }
+          }
+
+          let code_str = code_buf.to_string()
+          if code_str.length() > 0 {
+            local_children.push(MbxAST::PureCode(code_str))
+          }
+
+          nodes.push(MbxAST::DynamicCode(local_children))
+        }
         _ => {
           idx[0] += 1
           match tok {

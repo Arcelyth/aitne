@@ -31,13 +31,17 @@ fn todo_app() -> &View {
       <button on:click={add_item}> Add </button>
     </div>
     <ul>
-      {for_each(each=() => todo.get().iter(), key=(x) => { return x }, render=(item) => {
-        <li>
-          {() => item}
-          <button on:click={_ => remove_item(item)}> "Delete" </button>
-        </li>
-      })}
-     
+      <ForEach 
+        each={()=>todo.get().iter()}
+        key={(x)=>{return x}}
+        children={(item) => {
+          <li>
+            {() => item}
+            <button on:click={_ => remove_item(item)}> "Delete" </button>
+          </li>
+
+        }}
+      />
     </ul>
   </div>
 

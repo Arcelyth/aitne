@@ -76,3 +76,122 @@ test "parse style block" {
     ),
   )
 }
+
+///|
+test "parse nested tag in children" {
+  let tokens = [
+    // <div>{() => {<li>{()=>name.get()}</li>}}</div>
+    Token::TagOpen({ tag: "div", attrs: HashMap([]) }),
+    Token::BraceOpen,
+    Token::RawText("() => "),
+    Token::BraceOpen,
+    Token::TagOpen({ tag: "li", attrs: HashMap([]) }),
+    Token::BraceOpen,
+    Token::RawText("()=>name.get()"),
+    Token::BraceClose,
+    Token::TagClose({ tag: "li" }),
+    Token::BraceClose,
+    Token::BraceClose,
+    Token::TagClose({ tag: "div" }),
+  ]
+
+  let parser = Parser::new(tokens)
+  let result = parser.parse()
+
+  debug_inspect(
+    result,
+    content=(
+      #|[
+      #|  ElementNode(
+      #|    <StringView: "div">,
+      #|    <HashMap: {}>,
+      #|    [
+      #|      DynamicCode(
+      #|        [
+      #|          PureCode(<StringView: "() => {">),
+      #|          ElementNode(
+      #|            <StringView: "li">,
+      #|            <HashMap: {}>,
+      #|            [DynamicCode([PureCode(<StringView: "()=>name.get()">)])],
+      #|          ),
+      #|          PureCode(<StringView: "}">),
+      #|        ],
+      #|      ),
+      #|    ],
+      #|  ),
+      #|]
+    ),
+  )
+}
+
+///|
+test "parse deeply nested tag" {
+  let attrs = HashMap([])
+  attrs.set(
+    TokenAttr::{ ns: None, name: "data" },
+    AttrValue::Expr(
+      "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}",
+    ),
+  )
+
+  let tokens = [
+    // <Outer data={() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}}/>
+    Token::TagSelfClose({ tag: "Outer", attrs }),
+  ]
+
+  let parser = Parser::new(tokens)
+  let result = parser.parse()
+
+  debug_inspect(
+    result,
+    content=(
+      #|[
+      #|  ElementNode(
+      #|    <StringView: "Outer">,
+      #|    <HashMap:
+      #|      {
+      #|        { ns: None, name: <StringView: "data"> }: Expr(
+      #|          <StringView:
+      #|            "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}">,
+      #|        ),
+      #|      }>,
+      #|    [],
+      #|  ),
+      #|]
+    ),
+  )
+}
+
+///|
+test "parse sibling brace expressions" {
+  let tokens = [
+    // <div>{a}{b}</div>
+    Token::TagOpen({ tag: "div", attrs: HashMap([]) }),
+    Token::BraceOpen,
+    Token::RawText("a"),
+    Token::BraceClose,
+    Token::BraceOpen,
+    Token::RawText("b"),
+    Token::BraceClose,
+    Token::TagClose({ tag: "div" }),
+  ]
+
+  let parser = Parser::new(tokens)
+  let result = parser.parse()
+
+  debug_inspect(
+    result,
+    content=(
+      #|[
+      #|  ElementNode(
+      #|    <StringView: "div">,
+      #|    <HashMap: {}>,
+      #|    [
+      #|      DynamicCode([PureCode(<StringView: "a">)]),
+      #|      DynamicCode([PureCode(<StringView: "b">)]),
+      #|    ],
+      #|  ),
+      #|]
+    ),
+  )
+}

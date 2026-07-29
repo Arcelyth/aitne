@@ -76,13 +76,13 @@ fn app() -> &View {
 
   let run_lots = _ => set_data.set(build_data(10000))
 
-  let add = _ => set_data.set(data.get() + build_data(1000))
+  let add = _ => set_data.update(d => d.add(build_data(1000)))
 
   let update = _ => {
     let d = data.get()
     for i = 0; i < d.length(); i = i + 10 {
       let row = d[i]
-      row.set_label.set(row.label.get() + " !!!")
+      row.set_label.update(r => r + " !!!")
     }
   }
 

@@ -19,6 +19,14 @@ pub impl[P : IntoProperty] Attribute for Property[P] with fn html_len(_self) -> 
 }
 
 ///|
+pub impl[P : IntoProperty] Attribute for Property[P] with fn hydrate(
+  self,
+  el : @ffi.Element,
+) -> AttrState {
+  self.value.hydrate(el, self.key)
+}
+
+///|
 pub impl[P : IntoProperty] Attribute for Property[P] with fn to_html(
   _self,
   _b,
@@ -70,6 +78,7 @@ pub trait IntoProperty {
   ) -> Unit
   fn build(Self, el : @ffi.Element, key : String) -> AttrState
   fn rebuild(Self, state : Ref[AttrState], key : String) -> Unit
+  fn hydrate(Self, el : @ffi.Element, key : String) -> AttrState
   fn dry_resolve(Self) -> Unit
 }
 
@@ -78,6 +87,12 @@ pub trait IntoProperty {
 ///|
 pub impl IntoProperty for String with fn html_len(self) -> Int {
   self.length()
+}
+
+///|
+pub impl IntoProperty for String with fn hydrate(self, el, key) -> AttrState {
+  @ffi.dom_set_prop(@ffi.el_as_node(el), key, self)
+  AttrState::Element(el)
 }
 
 ///|
@@ -115,6 +130,15 @@ pub impl IntoProperty for String with fn dry_resolve(_self) -> Unit {
 ///|
 pub impl[S : Show] IntoProperty for ReadSignal[S] with fn html_len(_self) -> Int {
   0
+}
+
+///|
+pub impl[S : Show] IntoProperty for ReadSignal[S] with fn hydrate(self, el, key) -> AttrState {
+  let _ = @reactive.Effect::new(fn(_) {
+    let val = self.get()
+    @ffi.dom_set_prop(@ffi.el_as_node(el), key, val.to_string())
+  })
+  AttrState::None
 }
 
 ///|

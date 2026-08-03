@@ -47,6 +47,15 @@ pub impl Attribute for AttrList with fn html_len(self) -> Int {
 }
 
 ///|
+pub impl Attribute for AttrList with fn hydrate(self, el : @ffi.Element) -> AttrState {
+  let mut cur = AttrState::None
+  for item in self.items {
+    cur = AttrState::Pair(cur, item.hydrate(el))
+  }
+  cur
+}
+
+///|
 pub impl Attribute for AttrList with fn to_html(
   self,
   buf : StringBuilder,
@@ -143,6 +152,43 @@ pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with 
   } else {
     2 + tag_len + attrs_len + self.children.html_len() + 3 + tag_len
   }
+}
+
+///|
+pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with fn hydrate(
+  self,
+  cursor : Cursor,
+  pos : PositionState,
+) -> RenderState {
+  if pos.get() == Position::FirstChild {
+    cursor.child()
+  } else {
+    cursor.sibling()
+  }
+
+  if pos.get() == Position::NextChildAfterText {
+    cursor.sibling()
+  }
+
+  let node = cursor.current()
+  let el = @ffi.cast_node_to_element(node)
+  let attrs = self.attrs.hydrate(el)
+
+  let children = if self.tag.is_self_closing() {
+    RenderState::None
+  } else {
+    pos.set(Position::FirstChild)
+    let children_state = self.children.hydrate(cursor, pos)
+
+    if pos.get() != Position::FirstChild {
+      cursor.parent()
+    }
+    children_state
+  }
+
+  pos.set(Position::NextChild)
+
+  RenderState::Element(ElementState::{ el, attrs, children })
 }
 
 ///|
@@ -293,6 +339,21 @@ pub impl RenderHtml for Array[&View] with fn html_len(self) -> Int {
 }
 
 ///|
+pub impl RenderHtml for Array[&View] with fn hydrate(
+  self,
+  cursor : Cursor,
+  pos : PositionState,
+) -> RenderState {
+  let states = []
+
+  for kid in self {
+    states.push(RenderHtml::hydrate(kid, cursor, pos))
+  }
+
+  RenderState::Fragment(FragmentState::{ children: states })
+}
+
+///|
 pub impl RenderHtml for Array[&View] with fn to_html_with_buf(self, buf, pos) -> Unit {
   for kid in self {
     kid.to_html_with_buf(buf, pos)
@@ -326,6 +387,34 @@ pub impl Render for TextNode with fn rebuild(_self, _state) -> Unit {
 ///|
 pub impl RenderHtml for TextNode with fn html_len(self) -> Int {
   self.val.length()
+}
+
+///|
+pub impl RenderHtml for TextNode with fn hydrate(
+  _self,
+  cursor : Cursor,
+  pos : PositionState,
+) -> RenderState {
+  if pos.get() == Position::FirstChild {
+    cursor.child()
+  } else {
+    cursor.sibling()
+  }
+
+  if pos.get() == Position::NextChildAfterText {
+    cursor.sibling()
+  }
+
+  let curr_node = cursor.current()
+  let node = if @ffi.is_text_node(curr_node) {
+    @ffi.cast_node_to_text(curr_node)
+  } else {
+    failed_to_cast_text_node(curr_node)
+  }
+
+  pos.set(Position::NextChildAfterText)
+
+  RenderState::Text(TextState::{ node, })
 }
 
 ///|
@@ -363,6 +452,38 @@ pub impl Render for DynTextNode with fn rebuild(_self, _state) -> Unit {
 ///|
 pub impl RenderHtml for DynTextNode with fn html_len(_self) -> Int {
   0
+}
+
+///|
+pub impl RenderHtml for DynTextNode with fn hydrate(
+  self,
+  cursor : Cursor,
+  pos : PositionState,
+) -> RenderState {
+  if pos.get() == Position::FirstChild {
+    cursor.child()
+  } else {
+    cursor.sibling()
+  }
+
+  if pos.get() == Position::NextChildAfterText {
+    cursor.sibling()
+  }
+
+  let curr_node = cursor.current()
+  let node = if @ffi.is_text_node(curr_node) {
+    @ffi.cast_node_to_text(curr_node)
+  } else {
+    failed_to_cast_text_node(curr_node)
+  }
+
+  let _ = @reactive.Effect::new(fn(_) {
+    @ffi.dom_set_text(@ffi.text_as_node(node), (self.getter)())
+  })
+
+  pos.set(Position::NextChildAfterText)
+
+  RenderState::Text(TextState::{ node, })
 }
 
 ///|

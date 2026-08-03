@@ -39,6 +39,16 @@ pub impl Attribute for On with fn html_len(_self) -> Int {
 }
 
 ///|
+pub impl Attribute for On with fn hydrate(self, el : @ffi.Element) -> AttrState {
+  let cleanup = if self.event.capture {
+    self.attach_capture(el)
+  } else {
+    self.attach(el)
+  }
+  AttrState::Pair(AttrState::Element(el), AttrState::EventBound(cleanup))
+}
+
+///|
 pub impl Attribute for On with fn to_html(_self, _b, _c, _s, _i) -> Unit {
 
 }

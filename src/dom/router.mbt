@@ -327,18 +327,142 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn rebuild(
 
 ///|
 pub impl[D : MatchNestedRoutes] RenderHtml for NestedRouteView[D] with fn html_len(
-  _self,
+  self,
 ) -> Int {
-  0
+  let url = self.current_url.get_untracked()
+  let outlets = Ref([])
+  let loaders = Ref([])
+
+  match self.routes.match_route(url.path) {
+    None => (self.fallback)().html_len()
+    Some(matched) => {
+      matched.build(url, self.base, loaders, outlets, self.outer_owner)
+      top_level_outlet(outlets, self.outer_owner.val)().html_len()
+    }
+  }
+}
+
+///|
+pub impl[D : MatchNestedRoutes] RenderHtml for NestedRouteView[D] with fn hydrate(
+  self,
+  cursor : Cursor,
+  pos : PositionState,
+) -> RenderState {
+  let current_url = self.current_url
+  let routes = self.routes
+  let base = self.base
+  let fallback = self.fallback
+  let outer_owner = self.outer_owner
+
+  let url = current_url.get_untracked()
+  let path = url.path
+
+  let outlets = Ref([])
+  let loaders = Ref([])
+  let new_match = routes.match_route(path)
+
+  let rendered = match new_match {
+    None => RenderHtml::hydrate(fallback(), cursor, pos)
+    Some(matched) => {
+      matched.build(url, base, loaders, outlets, outer_owner)
+      RenderHtml::hydrate(
+        top_level_outlet(outlets, outer_owner.val)(),
+        cursor,
+        pos,
+      )
+    }
+  }
+
+  let state_ref : Ref[RenderState] = Ref(
+    RenderState::Router(RouterState::{
+      path: Ref(path),
+      current_url,
+      outlets,
+      view: Ref(rendered),
+      outer_owner,
+    }),
+  )
+
+  let _ = @reactive.Effect::new(fn(_) {
+    current_url.track()
+    let url = current_url.get_untracked()
+    let new_path = url.path
+
+    match state_ref.val {
+      RenderState::Router(router) => {
+        if router.path.val == new_path {
+          for outlet in router.outlets.val {
+            outlet.url.set(url)
+          }
+          return
+        }
+
+        router.path.val = new_path
+
+        let dom_pos : (@ffi.Node, @ffi.Node?)? = match
+          router.view.val.elements().get(0) {
+          Some(first_el) => {
+            let parent = @ffi.dom_parent(first_el)
+            if @ffi.dom_is_null(parent) {
+              Option::None
+            } else {
+              Some((parent, dom_next_sibling(first_el)))
+            }
+          }
+          None => Option::None
+        }
+
+        let new_match = routes.match_route(new_path)
+
+        let new_view = match new_match {
+          None => fallback().build()
+          Some(matched) => {
+            let _ = matched.rebuild(url, base, 0, router.outlets, outer_owner)
+            top_level_outlet(router.outlets, outer_owner.val)().build()
+          }
+        }
+
+        router.view.val.unmount()
+        match dom_pos {
+          Some((parent, next)) =>
+            match next {
+              Some(ref_node) => new_view.mount(parent, ref_node)
+              None => new_view.mount(parent, @ffi.dom_null_node())
+            }
+          None => ()
+        }
+
+        router.view.val = new_view
+        if new_match is None {
+          router.outlets.val = []
+        }
+      }
+      _ => ()
+    }
+  })
+
+  state_ref.val
 }
 
 ///|
 pub impl[D : MatchNestedRoutes] RenderHtml for NestedRouteView[D] with fn to_html_with_buf(
-  _self,
-  _buf,
-  _pos,
+  self,
+  buf,
+  pos,
 ) -> Unit {
-  // Router is client-side only now; no SSR output
+  let url = self.current_url.get_untracked()
+  let outlets = Ref([])
+  let loaders = Ref([])
+
+  match self.routes.match_route(url.path) {
+    None => (self.fallback)().to_html_with_buf(buf, pos)
+    Some(matched) => {
+      matched.build(url, self.base, loaders, outlets, self.outer_owner)
+      top_level_outlet(outlets, self.outer_owner.val)().to_html_with_buf(
+        buf, pos,
+      )
+    }
+  }
 }
 
 ///|
@@ -435,13 +559,50 @@ pub impl Render for OutletView with fn rebuild(self, state : Ref[RenderState]) -
 }
 
 ///|
-pub impl RenderHtml for OutletView with fn html_len(_self) -> Int {
-  0
+pub impl RenderHtml for OutletView with fn html_len(self) -> Int {
+  match self.child {
+    Some(c) => {
+      let view_fn = c.view_fn.val
+      let child_view = view_fn(self.outer_owner.child())
+      child_view.html_len()
+    }
+    None => 0
+  }
 }
 
 ///|
-pub impl RenderHtml for OutletView with fn to_html_with_buf(_self, _buf, _pos) -> Unit {
-  // Router is client-side only now; no SSR output
+pub impl RenderHtml for OutletView with fn hydrate(
+  self,
+  cursor : Cursor,
+  pos : PositionState,
+) -> RenderState {
+  match self.child {
+    Some(c) => {
+      c.trigger.track()
+
+      let view_fn = c.view_fn.val
+      let child_view = view_fn(self.outer_owner.child())
+
+      RenderHtml::hydrate(child_view, cursor, pos)
+    }
+    None => RenderState::None
+  }
+}
+
+///|
+pub impl RenderHtml for OutletView with fn to_html_with_buf(
+  self,
+  buf : StringBuilder,
+  pos : Ref[Position],
+) -> Unit {
+  match self.child {
+    Some(c) => {
+      let view_fn = c.view_fn.val
+      let child_view = view_fn(self.outer_owner.child())
+      child_view.to_html_with_buf(buf, pos)
+    }
+    None => ()
+  }
 }
 
 ///|

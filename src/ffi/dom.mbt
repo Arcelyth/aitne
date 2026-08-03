@@ -172,3 +172,7 @@ pub extern "js" fn dom_set_property_bool(
   #|(el, key, value) => el[key] = value
 
 // -----
+
+///|
+pub extern "js" fn is_text_node(node : Node) -> Bool =
+  #| (node) => node.nodeType === 3

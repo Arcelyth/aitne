@@ -12,6 +12,7 @@ pub trait RenderHtml: Render {
   fn html_len(Self) -> Int
   fn to_html(Self) -> String = _
   fn to_html_with_buf(Self, StringBuilder, Ref[Position]) -> Unit
+  fn hydrate(Self, cursor : Cursor, pos : PositionState) -> RenderState
 }
 
 ///|
@@ -321,6 +322,11 @@ pub impl Render for Unit with fn rebuild(_self, _state : Ref[RenderState]) -> Un
 }
 
 ///|
+pub impl RenderHtml for Unit with fn hydrate(_self, _cursor, _pos) -> RenderState {
+  RenderState::None
+}
+
+///|
 pub impl RenderHtml for Unit with fn html_len(_self) -> Int {
   0
 }
@@ -349,6 +355,31 @@ pub impl Render for String with fn rebuild(self, state : Ref[RenderState]) -> Un
 ///|
 pub impl RenderHtml for String with fn html_len(self) -> Int {
   self.length()
+}
+
+///|
+pub impl RenderHtml for String with fn hydrate(self, cursor, pos) -> RenderState {
+  if pos.get() == Position::FirstChild {
+    cursor.child()
+  } else {
+    cursor.sibling()
+  }
+
+  // Placecholder will be inserted between adjacent text nodes. 
+  if pos.get() == Position::NextChildAfterText {
+    cursor.sibling()
+  }
+
+  let curr_node = cursor.current()
+  let text_node = if @ffi.is_text_node(curr_node) {
+    @ffi.cast_node_to_text(curr_node)
+  } else {
+    failed_to_cast_text_node(curr_node)
+  }
+
+  pos.set(Position::NextChildAfterText)
+
+  RenderState::Text(TextState::{ node: text_node })
 }
 
 ///|

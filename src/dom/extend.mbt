@@ -141,6 +141,16 @@ pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn html_len(self) -
 }
 
 ///|
+/// Since ForNode is deprecated, hydrate will not be considered now.
+pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn hydrate(
+  _self,
+  _cursor,
+  _pos,
+) -> RenderState {
+  RenderState::None
+}
+
+///|
 pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn to_html_with_buf(
   self,
   buf,
@@ -224,7 +234,8 @@ pub impl[T] Render for ForEach[T] with fn rebuild(
 
 ///|
 pub impl[T] RenderHtml for ForEach[T] with fn html_len(self) -> Int {
-  let mut len = 0
+  // <!---->
+  let mut len = 7
   let items = (self.each)()
   for item in items {
     len += (self.children)(item).html_len()
@@ -238,6 +249,58 @@ pub impl[T] RenderHtml for ForEach[T] with fn to_html_with_buf(self, buf, pos) -
   for item in items {
     (self.children)(item).to_html_with_buf(buf, pos)
   }
+
+  // add marker
+  buf.write_string("<!---->")
+  pos.val = Position::NextChild
+}
+
+///|
+pub impl[T] RenderHtml for ForEach[T] with fn hydrate(
+  self,
+  cursor : Cursor,
+  pos : PositionState,
+) -> RenderState {
+  let each_fn = self.each
+  let key_fn = self.key
+  let render_fn = self.children
+
+  let owner = match Owner::current() {
+    Some(o) => o
+    None => panic()
+  }
+
+  let c = (_, child) => {
+    let child_owner = owner.with_(Owner::new)
+    let view = child_owner.with_(() => render_fn(child))
+    let dispose = _ => child_owner.cleanup()
+    (dispose, OwnedView::new_with_owner(child_owner, view))
+  }
+
+  let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c }
+
+  let state_ref : Ref[RenderState] = Ref(keyed.hydrate(cursor, pos))
+
+  let do_reconcile = fn(_) {
+    let _items = each_fn() // track
+    match state_ref.val {
+      RenderState::KeyedState(_) => {
+        let c = (_, child) => {
+          let child_owner = owner.with_(Owner::new)
+          let view = child_owner.with_(() => render_fn(child))
+          let dispose = _ => child_owner.cleanup()
+          (dispose, OwnedView::new_with_owner(child_owner, view))
+        }
+        let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c }
+        keyed.rebuild(state_ref)
+      }
+      _ => ()
+    }
+  }
+
+  let _ = @reactive.Effect::new(do_reconcile)
+
+  state_ref.val
 }
 
 ///|

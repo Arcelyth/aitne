@@ -74,18 +74,27 @@ pub impl[V : View + ToTemplate] Render for TemplateView[V] with fn rebuild(
 
 ///|
 pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V] with fn html_len(
-  _self,
+  self,
 ) -> Int {
-  0
+  RenderHtml::html_len(self.0)
+}
+
+///|
+pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V] with fn hydrate(
+  self,
+  cursor : Cursor,
+  pos : PositionState,
+) -> RenderState {
+  RenderHtml::hydrate(self.0, cursor, pos)
 }
 
 ///|
 pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V] with fn to_html_with_buf(
-  _self,
-  _buf,
-  _position,
+  self,
+  buf,
+  position,
 ) -> Unit {
-
+  RenderHtml::to_html_with_buf(self.0, buf, position)
 }
 
 ///|

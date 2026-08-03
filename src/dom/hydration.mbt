@@ -11,6 +11,12 @@ pub fn PositionState::new(pos : Position) -> PositionState {
 
 ///|
 #inline
+pub fn PositionState::default() -> PositionState {
+  { state: Ref(Position::FirstChild) }
+}
+
+///|
+#inline
 pub fn PositionState::set(self : PositionState, pos : Position) -> Unit {
   self.state.val = pos
 }

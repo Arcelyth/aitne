@@ -71,16 +71,21 @@ pub extern "js" fn prim_node_eq(a : Node, b : Node) -> Bool =
   #|(a, b) => a === b
 
 ///|
+#alias(dom_is_null)
 pub extern "js" fn prim_is_null(node : Node) -> Bool =
   #|(node) => node === null || node === undefined
 
 ///|
-pub extern "js" fn dom_is_null(node : Node) -> Bool =
-  #|(node) => node === null || node === undefined
+pub extern "js" fn element_is_null(el : Element) -> Bool =
+  #|(el) => el === null || el === undefined
 
 ///|
 pub extern "js" fn prim_first_child(node : Node) -> Node =
   #|(node) => node.firstChild
+
+///|
+pub extern "js" fn prim_first_element_child(node : Node) -> Element =
+  #|(node) => node.firstElementChild
 
 ///|
 pub extern "js" fn prim_next_sibling(node : Node) -> Node =

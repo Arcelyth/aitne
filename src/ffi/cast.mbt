@@ -23,5 +23,9 @@ pub extern "js" fn cast_text_to_node(t : Text) -> Node =
 
 ///|
 #alias(comment_as_node)
-pub extern "js" fn cast_commen_to_node(c : Comment) -> Node =
+pub extern "js" fn cast_comment_to_node(c : Comment) -> Node =
+  #|(c) => c
+
+///|
+pub extern "js" fn cast_template_element_to_node(c : TemplateElement) -> Node =
   #|(c) => c

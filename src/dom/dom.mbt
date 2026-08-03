@@ -28,24 +28,28 @@ pub fn mount_to_id(id : String, app : () -> &View) -> RenderState? {
 
 ///|
 /// Create an HTML element.
+#inline
 pub fn dom_create_element(tag : String) -> @ffi.Element {
   @ffi.prim_create_element(document(), tag)
 }
 
 ///|
 /// Create a text node.
+#inline
 pub fn dom_create_text_node(text : String) -> @ffi.Text {
   @ffi.prim_create_text_node(document(), text)
 }
 
 ///|
 /// Get an element by id.
+#inline
 pub fn dom_get_element_by_id(id : String) -> @ffi.Node? {
   @ffi.prim_get_element_by_id(document(), id)
 }
 
 ///|
 /// Get the document body.
+#inline
 pub fn dom_get_body() -> @ffi.Node {
   @ffi.prim_get_body(document())
 }
@@ -91,4 +95,48 @@ pub fn add_event_listener_capture(
 ) -> RemoveEventHandler {
   let handle = @ffi.prim_add_event_listener_capture(el, name, cb)
   RemoveEventHandler(Some(handle))
+}
+
+///|
+pub fn dom_create_element_from_html(html : String) -> Element {
+  let tpl = match templates_cache.get(html) {
+    Some(t) => clone_template(t)
+    None => {
+      let t = @ffi.create_template()
+      @ffi.set_inner_html(t, html)
+      let content = clone_template(t)
+      templates_cache.set(html, t)
+      content
+    }
+  }
+
+  let first = @ffi.prim_first_element_child(@ffi.cast_element_to_node(tpl))
+  if @ffi.element_is_null(first) {
+    tpl
+  } else {
+    first
+  }
+}
+
+///|
+pub fn clone_template(tpl : TemplateElement) -> Element {
+  @ffi.clone_template_content(tpl)
+}
+
+///|
+pub fn[V : ToTemplate] get_template(_self : V) -> TemplateElement {
+  let id = V::type_id()
+  match templates_cache.get(id) {
+    Some(tpl) => tpl
+    None => {
+      let tpl = @ffi.clone_node_shallow(get_base_template())
+
+      let buf = StringBuilder::new()
+      V::to_template(buf)
+      @ffi.set_inner_html(tpl, buf.to_string())
+
+      templates_cache.set(id, tpl)
+      tpl
+    }
+  }
 }

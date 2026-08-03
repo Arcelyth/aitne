@@ -13,7 +13,7 @@ pub fn anchor_target(Element) -> String
 pub fn cancel_animation_frame(AnimationFrameHandle) -> Unit
 
 #alias(comment_as_node)
-pub fn cast_commen_to_node(Comment) -> Node
+pub fn cast_comment_to_node(Comment) -> Node
 
 #alias(el_as_node)
 pub fn cast_element_to_node(Element) -> Node
@@ -24,6 +24,8 @@ pub fn cast_node_to_comment(Node) -> Comment
 pub fn cast_node_to_element(Node) -> Element
 
 pub fn cast_node_to_text(Node) -> Text
+
+pub fn cast_template_element_to_node(TemplateElement) -> Node
 
 #alias(text_as_node)
 pub fn cast_text_to_node(Text) -> Node
@@ -62,8 +64,6 @@ pub fn dom_create_effect(() -> Unit) -> Unit
 
 pub fn dom_insert_before(Node, Node, Node) -> Unit
 
-pub fn dom_is_null(Node) -> Bool
-
 pub fn dom_null_node() -> Node
 
 pub fn dom_parent(Node) -> Node
@@ -89,6 +89,8 @@ pub fn dom_set_property_bool(Element, String, Bool) -> Unit
 pub fn dom_set_text(Node, String) -> Unit
 
 pub fn dom_tag_name(Node) -> String
+
+pub fn element_is_null(Element) -> Bool
 
 pub fn event_alt_key(Event) -> Bool
 
@@ -154,10 +156,13 @@ pub fn prim_document() -> Document
 
 pub fn prim_first_child(Node) -> Node
 
+pub fn prim_first_element_child(Node) -> Element
+
 pub fn prim_get_body(Document) -> Node
 
 pub fn prim_get_element_by_id(Document, String) -> Node?
 
+#alias(dom_is_null)
 pub fn prim_is_null(Node) -> Bool
 
 pub fn prim_next_sibling(Node) -> Node

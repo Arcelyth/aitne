@@ -15,37 +15,6 @@ pub fn CodeGenTmp::new(ast : Array[MbxAST]) -> CodeGenTmp {
 }
 
 ///|
-/// Converts a node path into a string representation.
-fn path_to_str(path : Array[Int]) -> String {
-  let mut s = "["
-  let len = path.length()
-  for i = 0; i < len; i = i + 1 {
-    s += path[i].to_string()
-    if i < len - 1 {
-      s += ", "
-    }
-  }
-  s += "]"
-  s
-}
-
-///|
-fn escape_moonbit_str(s : String) -> String {
-  let mut res = ""
-  for c in s.iter() {
-    match c {
-      '"' => res += "\\\""
-      '\\' => res += "\\\\"
-      '\n' => res += "\\n"
-      '\r' => res += "\\r"
-      '\t' => res += "\\t"
-      _ => res += c.to_string()
-    }
-  }
-  res
-}
-
-///|
 /// Compiles a single template island into generated MoonBit code.
 ///
 /// The process consists of:

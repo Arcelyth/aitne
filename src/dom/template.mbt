@@ -32,36 +32,21 @@ fn get_base_template() -> TemplateElement {
 }
 
 ///|
-pub fn[V : ToTemplate] TemplateView::get_template(
-  _self : TemplateView[V],
-) -> TemplateElement {
-  let id = V::type_id()
-  match templates_cache.get(id) {
-    Some(tpl) => tpl
-    None => {
-      let tpl = @ffi.clone_node_shallow(get_base_template())
-
-      let buf = StringBuilder::new()
-      V::to_template(buf)
-      @ffi.set_inner_html(tpl, buf.to_string())
-
-      templates_cache.set(id, tpl)
-      tpl
-    }
-  }
-}
-
-///|
 pub fn[V : View + ToTemplate] TemplateView::new(view : V) -> TemplateView[V] {
   TemplateView(view)
 }
 
 ///|
 pub impl[V : View + ToTemplate] Render for TemplateView[V] with fn build(
-  _self : TemplateView[V],
+  self : TemplateView[V],
 ) -> RenderState {
-  // TODO
-  RenderState::None
+  let tpl = get_template(self.0)
+  let content = clone_template(tpl)
+  RenderHtml::hydrate(
+    self.0,
+    Cursor::new(@ffi.cast_element_to_node(content)),
+    PositionState::default(),
+  )
 }
 
 ///|
@@ -95,9 +80,4 @@ pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V] with fn to_html_w
   position,
 ) -> Unit {
   RenderHtml::to_html_with_buf(self.0, buf, position)
-}
-
-///|
-pub fn clone_template(tpl : TemplateElement) -> Element {
-  @ffi.clone_template_content(tpl)
 }

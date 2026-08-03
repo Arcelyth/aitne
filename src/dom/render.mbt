@@ -59,6 +59,7 @@ pub enum RenderState {
   KeyedState(KeyedState)
   Router(RouterState)
   OwnedViewState(OwnedViewState)
+  RawNode(@ffi.Node)
 }
 
 ///|
@@ -159,6 +160,7 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
       }
     }
     OwnedViewState(s) => s.unmount()
+    RawNode(n) => @ffi.dom_remove(n)
     None => ()
   }
 }
@@ -212,6 +214,12 @@ pub impl Mountable for RenderState with fn mount(
       }
     }
     OwnedViewState(s) => s.mount(parent, marker)
+    RawNode(n) =>
+      if @ffi.dom_is_null(marker) {
+        @ffi.dom_append(parent, n)
+      } else {
+        @ffi.dom_insert_before(parent, n, marker)
+      }
     None => ()
   }
 }
@@ -251,6 +259,15 @@ pub impl Mountable for RenderState with fn insert_before(
     }
     Router(s) => s.view.val.insert_before(child)
     OwnedViewState(s) => s.insert_before(child)
+    RawNode(n) => {
+      let p = @ffi.dom_parent(n)
+      if @ffi.dom_is_null(p) {
+        false
+      } else {
+        child.mount(p, n)
+        true
+      }
+    }
     KeyedState(s) => {
       let parent = @ffi.dom_parent(s.marker)
       if @ffi.dom_is_null(parent) {
@@ -304,6 +321,7 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[@ffi.Node] {
       println("[Debug] router elements")
       s.view.val.elements()
     }
+    RawNode(n) => [n]
     None => []
     _ => []
   }

@@ -239,6 +239,8 @@ pub fn provide_router_context(RouterContext) -> Unit
 
 pub fn q(children? : Array[&View]) -> HtmlElement[TagQ, Array[&View]]
 
+pub fn raw_node(@ffi.Node) -> RawNodeView
+
 pub fn resolve_path(String, String, String?) -> String
 
 pub fn[Ch] route(path? : String, view? : () -> &View) -> NestedRoute[Ch]
@@ -632,6 +634,13 @@ pub struct Property[P] {
 }
 pub impl[P : IntoProperty] Attribute for Property[P]
 
+pub struct RawNodeView {
+  node : @ffi.Node
+}
+pub impl Render for RawNodeView
+pub impl RenderHtml for RawNodeView
+pub impl View for RawNodeView
+
 pub struct RemoveEventHandler(@ffi.EventHandle?)
 pub fn RemoveEventHandler::invoke(Self) -> Unit
 pub fn RemoveEventHandler::new(@ffi.EventHandle) -> Self
@@ -646,6 +655,7 @@ pub enum RenderState {
   KeyedState(KeyedState)
   Router(RouterState)
   OwnedViewState(OwnedViewState)
+  RawNode(@ffi.Node)
 }
 pub impl Mountable for RenderState
 

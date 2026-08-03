@@ -535,3 +535,54 @@ pub impl View for TextNode with fn style(self, _i) -> &View {
 pub impl View for DynTextNode with fn style(self, _i) -> &View {
   self
 }
+
+///|
+pub struct RawNodeView {
+  node : @ffi.Node
+}
+
+///|
+pub fn raw_node(node : @ffi.Node) -> RawNodeView {
+  RawNodeView::{ node, }
+}
+
+///|
+pub impl Render for RawNodeView with fn build(self) -> RenderState {
+  RenderState::RawNode(self.node)
+}
+
+///|
+pub impl Render for RawNodeView with fn rebuild(
+  _self,
+  _state : Ref[RenderState],
+) -> Unit {
+
+}
+
+///|
+pub impl RenderHtml for RawNodeView with fn html_len(_self) -> Int {
+  0
+}
+
+///|
+pub impl RenderHtml for RawNodeView with fn to_html_with_buf(
+  _self,
+  _buf,
+  _position,
+) -> Unit {
+
+}
+
+///|
+pub impl RenderHtml for RawNodeView with fn hydrate(
+  self,
+  _cursor : Cursor,
+  _pos : PositionState,
+) -> RenderState {
+  RenderState::RawNode(self.node)
+}
+
+///|
+pub impl View for RawNodeView with fn style(self, _i) -> &View {
+  self
+}

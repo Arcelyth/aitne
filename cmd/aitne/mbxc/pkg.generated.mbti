@@ -39,9 +39,14 @@ pub fn CodeGen::output_style(Self) -> String
 
 pub(all) struct CodeGenTmp {
   ast : Array[MbxAST]
+  buf : StringBuilder
+  style : StringBuilder
+  last_buf : StringBuilder
+  path : String
+  tmpl_id : @ref.Ref[Int]
 }
 pub fn CodeGenTmp::generate(Self) -> String
-pub fn CodeGenTmp::new(Array[MbxAST]) -> Self
+pub fn CodeGenTmp::new(Array[MbxAST], path? : String) -> Self
 
 pub struct DocTag {
 } derive(Eq, @debug.Debug)

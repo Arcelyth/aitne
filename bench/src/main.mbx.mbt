@@ -35,14 +35,25 @@ fn build_data(count : Int) -> Array[Row] {
 }
 
 fn btn(id~: String, text~: String, on_click~: (@ffi.Event) -> Unit) -> &View {
-    @Arcelyth/aitne/src/dom.div(children=[@Arcelyth/aitne/src/dom.button(children=[@Arcelyth/aitne/src/dom.text_dyn(
-        () => text
-      )])
-  .attr("id", id)
-  .class("btn btn-primary btn-block")
-  .attr("type", "button")
-  .on(Click, on_click)])
-  .class("col-sm-6 smallpad")
+    let __tmpl_0 = { let _t = @Arcelyth/aitne/src/ffi.create_template(); @Arcelyth/aitne/src/ffi.set_inner_html(_t, "<div class=\"col-sm-6 smallpad\"><button class=\"btn btn-primary btn-block\" type=\"button\"><!></button></div>"); _t }
+
+  {
+    let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(__tmpl_0)
+    let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(@Arcelyth/aitne/src/ffi.cast_element_to_node(_frag))
+    let _n0 = @Arcelyth/aitne/src/ffi.prim_first_child(@Arcelyth/aitne/src/ffi.cast_element_to_node(_root))
+    let _n1 = @Arcelyth/aitne/src/ffi.prim_first_child(@Arcelyth/aitne/src/ffi.prim_first_child(@Arcelyth/aitne/src/ffi.cast_element_to_node(_root)))
+    @Arcelyth/aitne/src/ffi.dom_set_attr(@Arcelyth/aitne/src/ffi.cast_node_to_element(_n0), "id", id)
+    let _ = @Arcelyth/aitne/src/dom.add_event_listener(@Arcelyth/aitne/src/ffi.cast_node_to_element(_n0), "click", on_click)
+    let _t_parent = @Arcelyth/aitne/src/ffi.dom_parent(_n1)
+    let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(@Arcelyth/aitne/src/dom.document(), (() => text)())
+    @Arcelyth/aitne/src/ffi.dom_insert_before(_t_parent, @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text), _n1)
+    @Arcelyth/aitne/src/ffi.dom_remove(_n1)
+    let _ = @reactive.Effect::new(fn(_) {
+      @Arcelyth/aitne/src/ffi.dom_set_text(@Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text), (() => text)())
+    })
+    @Arcelyth/aitne/src/dom.raw_node(@Arcelyth/aitne/src/ffi.cast_element_to_node(_root))
+  }
+
 }
 
 fn app() -> &View {

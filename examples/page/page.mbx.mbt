@@ -31,22 +31,44 @@ fn header_section() -> &View {
 
 ///|
 fn interactive_section() -> &View {
-  @Arcelyth/aitne/src/dom.div(children=[
-    @Arcelyth/aitne/src/dom.button(children=["Start"])
-    .attr(
-      "style", "padding: 0.75rem 1.5rem; width: 100%; background-color: #2563eb; color: #ffffff; font-weight: 600; border-radius: 0.75rem; border: none; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); font-size: 1rem; transition: background-color 0.2s;",
+  let __tmpl_0 = {
+    let _t = @Arcelyth/aitne/src/ffi.create_template()
+    @Arcelyth/aitne/src/ffi.set_inner_html(
+      _t, "<div class=\"interactive_section\"><button style=\"padding: 0.75rem 1.5rem; width: 100%; background-color: #2563eb; color: #ffffff; font-weight: 600; border-radius: 0.75rem; border: none; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); font-size: 1rem; transition: background-color 0.2s;\">\n      Start\n    </button></div>",
     )
-    .on(Click, fn(_ev) { println("Clicked") }),
-  ]).class("interactive_section")
+    _t
+  }
+  let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(__tmpl_0)
+  let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(
+    @Arcelyth/aitne/src/ffi.cast_element_to_node(_frag),
+  )
+  let _n0 = @Arcelyth/aitne/src/ffi.prim_first_child(
+    @Arcelyth/aitne/src/ffi.cast_element_to_node(_root),
+  )
+  let _ = @Arcelyth/aitne/src/dom.add_event_listener(
+    @Arcelyth/aitne/src/ffi.cast_node_to_element(_n0),
+    "click",
+    fn(_ev) { println("Clicked") },
+  )
+  @Arcelyth/aitne/src/dom.raw_node(
+    @Arcelyth/aitne/src/ffi.cast_element_to_node(_root),
+  )
 }
 
 ///|
 fn footer_section() -> &View {
-  @Arcelyth/aitne/src/dom.div(children=[
-    @Arcelyth/aitne/src/dom.a(children=["document"])
-    .attr("href", "#")
-    .attr(
-      "style", "color: #64748b; font-size: 0.875rem; text-decoration: none;",
-    ),
-  ]).class("footer_section")
+  let __tmpl_1 = {
+    let _t = @Arcelyth/aitne/src/ffi.create_template()
+    @Arcelyth/aitne/src/ffi.set_inner_html(
+      _t, "<div class=\"footer_section\"><a href=\"#\" style=\"color: #64748b; font-size: 0.875rem; text-decoration: none;\">\n      document\n    </a></div>",
+    )
+    _t
+  }
+  let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(__tmpl_1)
+  let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(
+    @Arcelyth/aitne/src/ffi.cast_element_to_node(_frag),
+  )
+  @Arcelyth/aitne/src/dom.raw_node(
+    @Arcelyth/aitne/src/ffi.cast_element_to_node(_root),
+  )
 }

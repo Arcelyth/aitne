@@ -489,8 +489,8 @@ pub(all) struct Keyed[T, V] {
   view_fn : (Int, T) -> ((Int) -> Unit, V)
 }
 pub impl[T, V : Render] Render for Keyed[T, V]
-pub impl[T, V : Render] RenderHtml for Keyed[T, V]
-pub impl[T, V : Render] View for Keyed[T, V]
+pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V]
+pub impl[T, V : View] View for Keyed[T, V]
 
 pub struct KeyedState {
   mut parent : @ffi.Element?
@@ -1179,6 +1179,7 @@ pub trait Attribute {
   fn build(Self, @ffi.Element) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
   fn dry_resolve(Self) -> Unit
+  fn hydrate(Self, @ffi.Element) -> AttrState
   fn add_attr(Self, &Attribute) -> &Attribute
 }
 pub impl Attribute for Unit
@@ -1194,6 +1195,7 @@ pub trait AttributeValue {
   fn to_html(Self, String, StringBuilder) -> Unit
   fn build(Self, String, @ffi.Element) -> AttrState
   fn rebuild(Self, String, @ref.Ref[AttrState]) -> Unit
+  fn hydrate(Self, @ffi.Element) -> AttrState
   fn dry_resolve(Self) -> Unit
 }
 pub impl AttributeValue for Unit
@@ -1210,6 +1212,7 @@ pub trait IntoClass {
   fn to_html(Self, StringBuilder) -> Unit
   fn build(Self, @ffi.Element) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
+  fn hydrate(Self, @ffi.Element) -> AttrState
   fn dry_resolve(Self) -> Unit
 }
 pub impl IntoClass for String
@@ -1219,6 +1222,7 @@ pub trait IntoProperty {
   fn to_html(Self, StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
   fn build(Self, @ffi.Element, String) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState], String) -> Unit
+  fn hydrate(Self, @ffi.Element, String) -> AttrState
   fn dry_resolve(Self) -> Unit
 }
 pub impl IntoProperty for String
@@ -1230,6 +1234,7 @@ pub trait IntoStyle {
   fn build(Self, @ffi.Element) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
   fn dry_resolve(Self) -> Unit
+  fn hydrate(Self, @ffi.Element) -> AttrState
 }
 pub impl IntoStyle for String
 
@@ -1259,6 +1264,7 @@ pub trait RenderHtml : Render {
   fn html_len(Self) -> Int
   fn to_html(Self) -> String
   fn to_html_with_buf(Self, StringBuilder, @ref.Ref[Position]) -> Unit
+  fn hydrate(Self, Cursor, PositionState) -> RenderState
 }
 pub impl RenderHtml for Unit
 pub impl RenderHtml for String

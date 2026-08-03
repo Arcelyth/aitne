@@ -122,6 +122,8 @@ pub fn history_replace_state(String) -> Unit
 
 pub fn is_comment_node(Node) -> Bool
 
+pub fn is_text_node(Node) -> Bool
+
 pub fn js_array_get(JsArray, Int) -> Node
 
 pub fn js_array_length(JsArray) -> Int

@@ -88,6 +88,16 @@ pub impl[T : RenderHtml] RenderHtml for OwnedView[T] with fn html_len(self) -> I
 }
 
 ///|
+pub impl[T : RenderHtml] RenderHtml for OwnedView[T] with fn hydrate(
+  self,
+  cursor : Cursor,
+  position : PositionState,
+) -> RenderState {
+  let state = self.owner.with_(() => self.view.hydrate(cursor, position))
+  RenderState::OwnedViewState(OwnedViewState::new(state, self.owner))
+}
+
+///|
 pub impl[T : RenderHtml] RenderHtml for OwnedView[T] with fn to_html_with_buf(
   self,
   buf,

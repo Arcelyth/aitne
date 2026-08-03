@@ -1,20 +1,4 @@
 ///|
-pub extern "js" fn el_as_node(el : Element) -> Node =
-  #|(el) => el
-
-///|
-pub extern "js" fn text_as_node(t : Text) -> Node =
-  #|(t) => t
-
-///|
-pub extern "js" fn comment_as_node(c : Comment) -> Node =
-  #|(c) => c
-
-///|
-pub extern "js" fn node_as_element(node : Node) -> Element =
-  #|(node) => node
-
-///|
 pub extern "js" fn prim_document() -> Document =
   #|() => document
 

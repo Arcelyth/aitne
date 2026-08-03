@@ -39,7 +39,7 @@ pub enum Position {
   NextChildAfterText
   OnlyChild
   LastChild
-} derive(Debug, Eq)
+} derive(Eq, Hash)
 
 ///|
 /// The runtime representation of a rendered view.

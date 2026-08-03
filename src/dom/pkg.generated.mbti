@@ -60,6 +60,8 @@ pub fn[C] class_val(C) -> Class[C]
 
 pub fn clear_between(@ffi.Node, @ffi.Node) -> Unit
 
+pub fn clone_template(@ffi.TemplateElement) -> @ffi.Element
+
 pub fn code(children? : Array[&View]) -> HtmlElement[TagCode, Array[&View]]
 
 pub fn col(children? : Array[&View]) -> HtmlElement[TagCol, Array[&View]]
@@ -103,6 +105,12 @@ pub fn dt(children? : Array[&View]) -> HtmlElement[TagDt, Array[&View]]
 pub fn em(children? : Array[&View]) -> HtmlElement[TagEm, Array[&View]]
 
 pub fn embed(children? : Array[&View]) -> HtmlElement[TagEmbed, Array[&View]]
+
+pub fn failed_to_cast_element(String, @ffi.Node) -> @ffi.Element
+
+pub fn failed_to_cast_marker_node(@ffi.Node) -> @ffi.Comment
+
+pub fn failed_to_cast_text_node(@ffi.Node) -> @ffi.Text
 
 pub fn fieldset(children? : Array[&View]) -> HtmlElement[TagFieldset, Array[&View]]
 
@@ -255,6 +263,8 @@ pub fn section(children? : Array[&View]) -> HtmlElement[TagSection, Array[&View]
 
 pub fn select(children? : Array[&View]) -> HtmlElement[TagSelect, Array[&View]]
 
+pub fn set_currently_hydrating(String?) -> Unit
+
 pub fn slot(children? : Array[&View]) -> HtmlElement[TagSlot, Array[&View]]
 
 pub fn small(children? : Array[&View]) -> HtmlElement[TagSmall, Array[&View]]
@@ -357,6 +367,19 @@ pub impl @reactive.TypeName for BrowserUrl
 
 pub(all) struct Class[C](C)
 pub impl[C : IntoClass] Attribute for Class[C]
+
+pub struct Cursor {
+  inner : @ref.Ref[@ffi.Node]
+}
+pub fn Cursor::advance_to_placeholder(Self, PositionState) -> Unit
+pub fn Cursor::child(Self) -> Unit
+pub fn Cursor::clone(Self) -> Self
+pub fn Cursor::current(Self) -> @ffi.Node
+pub fn Cursor::new(@ffi.Node) -> Self
+pub fn Cursor::next_placeholder(Self, PositionState) -> @ffi.Comment
+pub fn Cursor::parent(Self) -> Unit
+pub fn Cursor::set(Self, @ffi.Node) -> Unit
+pub fn Cursor::sibling(Self) -> Unit
 
 pub struct Diff {
   removed : Array[DiffOpRemove]
@@ -588,7 +611,15 @@ pub enum Position {
   NextChildAfterText
   OnlyChild
   LastChild
-} derive(Eq, @debug.Debug)
+} derive(Eq, Hash)
+
+pub struct PositionState {
+  state : @ref.Ref[Position]
+}
+pub fn PositionState::deep_clone(Self) -> Self
+pub fn PositionState::get(Self) -> Position
+pub fn PositionState::new(Position) -> Self
+pub fn PositionState::set(Self, Position) -> Unit
 
 pub struct Property[P] {
   key : String
@@ -1111,6 +1142,12 @@ pub struct TagWbr {
 }
 pub impl ElementType for TagWbr
 
+pub(all) struct TemplateView[V](V)
+pub fn[V : ToTemplate] TemplateView::get_template(Self[V]) -> @ffi.TemplateElement
+pub fn[V : View + ToTemplate] TemplateView::new(V) -> Self[V]
+pub impl[V : View + ToTemplate] Render for TemplateView[V]
+pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V]
+
 pub struct TextNode {
   val : String
 }
@@ -1226,6 +1263,11 @@ pub trait RenderHtml : Render {
 pub impl RenderHtml for Unit
 pub impl RenderHtml for String
 pub impl RenderHtml for Array[&View]
+
+pub(open) trait ToTemplate {
+  fn type_id() -> String
+  fn to_template(StringBuilder) -> Unit
+}
 
 pub trait View : Render + RenderHtml {
   fn style(Self, &IntoStyle) -> &View

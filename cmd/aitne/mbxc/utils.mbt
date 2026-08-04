@@ -79,62 +79,6 @@ fn hash_string(dir : String) -> String {
 }
 
 ///|
-fn scope_class_string(
-  s : String,
-  path : String,
-  style_root : Array[String],
-) -> String {
-  let current_dir = normalize_dir(get_dir(path))
-
-  let mut skip_scoping = false
-  for root in style_root {
-    if current_dir == normalize_dir(root) {
-      skip_scoping = true
-      break
-    }
-  }
-
-  if skip_scoping {
-    return s
-  }
-
-  let suffix = hash_string(current_dir)
-  if suffix == "" {
-    return s
-  }
-
-  let classes = s.split(" ")
-  let mut result = ""
-
-  for c in classes {
-    let trimmed = c.to_owned()
-    if trimmed != "" {
-      if result != "" {
-        result += " "
-      }
-      result += trimmed + "_" + suffix
-    }
-  }
-
-  result
-}
-
-///|
-/// Converts a node path into a string representation.
-fn path_to_str(path : Array[Int]) -> String {
-  let mut s = "["
-  let len = path.length()
-  for i = 0; i < len; i = i + 1 {
-    s += path[i].to_string()
-    if i < len - 1 {
-      s += ", "
-    }
-  }
-  s += "]"
-  s
-}
-
-///|
 fn escape_moonbit_str(s : String) -> String {
   let mut res = ""
   for c in s.iter() {

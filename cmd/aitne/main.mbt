@@ -37,23 +37,22 @@ pub fn walk_and_compile(
   style_buffer : Ref[StringBuilder],
   style_root : Array[String],
 ) -> Unit raise @fs.IOError {
-  let entries = try? @fs.read_dir(dir)
-  match entries {
-    Ok(files) =>
-      for file in files {
-        if file == "." || file == ".." {
-          continue
-        }
-
-        let path = dir + "/" + file
-
-        if @fs.is_dir(path) {
-          walk_and_compile(path, show~, tmp~, out_dir, style_buffer, style_root)
-        } else if path.has_suffix(".mbx") {
-          compile_mbx_file(path, show, tmp, out_dir, style_buffer)
-        }
-      }
-    Err(e) => debug(e)
+  let files = @fs.read_dir(dir) catch {
+    e => {
+      debug(e)
+      return
+    }
+  }
+  for file in files {
+    if file == "." || file == ".." {
+      continue
+    }
+    let path = dir + "/" + file
+    if @fs.is_dir(path) {
+      walk_and_compile(path, show~, tmp~, out_dir, style_buffer, style_root)
+    } else if path.has_suffix(".mbx") {
+      compile_mbx_file(path, show, tmp, out_dir, style_buffer)
+    }
   }
 }
 
@@ -81,7 +80,7 @@ async fn main {
       }
       let mut show = false
       let mut tmp = false
-      let mut help = false
+      let mut _help = false
       let target_dir = "."
       let mut out_dir : String? = None
       let mut style_dir = "./dist"
@@ -132,7 +131,7 @@ async fn main {
             let create_res = try? @fs.create_dir(dir)
             match create_res {
               Ok(_) => ()
-              Err(e) => {
+              Err(_) => {
                 println("Error: Failed to create output directory '\{dir}'")
                 return
               }
@@ -267,7 +266,7 @@ async fn main {
       println(
         "Setup: Initializing project `\{p_name}` using template `\{tmpl_name}`...",
       )
-      let repo_url = "https://github.com/aitne-dev/template-\{tmpl_name}.git"
+      let _repo_url = "https://github.com/aitne-dev/template-\{tmpl_name}.git"
       init_project(p_name, tmpl_name)
     }
     "build" => handle_build()
@@ -348,7 +347,7 @@ fn get_config(target_file : String?) -> String? {
       if @fs.path_exists("./eirene.toml") {
         match (try? @fs.read_file_to_string("./eirene.toml")) {
           Ok(f) => Some(f)
-          Err(err) => {
+          Err(_) => {
             println("Failed to read file ./eirene.toml")
             return None
           }

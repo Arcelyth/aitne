@@ -376,7 +376,7 @@ pub impl RenderHtml for String with fn html_len(self) -> Int {
 }
 
 ///|
-pub impl RenderHtml for String with fn hydrate(self, cursor, pos) -> RenderState {
+pub impl RenderHtml for String with fn hydrate(_self, cursor, pos) -> RenderState {
   if pos.get() == Position::FirstChild {
     cursor.child()
   } else {

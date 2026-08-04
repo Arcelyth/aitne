@@ -8,44 +8,42 @@ pub async fn start_server(cfg : Config) -> Unit {
     ) => {
       let path = request.path
       if is_static_asset(path) {
-        match (try? @fs.read_file_to_string(cfg.build.out_dir + path)) {
-          Ok(content) => {
-            let headers = Map::from_array([
-              ("Content-Type", get_mime_type(path)),
-            ])
-            conn.send_response(200, "OK", extra_headers=headers)
-            conn.write_string(content)
-          }
+        let content = @fs.read_file_to_string(cfg.build.out_dir + path) catch {
           _ => {
             conn.send_response(404, "Not Found")
             conn.write_string("Asset `\{path}` not found")
+            return
           }
         }
+        let headers = Map::from_iter(
+          [("Content-Type", get_mime_type(path))].iter(),
+        )
+        conn.send_response(200, "OK", extra_headers=headers)
+        conn.write_string(content)
       } else {
-        match
-          (try? @fs.read_file_to_string(
-            join_paths(cfg.build.out_dir, cfg.app.entry_html),
-          )) {
-          Ok(html_content) => {
-            let headers = Map::from_array([
-              ("Content-Type", "text/html; charset=utf-8"),
-            ])
-            conn.send_response(200, "OK", extra_headers=headers)
-            conn.write_string(html_content)
-          }
+        let html_content = @fs.read_file_to_string(
+          join_paths(cfg.build.out_dir, cfg.app.entry_html),
+        ) catch {
           _ => {
             conn.send_response(500, "Internal Server Error")
             conn.write_string(
               "Fatal: \{cfg.build.out_dir} \{cfg.app.entry_html} is missing.",
             )
+            return
           }
         }
+        let headers = Map::from_iter(
+          [("Content-Type", "text/html; charset=utf-8")].iter(),
+        )
+        conn.send_response(200, "OK", extra_headers=headers)
+        conn.write_string(html_content)
       }
     },
   )
 }
 
 ///|
+#cfg(target="native")
 fn is_static_asset(path : String) -> Bool {
   path.has_suffix(".js") ||
   path.has_suffix(".css") ||
@@ -55,6 +53,7 @@ fn is_static_asset(path : String) -> Bool {
 }
 
 ///|
+#cfg(target="native")
 fn get_mime_type(path : String) -> String {
   if path.has_suffix(".js") {
     "application/javascript"
@@ -70,6 +69,7 @@ fn get_mime_type(path : String) -> String {
 }
 
 ///|
+#cfg(target="native")
 fn join_paths(base : String, relative : String) -> String {
   if base.length() == 0 {
     return relative

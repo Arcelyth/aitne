@@ -2,12 +2,12 @@
   "name": "aitne_key_benchmark",
   "version": "0.1.0",
   "deps": {
-    "moonbitlang/x": "0.4.45",
+    "moonbitlang/x": "0.4.47",
     "Arcelyth/html_escape": "0.3.1",
     "tonyfettes/any": "0.1.5",
-    "moonbitlang/async": "0.19.4",
-    "bobzhang/toml": "0.4.1",
-    "Arcelyth/aitne": "0.4.13"
+    "moonbitlang/async": "0.20.3",
+    "bobzhang/toml": "0.4.2",
+    "Arcelyth/aitne": "0.4.15"
   },
   "readme": "README.mbt.md",
   "repository": "https://github.com/Arcelyth/aitne",

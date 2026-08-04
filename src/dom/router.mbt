@@ -75,10 +75,7 @@ pub fn router(
 }
 
 ///|
-pub fn[Ch] route(
-  path? : String = "/",
-  view? : ViewFn = () => (),
-) -> NestedRoute[Ch] {
+pub fn route(path? : String = "/", view? : ViewFn = () => ()) -> NestedRoute {
   NestedRoute::new(path, view)
 }
 
@@ -86,11 +83,11 @@ pub fn[Ch] route(
 type ViewFn = () -> &View
 
 ///|
-pub fn[Ch] parent_route(
+pub fn parent_route(
   path? : String = "/",
   view? : () -> &View = () => (),
-  children~ : Ch,
-) -> NestedRoute[Ch] {
+  children~ : Array[NestedRoute],
+) -> NestedRoute {
   NestedRoute::new(path, view).child(children)
 }
 

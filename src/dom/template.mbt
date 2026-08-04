@@ -32,7 +32,7 @@ fn get_base_template() -> TemplateElement {
 }
 
 ///|
-pub fn[V : View + ToTemplate] TemplateView::new(view : V) -> TemplateView[V] {
+pub fn[V] TemplateView::new(view : V) -> TemplateView[V] {
   TemplateView(view)
 }
 

@@ -18,6 +18,8 @@ pub fn from_file(String, show? : Bool, to? : String?, tmp? : Bool, @ref.Ref[Stri
 
 pub fn gen_style_struct(Array[String], String, String, @ref.Ref[StringBuilder], @ref.Ref[StringBuilder]) -> Unit
 
+pub fn make_builtin_elements() -> @hashset.HashSet[String]
+
 // Errors
 type MbxcError derive(@debug.Debug)
 

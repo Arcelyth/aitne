@@ -223,8 +223,7 @@ fn emit_one_step(step : DomStep, code : StringBuilder) -> Unit {
 }
 
 ///|
-fn CodeGenTmp::compile_island(
-  _self : CodeGenTmp,
+fn compile_template_island(
   nodes : Array[MbxAST],
   tmpl_counter : Ref[Int],
 ) -> String {
@@ -422,7 +421,7 @@ pub fn CodeGenTmp::generate(self : CodeGenTmp) -> String {
   ) {
     let isl = ir.val
     if isl.length() > 0 {
-      let code = self.compile_island(isl, tc)
+      let code = compile_template_island(isl, tc)
       if code == "" {
         let fb = CodeGen::new(path=self.path)
         fc.write(fb.generate(isl))

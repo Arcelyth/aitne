@@ -10,8 +10,8 @@ cat > "$target_file" << 'EOF'
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo LIST</title>
-    <script type="module" src="./_build/js/debug/build/examples/todo/todo.js"></script>
+    <title>TODO LIST</title>
+    <script type="module" src="./_build/js/debug/build/examples/for_each/for_each.js"></script>
 </head>
 <body>
     

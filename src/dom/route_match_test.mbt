@@ -1,8 +1,8 @@
 ///|
 test "match /users/123" {
-  let route = NestedRoute::new("/users", () => "users").child(
+  let route = NestedRoute::new("/users", () => "users").child([
     NestedRoute::new("/:id", () => "profile"),
-  )
+  ])
   let (res, remain) = route.match_nested("/users/123")
 
   assert_eq(remain, "")
@@ -61,11 +61,11 @@ test "not match" {
 
 ///|
 test "nested route" {
-  let route = NestedRoute::new("/users", () => "users").child(
-    NestedRoute::new("/:id", () => "profile").child(
+  let route = NestedRoute::new("/users", () => "users").child([
+    NestedRoute::new("/:id", () => "profile").child([
       NestedRoute::new("/messages", () => "messages"),
-    ),
-  )
+    ]),
+  ])
 
   let (res, remain) = route.match_nested("/users/123/messages")
 

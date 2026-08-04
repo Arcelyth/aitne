@@ -37,23 +37,22 @@ pub fn walk_and_compile(
   style_buffer : Ref[StringBuilder],
   style_root : Array[String],
 ) -> Unit raise @fs.IOError {
-  let entries = try? @fs.read_dir(dir)
-  match entries {
-    Ok(files) =>
-      for file in files {
-        if file == "." || file == ".." {
-          continue
-        }
-
-        let path = dir + "/" + file
-
-        if @fs.is_dir(path) {
-          walk_and_compile(path, show~, tmp~, out_dir, style_buffer, style_root)
-        } else if path.has_suffix(".mbx") {
-          compile_mbx_file(path, show, tmp, out_dir, style_buffer)
-        }
-      }
-    Err(e) => debug(e)
+  let files = @fs.read_dir(dir) catch {
+    e => {
+      debug(e)
+      return
+    }
+  }
+  for file in files {
+    if file == "." || file == ".." {
+      continue
+    }
+    let path = dir + "/" + file
+    if @fs.is_dir(path) {
+      walk_and_compile(path, show~, tmp~, out_dir, style_buffer, style_root)
+    } else if path.has_suffix(".mbx") {
+      compile_mbx_file(path, show, tmp, out_dir, style_buffer)
+    }
   }
 }
 
@@ -75,13 +74,15 @@ async fn main {
         Some(c) => c
         None => return
       }
-      match (try? @eirene.load_config(content)) {
-        Ok(cfg) => style_root = cfg.build.style_root
-        Err(err) => debug("Config Error: \{to_repr(err)}")
+      try {
+        let cfg = @eirene.load_config(content)
+        style_root = cfg.build.style_root
+      } catch {
+        err => debug("Config Error: \{to_repr(err)}")
       }
       let mut show = false
       let mut tmp = false
-      let mut help = false
+      let mut _help = false
       let target_dir = "."
       let mut out_dir : String? = None
       let mut style_dir = "./dist"
@@ -129,10 +130,8 @@ async fn main {
       match out_dir {
         Some(dir) =>
           if !@fs.path_exists(dir) {
-            let create_res = try? @fs.create_dir(dir)
-            match create_res {
-              Ok(_) => ()
-              Err(e) => {
+            @fs.create_dir(dir) catch {
+              _ => {
                 println("Error: Failed to create output directory '\{dir}'")
                 return
               }
@@ -144,37 +143,31 @@ async fn main {
       match target_file {
         Some(file) =>
           compile_mbx_file(file, show, tmp, out_dir, Ref(style_buffer))
-        None => {
-          let res = try? walk_and_compile(
+        None =>
+          walk_and_compile(
             target_dir,
             show~,
             tmp~,
             out_dir,
             Ref(style_buffer),
             style_root,
-          )
-          match res {
-            Ok(_) => ()
-            Err(e) => debug(e)
+          ) catch {
+            e => debug(e)
           }
-        }
       }
 
       if !@fs.path_exists(style_dir) {
-        let _ = try? @fs.create_dir(style_dir)
+        @fs.create_dir(style_dir) catch {
+          _ => ()
+        }
       }
       let css_path = if style_dir.has_suffix("/") || style_dir.has_suffix("\\") {
         style_dir + "style.css"
       } else {
         style_dir + "/style.css"
       }
-      let write_res = try? @fs.write_string_to_file(
-        css_path,
-        style_buffer.to_string(),
-      )
-      match write_res {
-        Ok(_) => ()
-        Err(_) => println("Error: Failed to write style file '\{css_path}'")
+      @fs.write_string_to_file(css_path, style_buffer.to_string()) catch {
+        _ => println("Error: Failed to write style file '\{css_path}'")
       }
     }
     "run" => {
@@ -204,13 +197,13 @@ async fn main {
         None => return
       }
 
-      match (try? @eirene.load_config(content)) {
-        Ok(cfg) =>
-          match (try? @eirene.start_server(cfg)) {
-            Ok(_) => ()
-            Err(err) => debug("Server Error: \{to_repr(err)}")
-          }
-        Err(err) => debug("Config Error: \{to_repr(err)}")
+      try {
+        let cfg = @eirene.load_config(content)
+        @eirene.start_server(cfg) catch {
+          err => debug("Server Error: \{to_repr(err)}")
+        }
+      } catch {
+        err => debug("Config Error: \{to_repr(err)}")
       }
     }
     "init" => {
@@ -267,7 +260,7 @@ async fn main {
       println(
         "Setup: Initializing project `\{p_name}` using template `\{tmpl_name}`...",
       )
-      let repo_url = "https://github.com/aitne-dev/template-\{tmpl_name}.git"
+      let _repo_url = "https://github.com/aitne-dev/template-\{tmpl_name}.git"
       init_project(p_name, tmpl_name)
     }
     "build" => handle_build()
@@ -337,22 +330,24 @@ fn show_init_help() -> Unit {
 fn get_config(target_file : String?) -> String? {
   match target_file {
     Some(file) =>
-      match (try? @fs.read_file_to_string(file)) {
-        Ok(f) => Some(f)
-        Err(_) => {
-          println("Failed to read file \{file}")
-          return None
-        }
-      }
-    None =>
-      if @fs.path_exists("./eirene.toml") {
-        match (try? @fs.read_file_to_string("./eirene.toml")) {
-          Ok(f) => Some(f)
-          Err(err) => {
-            println("Failed to read file ./eirene.toml")
+      Some(
+        @fs.read_file_to_string(file) catch {
+          _ => {
+            println("Failed to read file \{file}")
             return None
           }
-        }
+        },
+      )
+    None =>
+      if @fs.path_exists("./eirene.toml") {
+        Some(
+          @fs.read_file_to_string("./eirene.toml") catch {
+            _ => {
+              println("Failed to read file ./eirene.toml")
+              return None
+            }
+          },
+        )
       } else {
         println("Error: Cannot find 'eirene.toml' at the current folder")
         return None

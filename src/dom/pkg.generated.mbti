@@ -221,7 +221,7 @@ pub fn output(children? : Array[&View]) -> HtmlElement[TagOutput, Array[&View]]
 
 pub fn p(children? : Array[&View]) -> HtmlElement[TagP, Array[&View]]
 
-pub fn[Ch] parent_route(path? : String, view? : () -> &View, children~ : Ch) -> NestedRoute[Ch]
+pub fn parent_route(path? : String, view? : () -> &View, children~ : Array[NestedRoute]) -> NestedRoute
 
 pub fn parse_url_with_base(String, String) -> Result[Url, String]
 
@@ -243,7 +243,7 @@ pub fn raw_node(@ffi.Node) -> RawNodeView
 
 pub fn resolve_path(String, String, String?) -> String
 
-pub fn[Ch] route(path? : String, view? : () -> &View) -> NestedRoute[Ch]
+pub fn route(path? : String, view? : () -> &View) -> NestedRoute
 
 pub fn router(children? : Array[RouterChildren], base? : String, set_is_routing? : (Bool) -> Unit) -> &View
 
@@ -542,17 +542,17 @@ pub fn NestedMatch::build(Self, Url, String?, @ref.Ref[Array[() -> @reactive.Tri
 pub fn NestedMatch::rebuild(Self, Url, String?, Int, @ref.Ref[Array[RouteContext]], @ref.Ref[@reactive.Owner]) -> Int
 pub impl @debug.Debug for NestedMatch
 
-pub(all) struct NestedRoute[Ch] {
+pub(all) struct NestedRoute {
   id : UInt
   path : String
-  child : Ch?
+  child : Array[NestedRoute]
   view : () -> &View
 }
-pub fn[Ch] NestedRoute::child(Self[Ch], Ch) -> Self[Ch]
-pub fn[Ch : MatchNestedRoutes] NestedRoute::match_nested(Self[Ch], String) -> ((UInt, NestedMatch)?, String)
-pub fn[Ch] NestedRoute::new(String, () -> &View) -> Self[Ch]
-pub impl[Ch : MatchNestedRoutes] MatchNestedRoutes for NestedRoute[Ch]
-pub impl[Ch] @debug.Debug for NestedRoute[Ch]
+pub fn NestedRoute::child(Self, Array[Self]) -> Self
+pub fn NestedRoute::match_nested(Self, String) -> ((UInt, NestedMatch)?, String)
+pub fn NestedRoute::new(String, () -> &View) -> Self
+pub impl MatchNestedRoutes for NestedRoute
+pub impl @debug.Debug for NestedRoute
 
 pub(all) struct NestedRouteView[D] {
   location : Location
@@ -1158,7 +1158,7 @@ pub struct TagWbr {
 pub impl ElementType for TagWbr
 
 pub(all) struct TemplateView[V](V)
-pub fn[V : View + ToTemplate] TemplateView::new(V) -> Self[V]
+pub fn[V] TemplateView::new(V) -> Self[V]
 pub impl[V : View + ToTemplate] Render for TemplateView[V]
 pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V]
 

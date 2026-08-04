@@ -23,7 +23,7 @@ test "parent cannot access child context" {
 
   child.provide_context("child")
 
-  assert_eq(root.use_context(), None)
+  assert_eq((root.use_context() : String?), None)
 }
 
 ///|
@@ -57,9 +57,9 @@ test "take context removes it" {
 
   owner.provide_context("hello")
 
-  assert_eq(owner.take_context(), Some("hello"))
+  assert_eq((owner.take_context() : String?), Some("hello"))
 
-  assert_eq(owner.use_context(), None)
+  assert_eq((owner.use_context() : String?), None)
 }
 
 ///|
@@ -69,9 +69,9 @@ test "take context from parent" {
 
   root.provide_context("root")
 
-  assert_eq(child.take_context(), Some("root"))
+  assert_eq((child.take_context() : String?), Some("root"))
 
-  assert_eq(root.use_context(), None)
+  assert_eq((root.use_context() : String?), None)
 }
 
 ///|
@@ -88,10 +88,9 @@ test "bidirectional finds child context" {
 test "bidirectional bfs" {
   let root = Owner::new()
 
-  let child1 = root.child()
-  let child2 = root.child()
+  let child = root.child()
 
-  let grandchild = child2.child()
+  let grandchild = child.child()
 
   grandchild.provide_context("target")
 

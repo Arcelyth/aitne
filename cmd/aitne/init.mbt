@@ -14,7 +14,7 @@ fn list_templates_local() -> Unit {
 async fn list_templates_remote() -> Unit {
   println("Fetching available templates from aitne-dev...")
 
-  let headers = Map::new()
+  let headers = Map([], capacity=8)
   headers.set("user-agent", "aitne-cli")
   headers.set("accept", "application/vnd.github+json")
   headers.set("accept-encoding", "identity")
@@ -58,25 +58,22 @@ async fn list_templates_remote() -> Unit {
 async fn fetch_latest_tag(tmpl_name : String) -> String {
   let path = "https://api.github.com/repos/aitne-dev/template-\{tmpl_name}/releases/latest"
 
-  let headers = Map::new()
+  let headers = Map([], capacity=8)
   headers.set("user-agent", USER_AGENT)
   headers.set("accept", "application/vnd.github+json")
   headers.set("accept-encoding", "identity")
   headers.set("connection", "close")
 
-  match (try? @http.get(path, headers~)) {
-    Ok((resp, body)) =>
-      if resp.code == 200 {
-        match body.json() {
-          Object(obj) =>
-            match obj.get("tag_name") {
-              Some(String(tag)) => return tag
-              _ => ()
-            }
+  let (resp, body) = @http.get(path, headers~) catch { _ => return "main" }
+  if resp.code == 200 {
+    match body.json() {
+      Object(obj) =>
+        match obj.get("tag_name") {
+          Some(String(tag)) => return tag
           _ => ()
         }
-      }
-    Err(_) => ()
+      _ => ()
+    }
   }
   "main"
 }
@@ -92,36 +89,33 @@ async fn[X] download_template_stream(
 
   println("Downloading asset stream from codeload...")
 
-  let headers = Map::new()
+  let headers = Map([], capacity=8)
   headers.set("user-agent", USER_AGENT)
 
-  match (try? @http.get(url, headers~)) {
-    Ok((resp, body)) =>
-      if resp.code == 200 {
-        let tmp_tar = "\{target_dir}/tmp_template.tar.gz"
-
-        if !@fs.path_exists(target_dir) {
-          @fs.create_dir(target_dir)
-        }
-
-        try {
-          if !@fs.path_exists(target_dir) {
-            @fs.create_dir(target_dir)
-          }
-
-          @fs.write_bytes_to_file(tmp_tar, body.binary())
-        } catch {
-          e => return Err("Failed to write temporary tarball to disk")
-        }
-
-        println("Extracting template archive...")
-
-        extract_tarball(group, tmp_tar, target_dir)
-      } else {
-        Err("Failed to download template asset, status code: \{resp.code}")
-      }
-    Err(_) => Err("Connection broke while pulling repository tarball.")
+  let (resp, body) = @http.get(url, headers~) catch {
+    _ => return Err("Connection broke while pulling repository tarball.")
   }
+  if resp.code != 200 {
+    return Err("Failed to download template asset, status code: \{resp.code}")
+  }
+  let tmp_tar = "\{target_dir}/tmp_template.tar.gz"
+
+  if !@fs.path_exists(target_dir) {
+    @fs.create_dir(target_dir)
+  }
+
+  try {
+    if !@fs.path_exists(target_dir) {
+      @fs.create_dir(target_dir)
+    }
+
+    @fs.write_bytes_to_file(tmp_tar, body.binary())
+  } catch {
+    _ => return Err("Failed to write temporary tarball to disk")
+  }
+
+  println("Extracting template archive...")
+  extract_tarball(group, tmp_tar, target_dir)
 }
 
 ///|
@@ -141,13 +135,12 @@ async fn[X] extract_tarball(
   ]
   let args : ArrayView[String] = args_raw
 
-  match (try? @process.spawn(group, cmd, args)) {
-    Ok(process) => {
-      let _status = process.wait()
-      Ok(())
-    }
-    Err(_) => Err("Failed to execute spawn: internal task group process error.")
+  let process = @process.spawn(group, cmd, args) catch {
+    _ =>
+      return Err("Failed to execute spawn: internal task group process error.")
   }
+  let _status = process.wait()
+  Ok(())
 }
 
 ///|

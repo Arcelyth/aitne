@@ -1,5 +1,5 @@
 ///|
-using @dom {trait View, for_node, for_each}
+using @dom {trait View, for_each}
 
 ///|
 let adjectives : Array[String] = [

@@ -24,6 +24,8 @@ jobs:
 
       - name: Setup Moonbit
         uses: hustcer/setup-moonbit@v1
+        with: 
+          version: "0.10.4+2cc641edf"
 
       - name: Build native cmd binary
         shell: bash
@@ -52,6 +54,8 @@ jobs:
 
       - name: Setup Moonbit
         uses: hustcer/setup-moonbit@v1
+        with:
+          version: "0.10.4+2cc641edf"
 
       - name: post install
         run: |

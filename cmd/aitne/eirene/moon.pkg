@@ -4,3 +4,7 @@ import {
   "moonbitlang/async/socket",
   "moonbitlang/x/fs",
 }
+
+options(
+  supported_targets: "native",
+)

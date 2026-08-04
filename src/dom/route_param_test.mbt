@@ -33,7 +33,7 @@ test "from_search_duplicate_keys_behavior" {
 test "to_params should group values by duplicate keys" {
   let empty_input : Array[(String, String)] = []
   let Params(empty_res) = to_params(empty_input)
-  inspect(empty_res.length(), content="0")
+  debug_inspect(empty_res.length(), content="0")
 
   let input = [
     ("id", "123"),
@@ -45,14 +45,44 @@ test "to_params should group values by duplicate keys" {
 
   let Params(res) = to_params(input)
 
-  inspect(res.length(), content="3")
+  debug_inspect(res.length(), content="3")
 
-  inspect(res[0].0, content="id")
-  inspect(res[0].1, content="[123, 456]")
+  debug_inspect(
+    res[0].0,
+    content=(
+      #|"id"
+    ),
+  )
+  debug_inspect(
+    res[0].1,
+    content=(
+      #|["123", "456"]
+    ),
+  )
 
-  inspect(res[1].0, content="tag")
-  inspect(res[1].1, content="[rust, moonbit]")
+  debug_inspect(
+    res[1].0,
+    content=(
+      #|"tag"
+    ),
+  )
+  debug_inspect(
+    res[1].1,
+    content=(
+      #|["rust", "moonbit"]
+    ),
+  )
 
-  inspect(res[2].0, content="page")
-  inspect(res[2].1, content="[1]")
+  debug_inspect(
+    res[2].0,
+    content=(
+      #|"page"
+    ),
+  )
+  debug_inspect(
+    res[2].1,
+    content=(
+      #|["1"]
+    ),
+  )
 }

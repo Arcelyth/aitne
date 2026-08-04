@@ -12,15 +12,15 @@ fn next_route_id() -> UInt {
 }
 
 ///|
-pub(all) struct NestedRoute[Ch] {
+pub(all) struct NestedRoute {
   id : UInt
   path : String
-  child : Ch?
+  child : Array[NestedRoute]
   view : ViewFn
 }
 
 ///|
-pub impl[Ch] Debug for NestedRoute[Ch] with fn to_repr(self) -> Repr {
+pub impl Debug for NestedRoute with fn to_repr(self) -> Repr {
   @debug.Repr::tuple([
     @debug.Repr::string("id"),
     to_repr(self.id),
@@ -30,16 +30,16 @@ pub impl[Ch] Debug for NestedRoute[Ch] with fn to_repr(self) -> Repr {
 }
 
 ///|
-pub fn[Ch] NestedRoute::new(path : String, view : ViewFn) -> NestedRoute[Ch] {
-  NestedRoute::{ id: next_route_id(), path, child: None, view }
+pub fn NestedRoute::new(path : String, view : ViewFn) -> NestedRoute {
+  NestedRoute::{ id: next_route_id(), path, child: [], view }
 }
 
 ///|
-pub fn[Ch] NestedRoute::child(
-  self : NestedRoute[Ch],
-  child : Ch,
-) -> NestedRoute[Ch] {
-  { ..self, child: Some(child) }
+pub fn NestedRoute::child(
+  self : NestedRoute,
+  child : Array[NestedRoute],
+) -> NestedRoute {
+  { ..self, child, }
 }
 
 ///|
@@ -388,7 +388,7 @@ pub impl MatchNestedRoutes for Unit with fn match_nested(_self, path : String) -
 }
 
 ///|
-pub impl[Ch : MatchNestedRoutes] MatchNestedRoutes for NestedRoute[Ch] with fn match_nested(
+pub impl MatchNestedRoutes for NestedRoute with fn match_nested(
   self,
   path : String,
 ) -> ((UInt, NestedMatch)?, String) {
@@ -396,8 +396,8 @@ pub impl[Ch : MatchNestedRoutes] MatchNestedRoutes for NestedRoute[Ch] with fn m
 }
 
 ///|
-pub fn[Ch : MatchNestedRoutes] NestedRoute::match_nested(
-  self : NestedRoute[Ch],
+pub fn NestedRoute::match_nested(
+  self : NestedRoute,
   path : String,
 ) -> ((UInt, NestedMatch)?, String) {
   let route_segs = split_segments(self.path)
@@ -442,25 +442,24 @@ pub fn[Ch : MatchNestedRoutes] NestedRoute::match_nested(
     join_suffix(path_segs, match_len)
   }
 
-  let (child_match, final_remaining) = match self.child {
-    Some(child_route) => {
-      let (inner, child_remaining) = child_route.match_nested(remaining)
-      match inner {
-        Some((_, child)) => (Some(child), child_remaining)
-        None =>
-          if remaining == "" || remaining == "/" {
-            (None, remaining)
-          } else {
-            return (None, path)
-          }
-      }
+  let (child_match, final_remaining) = if self.child.length() != 0 {
+    let child_route = self.child
+    let (inner, child_remaining) = MatchNestedRoutes::match_nested(
+      child_route, remaining,
+    )
+    match inner {
+      Some((_, child)) => (Some(child), child_remaining)
+      None =>
+        if remaining == "" || remaining == "/" {
+          (None, remaining)
+        } else {
+          return (None, path)
+        }
     }
-    None =>
-      if remaining == "" || remaining == "/" {
-        (None, remaining)
-      } else {
-        return (None, path)
-      }
+  } else if remaining == "" || remaining == "/" {
+    (None, remaining)
+  } else {
+    return (None, path)
   }
 
   let id = self.id

@@ -1158,7 +1158,7 @@ pub struct TagWbr {
 pub impl ElementType for TagWbr
 
 pub(all) struct TemplateView[V](V)
-pub fn[V : View + ToTemplate] TemplateView::new(V) -> Self[V]
+pub fn[V] TemplateView::new(V) -> Self[V]
 pub impl[V : View + ToTemplate] Render for TemplateView[V]
 pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V]
 

@@ -23,11 +23,6 @@ exp_todo:
 	chmod +x ./examples/todo/run.sh
 	./examples/todo/run.sh
 	
-exp_for: 
-	moon build ./examples/for_each/
-	chmod +x ./examples/for_each/run.sh
-	./examples/for_each/run.sh
-
 exp_dyn: 
 	moon build ./examples/dyn/
 	chmod +x ./examples/dyn/run.sh

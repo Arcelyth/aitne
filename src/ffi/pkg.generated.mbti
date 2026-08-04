@@ -12,11 +12,35 @@ pub fn anchor_target(Element) -> String
 
 pub fn cancel_animation_frame(AnimationFrameHandle) -> Unit
 
+#alias(comment_as_node)
+pub fn cast_comment_to_node(Comment) -> Node
+
+#alias(el_as_node)
+pub fn cast_element_to_node(Element) -> Node
+
+pub fn cast_node_to_comment(Node) -> Comment
+
+#alias(node_as_element)
+pub fn cast_node_to_element(Node) -> Element
+
+pub fn cast_node_to_text(Node) -> Text
+
+pub fn cast_template_element_to_node(TemplateElement) -> Node
+
+#alias(text_as_node)
+pub fn cast_text_to_node(Text) -> Node
+
 pub fn clear_interval(IntervalHandle) -> Unit
 
 pub fn clear_timeout(TimeoutHandle) -> Unit
 
-pub fn comment_as_node(Comment) -> Node
+pub fn clone_node_shallow(TemplateElement) -> TemplateElement
+
+pub fn clone_template_content(TemplateElement) -> Element
+
+pub fn console_error(String, Node, String) -> Unit
+
+pub fn create_template() -> TemplateElement
 
 pub fn current_hash() -> String
 
@@ -39,8 +63,6 @@ pub fn dom_create_comment(String) -> Node
 pub fn dom_create_effect(() -> Unit) -> Unit
 
 pub fn dom_insert_before(Node, Node, Node) -> Unit
-
-pub fn dom_is_null(Node) -> Bool
 
 pub fn dom_null_node() -> Node
 
@@ -68,7 +90,7 @@ pub fn dom_set_text(Node, String) -> Unit
 
 pub fn dom_tag_name(Node) -> String
 
-pub fn el_as_node(Element) -> Node
+pub fn element_is_null(Element) -> Bool
 
 pub fn event_alt_key(Event) -> Bool
 
@@ -90,6 +112,8 @@ pub fn event_target_checked(Event) -> Bool
 
 pub fn event_target_value(Event) -> String
 
+pub fn first_child_skip_comments(Node) -> Node?
+
 pub fn get_bool_property(Element, String) -> Bool
 
 pub fn get_property(Element, String) -> String
@@ -98,15 +122,21 @@ pub fn history_push_state(String) -> Unit
 
 pub fn history_replace_state(String) -> Unit
 
+pub fn is_comment_node(Node) -> Bool
+
+pub fn is_text_node(Node) -> Bool
+
 pub fn js_array_get(JsArray, Int) -> Node
 
 pub fn js_array_length(JsArray) -> Int
 
-pub fn node_as_element(Node) -> Element
+pub fn next_sibling_skip_comments(Node) -> Node?
 
 pub fn node_is_anchor(Node) -> Bool
 
 pub fn on_popstate(() -> Unit) -> () -> Unit
+
+pub fn parent_node(Node) -> Node?
 
 pub fn prim_add_event_listener(Element, String, (Event) -> Unit) -> EventHandle
 
@@ -126,10 +156,13 @@ pub fn prim_document() -> Document
 
 pub fn prim_first_child(Node) -> Node
 
+pub fn prim_first_element_child(Node) -> Element
+
 pub fn prim_get_body(Document) -> Node
 
 pub fn prim_get_element_by_id(Document, String) -> Node?
 
+#alias(dom_is_null)
 pub fn prim_is_null(Node) -> Bool
 
 pub fn prim_next_sibling(Node) -> Node
@@ -142,6 +175,8 @@ pub fn remove_property(Element, String) -> Unit
 
 pub fn request_animation_frame(() -> Unit) -> AnimationFrameHandle
 
+pub fn set_inner_html(TemplateElement, String) -> Unit
+
 pub fn set_interval(() -> Unit, Int) -> IntervalHandle
 
 pub fn set_property(Element, String, String) -> Unit
@@ -149,8 +184,6 @@ pub fn set_property(Element, String, String) -> Unit
 pub fn set_timeout(() -> Unit, Int) -> TimeoutHandle
 
 pub fn set_window_href(String) -> Unit
-
-pub fn text_as_node(Text) -> Node
 
 pub fn url_can_parse(String, String) -> Bool
 
@@ -188,6 +221,8 @@ pub type IntervalHandle
 pub type JsArray
 
 pub type Node
+
+pub type TemplateElement
 
 pub type Text
 

@@ -60,6 +60,8 @@ pub fn[C] class_val(C) -> Class[C]
 
 pub fn clear_between(@ffi.Node, @ffi.Node) -> Unit
 
+pub fn clone_template(@ffi.TemplateElement) -> @ffi.Element
+
 pub fn code(children? : Array[&View]) -> HtmlElement[TagCode, Array[&View]]
 
 pub fn col(children? : Array[&View]) -> HtmlElement[TagCol, Array[&View]]
@@ -90,6 +92,8 @@ pub fn document() -> @ffi.Document
 
 pub fn dom_create_element(String) -> @ffi.Element
 
+pub fn dom_create_element_from_html(String) -> @ffi.Element
+
 pub fn dom_create_text_node(String) -> @ffi.Text
 
 pub fn dom_get_body() -> @ffi.Node
@@ -103,6 +107,12 @@ pub fn dt(children? : Array[&View]) -> HtmlElement[TagDt, Array[&View]]
 pub fn em(children? : Array[&View]) -> HtmlElement[TagEm, Array[&View]]
 
 pub fn embed(children? : Array[&View]) -> HtmlElement[TagEmbed, Array[&View]]
+
+pub fn failed_to_cast_element(String, @ffi.Node) -> @ffi.Element
+
+pub fn failed_to_cast_marker_node(@ffi.Node) -> @ffi.Comment
+
+pub fn failed_to_cast_text_node(@ffi.Node) -> @ffi.Text
 
 pub fn fieldset(children? : Array[&View]) -> HtmlElement[TagFieldset, Array[&View]]
 
@@ -118,6 +128,8 @@ pub fn[T] for_each(each~ : () -> Iter[T], key~ : (T) -> String, children~ : (T) 
 pub fn[T, K : Hash + Eq] for_node(() -> Array[T], (T) -> K, (T) -> &View) -> &View
 
 pub fn form(children? : Array[&View]) -> HtmlElement[TagForm, Array[&View]]
+
+pub fn[V : ToTemplate] get_template(V) -> @ffi.TemplateElement
 
 pub fn h1(children? : Array[&View]) -> HtmlElement[TagH1, Array[&View]]
 
@@ -227,6 +239,8 @@ pub fn provide_router_context(RouterContext) -> Unit
 
 pub fn q(children? : Array[&View]) -> HtmlElement[TagQ, Array[&View]]
 
+pub fn raw_node(@ffi.Node) -> RawNodeView
+
 pub fn resolve_path(String, String, String?) -> String
 
 pub fn[Ch] route(path? : String, view? : () -> &View) -> NestedRoute[Ch]
@@ -254,6 +268,8 @@ pub fn search(children? : Array[&View]) -> HtmlElement[TagSearch, Array[&View]]
 pub fn section(children? : Array[&View]) -> HtmlElement[TagSection, Array[&View]]
 
 pub fn select(children? : Array[&View]) -> HtmlElement[TagSelect, Array[&View]]
+
+pub fn set_currently_hydrating(String?) -> Unit
 
 pub fn slot(children? : Array[&View]) -> HtmlElement[TagSlot, Array[&View]]
 
@@ -357,6 +373,19 @@ pub impl @reactive.TypeName for BrowserUrl
 
 pub(all) struct Class[C](C)
 pub impl[C : IntoClass] Attribute for Class[C]
+
+pub struct Cursor {
+  inner : @ref.Ref[@ffi.Node]
+}
+pub fn Cursor::advance_to_placeholder(Self, PositionState) -> Unit
+pub fn Cursor::child(Self) -> Unit
+pub fn Cursor::clone(Self) -> Self
+pub fn Cursor::current(Self) -> @ffi.Node
+pub fn Cursor::new(@ffi.Node) -> Self
+pub fn Cursor::next_placeholder(Self, PositionState) -> @ffi.Comment
+pub fn Cursor::parent(Self) -> Unit
+pub fn Cursor::set(Self, @ffi.Node) -> Unit
+pub fn Cursor::sibling(Self) -> Unit
 
 pub struct Diff {
   removed : Array[DiffOpRemove]
@@ -466,8 +495,8 @@ pub(all) struct Keyed[T, V] {
   view_fn : (Int, T) -> ((Int) -> Unit, V)
 }
 pub impl[T, V : Render] Render for Keyed[T, V]
-pub impl[T, V : Render] RenderHtml for Keyed[T, V]
-pub impl[T, V : Render] View for Keyed[T, V]
+pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V]
+pub impl[T, V : View] View for Keyed[T, V]
 
 pub struct KeyedState {
   mut parent : @ffi.Element?
@@ -588,13 +617,29 @@ pub enum Position {
   NextChildAfterText
   OnlyChild
   LastChild
-} derive(Eq, @debug.Debug)
+} derive(Eq, Hash)
+
+pub struct PositionState {
+  state : @ref.Ref[Position]
+}
+pub fn PositionState::deep_clone(Self) -> Self
+pub fn PositionState::default() -> Self
+pub fn PositionState::get(Self) -> Position
+pub fn PositionState::new(Position) -> Self
+pub fn PositionState::set(Self, Position) -> Unit
 
 pub struct Property[P] {
   key : String
   value : P
 }
 pub impl[P : IntoProperty] Attribute for Property[P]
+
+pub struct RawNodeView {
+  node : @ffi.Node
+}
+pub impl Render for RawNodeView
+pub impl RenderHtml for RawNodeView
+pub impl View for RawNodeView
 
 pub struct RemoveEventHandler(@ffi.EventHandle?)
 pub fn RemoveEventHandler::invoke(Self) -> Unit
@@ -610,6 +655,7 @@ pub enum RenderState {
   KeyedState(KeyedState)
   Router(RouterState)
   OwnedViewState(OwnedViewState)
+  RawNode(@ffi.Node)
 }
 pub impl Mountable for RenderState
 
@@ -1111,6 +1157,11 @@ pub struct TagWbr {
 }
 pub impl ElementType for TagWbr
 
+pub(all) struct TemplateView[V](V)
+pub fn[V : View + ToTemplate] TemplateView::new(V) -> Self[V]
+pub impl[V : View + ToTemplate] Render for TemplateView[V]
+pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V]
+
 pub struct TextNode {
   val : String
 }
@@ -1142,6 +1193,7 @@ pub trait Attribute {
   fn build(Self, @ffi.Element) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
   fn dry_resolve(Self) -> Unit
+  fn hydrate(Self, @ffi.Element) -> AttrState
   fn add_attr(Self, &Attribute) -> &Attribute
 }
 pub impl Attribute for Unit
@@ -1157,6 +1209,7 @@ pub trait AttributeValue {
   fn to_html(Self, String, StringBuilder) -> Unit
   fn build(Self, String, @ffi.Element) -> AttrState
   fn rebuild(Self, String, @ref.Ref[AttrState]) -> Unit
+  fn hydrate(Self, @ffi.Element) -> AttrState
   fn dry_resolve(Self) -> Unit
 }
 pub impl AttributeValue for Unit
@@ -1173,6 +1226,7 @@ pub trait IntoClass {
   fn to_html(Self, StringBuilder) -> Unit
   fn build(Self, @ffi.Element) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
+  fn hydrate(Self, @ffi.Element) -> AttrState
   fn dry_resolve(Self) -> Unit
 }
 pub impl IntoClass for String
@@ -1182,6 +1236,7 @@ pub trait IntoProperty {
   fn to_html(Self, StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
   fn build(Self, @ffi.Element, String) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState], String) -> Unit
+  fn hydrate(Self, @ffi.Element, String) -> AttrState
   fn dry_resolve(Self) -> Unit
 }
 pub impl IntoProperty for String
@@ -1193,6 +1248,7 @@ pub trait IntoStyle {
   fn build(Self, @ffi.Element) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
   fn dry_resolve(Self) -> Unit
+  fn hydrate(Self, @ffi.Element) -> AttrState
 }
 pub impl IntoStyle for String
 
@@ -1222,10 +1278,16 @@ pub trait RenderHtml : Render {
   fn html_len(Self) -> Int
   fn to_html(Self) -> String
   fn to_html_with_buf(Self, StringBuilder, @ref.Ref[Position]) -> Unit
+  fn hydrate(Self, Cursor, PositionState) -> RenderState
 }
 pub impl RenderHtml for Unit
 pub impl RenderHtml for String
 pub impl RenderHtml for Array[&View]
+
+pub(open) trait ToTemplate {
+  fn type_id() -> String
+  fn to_template(StringBuilder) -> Unit
+}
 
 pub trait View : Render + RenderHtml {
   fn style(Self, &IntoStyle) -> &View

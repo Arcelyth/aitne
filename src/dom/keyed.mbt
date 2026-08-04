@@ -48,24 +48,71 @@ pub impl[T, V : Render] Render for Keyed[T, V] with fn rebuild(
 }
 
 ///|
-pub impl[T, V : Render] View for Keyed[T, V] with fn style(_s, _d) {
+pub impl[T, V : View] View for Keyed[T, V] with fn style(_s, _d) {
 
 }
 
 ///|
-pub impl[T, V : Render] RenderHtml for Keyed[T, V] with fn html_len(_self) -> Int {
-  // TODO
-  0
+pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V] with fn hydrate(
+  self,
+  cursor : Cursor,
+  pos : PositionState,
+) -> RenderState {
+  let items = (self.items)()
+  let keys = Ref(@utils.IndexSet::new())
+  let rendered_items = []
+
+  items.eachi((idx, item) => {
+    let _ = keys.val.insert((self.key_fn)(item))
+    let (set_idx, view) = (self.view_fn)(idx, item)
+
+    let child_state = RenderHtml::hydrate(view, cursor, pos)
+    rendered_items.push(Some((set_idx, child_state)))
+  })
+
+  if pos.get() == Position::FirstChild {
+    cursor.child()
+  } else {
+    cursor.sibling()
+  }
+
+  let marker = cursor.current()
+  pos.set(Position::NextChild)
+
+  RenderState::KeyedState(KeyedState::{
+    parent: None,
+    marker,
+    keys,
+    rendered_items,
+  })
 }
 
 ///|
-pub impl[T, V : Render] RenderHtml for Keyed[T, V] with fn to_html_with_buf(
-  _self,
-  _buf,
-  _position,
+pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V] with fn html_len(
+  self,
+) -> Int {
+  let mut len = 7 // "<!---->" 
+  let items = (self.items)()
+  items.eachi((idx, item) => {
+    let (_, view) = (self.view_fn)(idx, item)
+    len += RenderHtml::html_len(view)
+  })
+  len
+}
+
+///|
+pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V] with fn to_html_with_buf(
+  self,
+  buf,
+  pos,
 ) -> Unit {
-  // TODO
-  ()
+  let items = (self.items)()
+  items.eachi((idx, item) => {
+    let (_, view) = (self.view_fn)(idx, item)
+    RenderHtml::to_html_with_buf(view, buf, pos)
+  })
+  buf.write_string("<!---->")
+  pos.val = Position::NextChild
 }
 
 ///|

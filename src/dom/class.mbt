@@ -15,6 +15,14 @@ pub impl[C : IntoClass] Attribute for Class[C] with fn html_len(_self) -> Int {
 }
 
 ///|
+pub impl[C : IntoClass] Attribute for Class[C] with fn hydrate(
+  self,
+  el : @ffi.Element,
+) -> AttrState {
+  self.0.hydrate(el)
+}
+
+///|
 pub impl[C : IntoClass] Attribute for Class[C] with fn to_html(
   _self,
   _b,
@@ -60,12 +68,18 @@ pub trait IntoClass {
   fn to_html(Self, style : StringBuilder) -> Unit
   fn build(Self, el : @ffi.Element) -> AttrState
   fn rebuild(Self, state : Ref[AttrState]) -> Unit
+  fn hydrate(Self, el : @ffi.Element) -> AttrState
   fn dry_resolve(Self) -> Unit
 }
 
 ///|
 pub impl IntoClass for String with fn html_len(self) -> Int {
   self.length()
+}
+
+///|
+pub impl IntoClass for String with fn hydrate(self, el : @ffi.Element) -> AttrState {
+  AttrState::Pair(AttrState::Element(el), AttrState::Str(self))
 }
 
 ///|
@@ -110,6 +124,26 @@ pub fn[T] rx_class(f : () -> T) -> RxClass[T] {
 ///|
 pub impl[T : IntoClass] IntoClass for RxClass[T] with fn html_len(_self) -> Int {
   0
+}
+
+///|
+pub impl[T : IntoClass] IntoClass for RxClass[T] with fn hydrate(
+  self,
+  el : @ffi.Element,
+) -> AttrState {
+  RenderEffect(
+    RenderEffect::new(prev => {
+      let val = (self.0)()
+      match prev {
+        Some(state) => {
+          let r = Ref(state)
+          val.rebuild(r)
+          r.val
+        }
+        _ => val.hydrate(el)
+      }
+    }),
+  )
 }
 
 ///|

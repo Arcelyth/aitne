@@ -12,6 +12,7 @@ pub trait RenderHtml: Render {
   fn html_len(Self) -> Int
   fn to_html(Self) -> String = _
   fn to_html_with_buf(Self, StringBuilder, Ref[Position]) -> Unit
+  fn hydrate(Self, cursor : Cursor, pos : PositionState) -> RenderState
 }
 
 ///|
@@ -39,7 +40,7 @@ pub enum Position {
   NextChildAfterText
   OnlyChild
   LastChild
-} derive(Debug, Eq)
+} derive(Eq, Hash)
 
 ///|
 /// The runtime representation of a rendered view.
@@ -58,6 +59,7 @@ pub enum RenderState {
   KeyedState(KeyedState)
   Router(RouterState)
   OwnedViewState(OwnedViewState)
+  RawNode(@ffi.Node)
 }
 
 ///|
@@ -158,6 +160,7 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
       }
     }
     OwnedViewState(s) => s.unmount()
+    RawNode(n) => @ffi.dom_remove(n)
     None => ()
   }
 }
@@ -211,6 +214,12 @@ pub impl Mountable for RenderState with fn mount(
       }
     }
     OwnedViewState(s) => s.mount(parent, marker)
+    RawNode(n) =>
+      if @ffi.dom_is_null(marker) {
+        @ffi.dom_append(parent, n)
+      } else {
+        @ffi.dom_insert_before(parent, n, marker)
+      }
     None => ()
   }
 }
@@ -250,6 +259,15 @@ pub impl Mountable for RenderState with fn insert_before(
     }
     Router(s) => s.view.val.insert_before(child)
     OwnedViewState(s) => s.insert_before(child)
+    RawNode(n) => {
+      let p = @ffi.dom_parent(n)
+      if @ffi.dom_is_null(p) {
+        false
+      } else {
+        child.mount(p, n)
+        true
+      }
+    }
     KeyedState(s) => {
       let parent = @ffi.dom_parent(s.marker)
       if @ffi.dom_is_null(parent) {
@@ -303,6 +321,7 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[@ffi.Node] {
       println("[Debug] router elements")
       s.view.val.elements()
     }
+    RawNode(n) => [n]
     None => []
     _ => []
   }
@@ -318,6 +337,11 @@ pub impl Render for Unit with fn build(_self) -> RenderState {
 ///|
 pub impl Render for Unit with fn rebuild(_self, _state : Ref[RenderState]) -> Unit {
 
+}
+
+///|
+pub impl RenderHtml for Unit with fn hydrate(_self, _cursor, _pos) -> RenderState {
+  RenderState::None
 }
 
 ///|
@@ -349,6 +373,31 @@ pub impl Render for String with fn rebuild(self, state : Ref[RenderState]) -> Un
 ///|
 pub impl RenderHtml for String with fn html_len(self) -> Int {
   self.length()
+}
+
+///|
+pub impl RenderHtml for String with fn hydrate(self, cursor, pos) -> RenderState {
+  if pos.get() == Position::FirstChild {
+    cursor.child()
+  } else {
+    cursor.sibling()
+  }
+
+  // Placecholder will be inserted between adjacent text nodes. 
+  if pos.get() == Position::NextChildAfterText {
+    cursor.sibling()
+  }
+
+  let curr_node = cursor.current()
+  let text_node = if @ffi.is_text_node(curr_node) {
+    @ffi.cast_node_to_text(curr_node)
+  } else {
+    failed_to_cast_text_node(curr_node)
+  }
+
+  pos.set(Position::NextChildAfterText)
+
+  RenderState::Text(TextState::{ node: text_node })
 }
 
 ///|

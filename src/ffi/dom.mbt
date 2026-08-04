@@ -1,20 +1,4 @@
 ///|
-pub extern "js" fn el_as_node(el : Element) -> Node =
-  #|(el) => el
-
-///|
-pub extern "js" fn text_as_node(t : Text) -> Node =
-  #|(t) => t
-
-///|
-pub extern "js" fn comment_as_node(c : Comment) -> Node =
-  #|(c) => c
-
-///|
-pub extern "js" fn node_as_element(node : Node) -> Element =
-  #|(node) => node
-
-///|
 pub extern "js" fn prim_document() -> Document =
   #|() => document
 
@@ -87,16 +71,21 @@ pub extern "js" fn prim_node_eq(a : Node, b : Node) -> Bool =
   #|(a, b) => a === b
 
 ///|
+#alias(dom_is_null)
 pub extern "js" fn prim_is_null(node : Node) -> Bool =
   #|(node) => node === null || node === undefined
 
 ///|
-pub extern "js" fn dom_is_null(node : Node) -> Bool =
-  #|(node) => node === null || node === undefined
+pub extern "js" fn element_is_null(el : Element) -> Bool =
+  #|(el) => el === null || el === undefined
 
 ///|
 pub extern "js" fn prim_first_child(node : Node) -> Node =
   #|(node) => node.firstChild
+
+///|
+pub extern "js" fn prim_first_element_child(node : Node) -> Element =
+  #|(node) => node.firstElementChild
 
 ///|
 pub extern "js" fn prim_next_sibling(node : Node) -> Node =
@@ -188,3 +177,7 @@ pub extern "js" fn dom_set_property_bool(
   #|(el, key, value) => el[key] = value
 
 // -----
+
+///|
+pub extern "js" fn is_text_node(node : Node) -> Bool =
+  #| (node) => node.nodeType === 3

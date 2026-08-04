@@ -15,6 +15,14 @@ pub impl[S : IntoStyle] Attribute for Style[S] with fn html_len(_self) -> Int {
 }
 
 ///|
+pub impl[S : IntoStyle] Attribute for Style[S] with fn hydrate(
+  self,
+  el : @ffi.Element,
+) -> AttrState {
+  self.0.hydrate(el)
+}
+
+///|
 pub impl[S : IntoStyle] Attribute for Style[S] with fn to_html(
   self,
   _b,
@@ -61,11 +69,17 @@ pub trait IntoStyle {
   fn build(Self, el : @ffi.Element) -> AttrState
   fn rebuild(Self, state : Ref[AttrState]) -> Unit
   fn dry_resolve(Self) -> Unit
+  fn hydrate(Self, el : @ffi.Element) -> AttrState
 }
 
 ///|
 pub impl IntoStyle for String with fn html_len(self) -> Int {
   self.length()
+}
+
+///|
+pub impl IntoStyle for String with fn hydrate(self, el : @ffi.Element) -> AttrState {
+  AttrState::Pair(AttrState::Element(el), AttrState::Str(self))
 }
 
 ///|

@@ -1,11 +1,35 @@
 ///|
 pub fn not_found() -> &View {
-  @Arcelyth/aitne/src/dom.div(children=["NOT FOUND !!!!!!"])
+  let __tmpl_0 = {
+    let _t = @Arcelyth/aitne/src/ffi.create_template()
+    @Arcelyth/aitne/src/ffi.set_inner_html(_t, "<div>NOT FOUND !!!!!!</div>")
+    _t
+  }
+  let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(__tmpl_0)
+  let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(
+    @Arcelyth/aitne/src/ffi.cast_element_to_node(_frag),
+  )
+  @Arcelyth/aitne/src/dom.raw_node(
+    @Arcelyth/aitne/src/ffi.cast_element_to_node(_root),
+  )
 }
 
 ///|
 pub fn try_page() -> &View {
-  @Arcelyth/aitne/src/dom.div(children=["This is try page !!!!!!"])
+  let __tmpl_1 = {
+    let _t = @Arcelyth/aitne/src/ffi.create_template()
+    @Arcelyth/aitne/src/ffi.set_inner_html(
+      _t, "<div>This is try page !!!!!!</div>",
+    )
+    _t
+  }
+  let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(__tmpl_1)
+  let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(
+    @Arcelyth/aitne/src/ffi.cast_element_to_node(_frag),
+  )
+  @Arcelyth/aitne/src/dom.raw_node(
+    @Arcelyth/aitne/src/ffi.cast_element_to_node(_root),
+  )
 }
 
 ///|

@@ -2,6 +2,7 @@ import {
   "moonbitlang/x/fs",
   "moonbitlang/core/hashmap",
   "moonbitlang/core/hashset",
+  "Arcelyth/html_escape" @escape,
 }
 
 options(

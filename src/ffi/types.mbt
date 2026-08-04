@@ -33,3 +33,6 @@ pub type EventHandle
 
 ///|
 pub type JsArray
+
+///|
+pub type TemplateElement

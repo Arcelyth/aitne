@@ -24,6 +24,7 @@ pub trait AttributeValue {
   fn to_html(Self, key : String, buf : StringBuilder) -> Unit
   fn build(Self, key : String, el : @ffi.Element) -> AttrState
   fn rebuild(Self, key : String, state : Ref[AttrState]) -> Unit
+  fn hydrate(Self, el : @ffi.Element) -> AttrState
   fn dry_resolve(Self) -> Unit
 }
 
@@ -41,6 +42,7 @@ pub trait Attribute {
   fn build(Self, el : @ffi.Element) -> AttrState
   fn rebuild(Self, state : Ref[AttrState]) -> Unit
   fn dry_resolve(Self) -> Unit
+  fn hydrate(Self, el : @ffi.Element) -> AttrState
   fn add_attr(Self, attr : &Attribute) -> &Attribute
 }
 
@@ -49,6 +51,11 @@ pub trait Attribute {
 ///|
 pub impl Attribute for Unit with fn html_len(_self) -> Int {
   0
+}
+
+///|
+pub impl Attribute for Unit with fn hydrate(_self, _el) -> AttrState {
+  AttrState::None
 }
 
 ///|
@@ -84,6 +91,11 @@ pub impl AttributeValue for Unit with fn html_len(_self) -> Int {
 }
 
 ///|
+pub impl AttributeValue for Unit with fn hydrate(_self, _el) -> AttrState {
+  AttrState::None
+}
+
+///|
 pub impl AttributeValue for Unit with fn to_html(_self, _k, _b) -> Unit {
 
 }
@@ -115,6 +127,11 @@ pub impl AttributeKey for String with fn get_key(self) -> String {
 ///|
 pub impl AttributeValue for Bool with fn html_len(_self) -> Int {
   0
+}
+
+///|
+pub impl AttributeValue for Bool with fn hydrate(self, el : @ffi.Element) -> AttrState {
+  AttrState::Pair(AttrState::Element(el), AttrState::Bool(self))
 }
 
 ///|
@@ -177,6 +194,11 @@ pub impl AttributeValue for String with fn html_len(self) -> Int {
 }
 
 ///|
+pub impl AttributeValue for String with fn hydrate(self, el : @ffi.Element) -> AttrState {
+  AttrState::Pair(AttrState::Element(el), AttrState::Str(self))
+}
+
+///|
 pub impl AttributeValue for String with fn to_html(
   self,
   key : String,
@@ -236,6 +258,14 @@ pub impl[K : AttributeKey, V : AttributeValue] Attribute for Attr[K, V] with fn 
 }
 
 ///|
+pub impl[K : AttributeKey, V : AttributeValue] Attribute for Attr[K, V] with fn hydrate(
+  self,
+  el : @ffi.Element,
+) -> AttrState {
+  self.1.hydrate(el)
+}
+
+///|
 pub impl[K : AttributeKey, V : AttributeValue] Attribute for Attr[K, V] with fn to_html(
   self,
   buf,
@@ -284,6 +314,14 @@ pub impl[A : Attribute, B : Attribute] Attribute for (A, B) with fn html_len(
   self,
 ) -> Int {
   self.0.html_len() + self.1.html_len()
+}
+
+///|
+pub impl[A : Attribute, B : Attribute] Attribute for (A, B) with fn hydrate(
+  self,
+  el : @ffi.Element,
+) -> AttrState {
+  AttrState::Pair(self.0.hydrate(el), self.1.hydrate(el))
 }
 
 ///|

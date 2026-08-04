@@ -3,11 +3,11 @@ name = "Arcelyth/aitne"
 version = "0.4.13"
 
 import {
-  "moonbitlang/x@0.4.45",
+  "moonbitlang/x@0.4.47",
   "Arcelyth/html_escape@0.3.1",
   "tonyfettes/any@0.1.5",
-  "moonbitlang/async@0.19.4",
-  "bobzhang/toml@0.4.1",
+  "moonbitlang/async@0.20.3",
+  "bobzhang/toml@0.4.2",
 }
 
 readme = "README.mbt.md"

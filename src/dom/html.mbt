@@ -33,8 +33,8 @@ pub fn AttrList::new() -> AttrList {
 
 ///|
 fn AttrList::push(self : AttrList, attr : &Attribute) -> AttrList {
-  let items = self.items
-  AttrList::{ items: items + [attr] }
+  self.items.push(attr)
+  self
 }
 
 ///|
@@ -80,17 +80,16 @@ pub impl Attribute for AttrList with fn build(self, el : @ffi.Element) -> AttrSt
 ///|
 pub impl Attribute for AttrList with fn rebuild(self, state : Ref[AttrState]) -> Unit {
   let mut rem = state.val
+  let r = Ref::{ val: AttrState::None }
   for item in self.items {
     match rem {
       AttrState::Pair(first, rest) => {
-        let r = Ref::{ val: first }
+        r.val = first
         item.rebuild(r)
         rem = rest
         state.val = AttrState::Pair(r.val, rem)
       }
-      _ =>
-        // Attribute count mismatch — re-build.
-        ()
+      _ => ()
     }
   }
 }
@@ -127,11 +126,11 @@ pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C] with fn rebui
 ) -> Unit {
   match state.val {
     RenderState::Element(el_state) => {
-      let attr_ref = @ref.new(el_state.attrs)
+      let attr_ref = Ref::{ val: el_state.attrs }
       self.attrs.rebuild(attr_ref)
       el_state.attrs = attr_ref.val
 
-      let children_ref = @ref.new(el_state.children)
+      let children_ref = Ref::{ val: el_state.children }
       self.children.rebuild(children_ref)
       el_state.children = children_ref.val
     }
@@ -145,12 +144,13 @@ pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C] with fn rebui
 pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with fn html_len(
   self,
 ) -> Int {
-  let tag_len = self.tag.tag().length()
+  let tag_name = self.tag.tag()
+  let tag_len = tag_name.length()
   let attrs_len = self.attrs.html_len()
   if self.tag.is_self_closing() {
     3 + tag_len + attrs_len
   } else {
-    2 + tag_len + attrs_len + self.children.html_len() + 3 + tag_len
+    5 + tag_len * 2 + attrs_len + self.children.html_len()
   }
 }
 
@@ -207,14 +207,16 @@ pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with 
 
   self.attrs.to_html(buf, class_buf, style_buf, inner_buf)
 
-  if class_buf.to_string().length() > 0 {
+  let class_str = class_buf.to_string()
+  if !class_str.is_empty() {
     buf.write_string(" class=\"")
-    buf.write_string(class_buf.to_string())
+    buf.write_string(class_str)
     buf.write_string("\"")
   }
-  if style_buf.to_string().length() > 0 {
+  let style_str = style_buf.to_string()
+  if !style_str.is_empty() {
     buf.write_string(" style=\"")
-    buf.write_string(style_buf.to_string())
+    buf.write_string(style_str)
     buf.write_string("\"")
   }
 
@@ -248,11 +250,8 @@ pub fn[T, C] HtmlElement::add_attr(
   self : HtmlElement[T, C],
   attr : &Attribute,
 ) -> HtmlElement[T, C] {
-  HtmlElement::{
-    tag: self.tag,
-    attrs: self.attrs.push(attr),
-    children: self.children,
-  }
+  let _ = self.attrs.push(attr)
+  self
 }
 
 ///|
@@ -319,8 +318,9 @@ pub impl Render for Array[&View] with fn rebuild(self, state : Ref[RenderState])
   match state.val {
     RenderState::Fragment(frag) => {
       let len = self.length()
+      let child_ref = Ref::{ val: RenderState::None }
       for i in 0..<len {
-        let child_ref = @ref.new(frag.children[i])
+        child_ref.val = frag.children[i]
         self[i].rebuild(child_ref)
         frag.children[i] = child_ref.val
       }
@@ -437,9 +437,10 @@ pub fn text_dyn(f : () -> String) -> DynTextNode {
 
 ///|
 pub impl Render for DynTextNode with fn build(self) -> RenderState {
-  let node = @ffi.prim_create_text_node(document(), (self.getter)())
+  let getter = self.getter
+  let node = @ffi.prim_create_text_node(document(), getter())
   let _ = @reactive.Effect::new(fn(_) {
-    @ffi.dom_set_text(@ffi.text_as_node(node), (self.getter)())
+    @ffi.dom_set_text(@ffi.text_as_node(node), getter())
   })
   RenderState::Text(TextState::{ node, })
 }
@@ -477,8 +478,9 @@ pub impl RenderHtml for DynTextNode with fn hydrate(
     failed_to_cast_text_node(curr_node)
   }
 
+  let getter = self.getter
   let _ = @reactive.Effect::new(fn(_) {
-    @ffi.dom_set_text(@ffi.text_as_node(node), (self.getter)())
+    @ffi.dom_set_text(@ffi.text_as_node(node), getter())
   })
 
   pos.set(Position::NextChildAfterText)

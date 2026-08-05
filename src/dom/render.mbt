@@ -317,10 +317,7 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[@ffi.Node] {
       }
       nodes
     }
-    Router(s) => {
-      println("[Debug] router elements")
-      s.view.val.elements()
-    }
+    Router(s) => s.view.val.elements()
     RawNode(n) => [n]
     None => []
     _ => []

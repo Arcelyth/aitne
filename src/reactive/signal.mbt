@@ -492,8 +492,7 @@ pub fn[T] RwSignal::update(self : RwSignal[T], f : (T) -> T) -> Unit {
 
 ///|
 pub fn[T] RwSignal::try_set(self : RwSignal[T], value : T) -> T? {
-  let current_inner = self.inner.val
-  self.inner.val = { ..current_inner, value, }
+  self.inner.val.value = value
   self.mark_stale()
   None
 }

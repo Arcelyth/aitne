@@ -11,7 +11,7 @@ cat > "$target_file" << 'EOF'
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TODO LIST</title>
-    <script type="module" src="./_build/js/debug/build/examples/for_each/for_each.js"></script>
+    <script type="module" src="./_build/js/debug/build/examples/todo/todo.js"></script>
 </head>
 <body>
     

@@ -376,7 +376,7 @@ pub fn text(s : String) -> TextNode {
 ///|
 pub impl Render for TextNode with fn build(self) -> RenderState {
   let node = @ffi.prim_create_text_node(document(), self.val)
-  RenderState::Text(TextState::{ node, })
+  RenderState::Text(TextState::{ node, text: self.val })
 }
 
 ///|
@@ -414,7 +414,7 @@ pub impl RenderHtml for TextNode with fn hydrate(
 
   pos.set(Position::NextChildAfterText)
 
-  RenderState::Text(TextState::{ node, })
+  RenderState::Text(TextState::{ node, text: _self.val })
 }
 
 ///|
@@ -438,11 +438,12 @@ pub fn text_dyn(f : () -> String) -> DynTextNode {
 ///|
 pub impl Render for DynTextNode with fn build(self) -> RenderState {
   let getter = self.getter
-  let node = @ffi.prim_create_text_node(document(), getter())
+  let initial = getter()
+  let node = @ffi.prim_create_text_node(document(), initial)
   let _ = @reactive.Effect::new(fn(_) {
     @ffi.dom_set_text(@ffi.text_as_node(node), getter())
   })
-  RenderState::Text(TextState::{ node, })
+  RenderState::Text(TextState::{ node, text: initial })
 }
 
 ///|
@@ -485,7 +486,7 @@ pub impl RenderHtml for DynTextNode with fn hydrate(
 
   pos.set(Position::NextChildAfterText)
 
-  RenderState::Text(TextState::{ node, })
+  RenderState::Text(TextState::{ node, text: getter() })
 }
 
 ///|

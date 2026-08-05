@@ -34,6 +34,7 @@ let next_id : Ref[Int] = Ref(1)
 let seed : Ref[Int] = Ref(12345)
 
 ///|
+#inline
 fn pseudo_random(max : Int) -> Int {
   seed.val = (seed.val * 1103515245 + 12345) & 0x7fffffff
   seed.val % max

@@ -72,6 +72,12 @@ pub struct ElementState {
 ///|
 pub struct TextState {
   node : @ffi.Text
+  mut text : String
+}
+
+///|
+pub fn TextState::new(node : @ffi.Text, text : String) -> TextState {
+  { node, text }
 }
 
 ///|
@@ -293,9 +299,14 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[@ffi.Node] {
     Element(s) => [@ffi.el_as_node(s.el)]
     Text(s) => [@ffi.text_as_node(s.node)]
     Fragment(s) => {
-      let res = []
+      let res : Array[@ffi.Node] = []
       for child in s.children {
-        res.push_iter(child.elements().iter())
+        match child {
+          Element(es) => res.push(@ffi.el_as_node(es.el))
+          Text(ts) => res.push(@ffi.text_as_node(ts.node))
+          RawNode(n) => res.push(n)
+          _ => res.push_iter(child.elements().iter())
+        }
       }
       res
     }
@@ -356,13 +367,17 @@ pub impl RenderHtml for Unit with fn to_html_with_buf(_self, _buf, _position) ->
 ///|
 pub impl Render for String with fn build(self) -> RenderState {
   let node = dom_create_text_node(self)
-  RenderState::Text(TextState::{ node, })
+  RenderState::Text(TextState::{ node, text: self })
 }
 
 ///|
 pub impl Render for String with fn rebuild(self, state : Ref[RenderState]) -> Unit {
   match state.val {
-    RenderState::Text(s) => @ffi.dom_set_text(@ffi.text_as_node(s.node), self)
+    RenderState::Text(s) =>
+      if s.text != self {
+        s.text = self
+        @ffi.dom_set_text(@ffi.text_as_node(s.node), self)
+      }
     _ => ()
   }
 }
@@ -394,7 +409,7 @@ pub impl RenderHtml for String with fn hydrate(_self, cursor, pos) -> RenderStat
 
   pos.set(Position::NextChildAfterText)
 
-  RenderState::Text(TextState::{ node: text_node })
+  RenderState::Text(TextState::{ node: text_node, text: _self })
 }
 
 ///|
@@ -435,20 +450,7 @@ pub fn RemoveEventHandler::take(
 ///|
 /// Clear all DOM nodes between two anchor nodes (exclusive of the anchors).
 fn clear_between_anchors(start : @ffi.Node, end : @ffi.Node) -> Unit {
-  let mut cur = dom_next_sibling(start)
-  while true {
-    match cur {
-      Some(n) => {
-        if @ffi.prim_node_eq(n, end) {
-          break
-        }
-        let after = dom_next_sibling(n)
-        @ffi.dom_remove(n)
-        cur = after
-      }
-      None => break
-    }
-  }
+  @ffi.dom_remove_range(start, end)
 }
 
 ///|

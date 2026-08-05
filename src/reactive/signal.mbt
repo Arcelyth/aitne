@@ -3,6 +3,7 @@
 let signal_id_counter : Ref[UInt] = @ref.new(0)
 
 ///|
+#inline
 fn next_signal_id() -> UInt {
   let id = signal_id_counter.val
   signal_id_counter.val = id + 1

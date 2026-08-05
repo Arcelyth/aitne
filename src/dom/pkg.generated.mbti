@@ -1171,7 +1171,9 @@ pub impl View for TextNode
 
 pub struct TextState {
   node : @ffi.Text
+  mut text : String
 }
+pub fn TextState::new(@ffi.Text, String) -> Self
 
 pub(all) struct Url {
   origin : String

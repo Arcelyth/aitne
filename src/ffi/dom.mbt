@@ -67,6 +67,15 @@ pub extern "js" fn prim_clone_node(node : Node) -> Node =
   #|(node) => node.cloneNode(true)
 
 ///|
+pub extern "js" fn dom_remove_range(start : Node, end : Node) -> Unit =
+  #|(start, end) => {
+  #|  const range = document.createRange();
+  #|  range.setStartAfter(start);
+  #|  range.setEndBefore(end);
+  #|  range.deleteContents();
+  #|}
+
+///|
 pub extern "js" fn prim_node_eq(a : Node, b : Node) -> Bool =
   #|(a, b) => a === b
 

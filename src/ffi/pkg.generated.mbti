@@ -76,6 +76,8 @@ pub fn dom_remove_attribute(Element, String) -> Unit
 
 pub fn dom_remove_child(Node, Node) -> Unit
 
+pub fn dom_remove_range(Node, Node) -> Unit
+
 pub fn dom_remove_self(Node) -> Unit
 
 pub fn dom_set_attr(Element, String, String) -> Unit

@@ -91,7 +91,7 @@ pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V] with fn hydrate(
 pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V] with fn html_len(
   self,
 ) -> Int {
-  let mut len = 7 // "<!---->" 
+  let mut len = 7 // "<!---->"
   let items = (self.items)()
   items.eachi((idx, item) => {
     let (_, view) = (self.view_fn)(idx, item)
@@ -225,7 +225,12 @@ pub fn diff(
         current_move.len = current_move.len + next_move.len
       } else {
         grouped_moved.push(current_move)
-        current_move = next_move
+        current_move = {
+          from: next_move.from,
+          to: next_move.to,
+          len: next_move.len,
+          move_in_dom: next_move.move_in_dom,
+        }
       }
     }
     grouped_moved.push(current_move)
@@ -273,26 +278,25 @@ pub fn[T, V : Render] apply_diff(
     }
   }
 
-  let move_cmds : Array[DiffOpMove] = []
+  let mut total_moves = 0
   for group in diff.moved {
-    for j = 0; j < group.len; j = j + 1 {
-      move_cmds.push({
-        from: group.from + j,
-        to: group.to + j,
-        len: 1,
-        move_in_dom: group.move_in_dom,
-      })
-    }
+    total_moves = total_moves + group.len
   }
 
-  let moved_children : Array[((Int) -> Unit, RenderState)?] = []
-  for op in move_cmds {
-    if op.from < children.length() {
-      let child = children[op.from]
-      children[op.from] = None
-      moved_children.push(child)
-    } else {
-      moved_children.push(None)
+  let move_ops : Array[(Int, Int, Bool, ((Int) -> Unit, RenderState)?)] = []
+  move_ops.reserve_capacity(total_moves)
+
+  for group in diff.moved {
+    for j = 0; j < group.len; j = j + 1 {
+      let from_idx = group.from + j
+      let child = if from_idx < children.length() {
+        let c = children[from_idx]
+        children[from_idx] = None
+        c
+      } else {
+        None
+      }
+      move_ops.push((from_idx, group.to + j, group.move_in_dom, child))
     }
   }
 
@@ -315,27 +319,27 @@ pub fn[T, V : Render] apply_diff(
     res
   }
 
-  for i = 0; i < move_cmds.length(); i = i + 1 {
-    let op = move_cmds[i]
-    if !op.move_in_dom {
-      match moved_children[i] {
+  for i = 0; i < move_ops.length(); i = i + 1 {
+    let (_, to, move_in_dom, child) = move_ops[i]
+    if !move_in_dom {
+      match child {
         Some((set_index, state)) => {
-          set_index(op.to)
-          children[op.to] = Some((set_index, state))
+          set_index(to)
+          children[to] = Some((set_index, state))
         }
         None => ()
       }
     }
   }
 
-  for i = 0; i < move_cmds.length(); i = i + 1 {
-    let op = move_cmds[i]
-    if op.move_in_dom {
-      match moved_children[i] {
+  for i = 0; i < move_ops.length(); i = i + 1 {
+    let (_, to, move_in_dom, child) = move_ops[i]
+    if move_in_dom {
+      match child {
         Some((set_index, state)) => {
           match parent {
             Some(p) =>
-              match get_next_mounted(op.to) {
+              match get_next_mounted(to) {
                 Some(target_state) => {
                   let _ = target_state.insert_before(state)
                 }
@@ -343,8 +347,8 @@ pub fn[T, V : Render] apply_diff(
               }
             None => ()
           }
-          set_index(op.to)
-          children[op.to] = Some((set_index, state))
+          set_index(to)
+          children[to] = Some((set_index, state))
         }
         None => ()
       }
@@ -379,14 +383,19 @@ pub fn[T, V : Render] apply_diff(
     }
   }
 
-  let mut k = 0
-  while k < children.length() {
-    match children[k] {
-      None => {
-        let _ = children.remove(k)
+  let mut valid_idx = 0
+  for i = 0; i < children.length(); i = i + 1 {
+    match children[i] {
+      Some(c) => {
+        children[valid_idx] = Some(c)
+        valid_idx = valid_idx + 1
       }
-      Some(_) => k = k + 1
+      None => ()
     }
+  }
+
+  while children.length() > valid_idx {
+    let _ = children.remove(children.length() - 1)
   }
 }
 

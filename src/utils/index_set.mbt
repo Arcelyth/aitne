@@ -8,16 +8,19 @@ pub struct IndexSet[K] {
 }
 
 ///|
+#inline
 pub fn[K : Hash + Eq] IndexSet::new() -> IndexSet[K] {
   { keys: [], key_index: HashMap([]) }
 }
 
 ///|
+#inline
 pub fn[K] IndexSet::length(self : IndexSet[K]) -> Int {
   self.keys.length()
 }
 
 ///|
+#inline
 pub fn[K] IndexSet::is_empty(self : IndexSet[K]) -> Bool {
   self.keys.is_empty()
 }
@@ -34,16 +37,19 @@ pub fn[K : Hash + Eq] IndexSet::insert(self : IndexSet[K], key : K) -> Bool {
 }
 
 ///|
+#inline
 pub fn[K : Hash + Eq] IndexSet::contains(self : IndexSet[K], key : K) -> Bool {
   self.key_index.contains(key)
 }
 
 ///|
+#inline
 pub fn[K : Hash + Eq] IndexSet::get_index(self : IndexSet[K], key : K) -> Int? {
   self.key_index.get(key)
 }
 
 ///|
+#inline
 pub fn[K] IndexSet::get(self : IndexSet[K], index : Int) -> K? {
   if index >= 0 && index < self.keys.length() {
     Some(self.keys[index])
@@ -83,8 +89,13 @@ pub fn[K : Hash + Eq] IndexSet::shift_remove(
     Some(index) => {
       self.key_index.remove(key)
       let _ = self.keys.remove(index)
-      for i = index; i < self.keys.length(); i = i + 1 {
-        self.key_index.set(self.keys[i], i)
+
+      let keys = self.keys
+      let len = keys.length()
+      let mut i = index
+      while i < len {
+        self.key_index.set(keys[i], i)
+        i = i + 1
       }
       true
     }
@@ -92,12 +103,14 @@ pub fn[K : Hash + Eq] IndexSet::shift_remove(
 }
 
 ///|
+#inline
 pub fn[K] IndexSet::clear(self : IndexSet[K]) -> Unit {
   self.keys.clear()
   self.key_index.clear()
 }
 
 ///|
+#inline
 pub fn[K] IndexSet::iter(self : IndexSet[K]) -> Iter[K] {
   self.keys.iter()
 }

@@ -20,9 +20,13 @@ pub fn flush_scheduler() -> Unit
 
 pub fn on_cleanup(() -> Unit) -> Unit
 
+pub fn owner_exists(Int) -> Bool
+
 pub fn owner_state_of(Int) -> @ref.Ref[OwnerState]?
 
 pub fn[T : TypeName] provide_context(T) -> Unit
+
+pub fn remove_child_from_parent(Int, Int) -> Unit
 
 pub fn schedule_effect(&EffectRunner) -> Unit
 
@@ -119,7 +123,8 @@ pub struct ObserverState {
 
 pub struct Owner {
   id : Int
-} derive(@debug.Debug)
+  inner : @ref.Ref[OwnerState]
+}
 pub fn Owner::child(Self) -> Self
 pub fn Owner::cleanup(Self) -> Unit
 pub fn Owner::current() -> Self?
@@ -135,11 +140,13 @@ pub fn[T : TypeName] Owner::use_context_bidirectional(Self) -> T?
 pub fn[T] Owner::with_(Self, () -> T) -> T
 pub fn[T] Owner::with_cleanup(Self, () -> T) -> T
 pub fn[T : TypeName, R] Owner::with_context(Self, (T) -> R) -> R?
+pub impl @debug.Debug for Owner
 
 pub struct OwnerState {
-  parent : Int?
+  id : Int
+  parent : @ref.Ref[OwnerState]?
   mut cleanups : Array[() -> Unit]
-  mut children : @hashset.HashSet[Int]
+  mut children : Array[@ref.Ref[OwnerState]]
   contexts : @hashmap.HashMap[String, @any.Any]
   mut disposed : Bool
 }

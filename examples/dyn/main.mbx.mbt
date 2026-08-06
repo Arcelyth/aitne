@@ -1,16 +1,23 @@
 ///|
+let __tmpl_cache_0 : Ref[@Arcelyth/aitne/src/ffi.TemplateElement?] = Ref(None)
+
+///|
 using @dom {trait View}
 
 ///|
 fn app() -> &View {
   let (selected, set_selected) = @reactive.create_signal(false)
 
-  let __tmpl_0 = {
-    let _t = @Arcelyth/aitne/src/ffi.create_template()
-    @Arcelyth/aitne/src/ffi.set_inner_html(
-      _t, "<div><button>\n      &quot;toggle&quot;\n    </button><div><!></div></div>",
-    )
-    _t
+  let __tmpl_0 = match __tmpl_cache_0.val {
+    Some(t) => t
+    None => {
+      let _t = @Arcelyth/aitne/src/ffi.create_template()
+      @Arcelyth/aitne/src/ffi.set_inner_html(
+        _t, "<div><button>\n      &quot;toggle&quot;\n    </button><div><!></div></div>",
+      )
+      __tmpl_cache_0.val = Some(_t)
+      _t
+    }
   }
   let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(__tmpl_0)
   let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(

@@ -54,11 +54,18 @@ fn app() -> &View {
     _n0,
     @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
   )
-  let _ = @reactive.Effect::new(fn(_) {
-    @Arcelyth/aitne/src/ffi.dom_set_text(
-      @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
-      (() => count.get().to_string())(),
-    )
+  let _ = @reactive.RenderEffect::new(fn(prev) {
+    let val = (() => count.get().to_string())()
+    match prev {
+      Some(_) => {
+        @Arcelyth/aitne/src/ffi.dom_set_text(
+          @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
+          val,
+        )
+        val
+      }
+      None => val
+    }
   })
   let _ = @Arcelyth/aitne/src/dom.add_event_listener(
     @Arcelyth/aitne/src/ffi.cast_node_to_element(_n1),

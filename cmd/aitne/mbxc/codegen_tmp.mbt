@@ -158,7 +158,10 @@ fn walk(node : MbxAST, ctx : WalkCtx) -> Unit {
             let mut has_el = false
             for c in dc {
               match c {
-                MbxAST::ElementNode(_) => { has_el = true; break }
+                MbxAST::ElementNode(_) => {
+                  has_el = true
+                  break
+                }
                 _ => ()
               }
             }
@@ -302,7 +305,8 @@ fn compile_template_island(
   let safe = escape_moonbit_str(ctx.html.to_string())
 
   // Emit module-level cache variable (created once, reused across calls)
-  cache_decls <+ "let \{cache_var} : Ref[@Arcelyth/aitne/src/ffi.TemplateElement?] = Ref(None)\n"
+  cache_decls <+
+    "let \{cache_var} : Ref[@Arcelyth/aitne/src/ffi.TemplateElement?] = Ref(None)\n"
 
   // Emit inline code that uses the module-level cache
   let c = StringBuilder::new()
@@ -316,8 +320,10 @@ fn compile_template_island(
   c <+ "  }\n"
   c <+ "}\n"
   c <+ "\n  {\n"
-  c <+ "    let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(\{tmpl_var})\n"
-  c <+ "    let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(@Arcelyth/aitne/src/ffi.cast_element_to_node(_frag))\n"
+  c <+
+    "    let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(\{tmpl_var})\n"
+  c <+
+    "    let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(@Arcelyth/aitne/src/ffi.cast_element_to_node(_frag))\n"
 
   // Flat approach: each unique step sequence gets a full chain from root
   // Node caching: identical step sequences share the same variable
@@ -339,7 +345,8 @@ fn compile_template_island(
       vc = vc + 1
       var_map.push((key, vn))
       if b.steps.length() == 0 {
-        c <+ "    let \{vn} = @Arcelyth/aitne/src/ffi.cast_element_to_node(_root)\n"
+        c <+
+          "    let \{vn} = @Arcelyth/aitne/src/ffi.cast_element_to_node(_root)\n"
       } else {
         c <+ "    let \{vn} = "
         let mut si = b.steps.length()
@@ -373,9 +380,7 @@ fn compile_template_island(
         )
         c.write(b.code)
         c.write(")())\n")
-        c.write(
-          "    @Arcelyth/aitne/src/ffi.dom_append(",
-        )
+        c.write("    @Arcelyth/aitne/src/ffi.dom_append(")
         c.write(vn)
         c.write(", @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text))\n")
         if is_code_closure(b.code) && has_signal_read(b.code) {
@@ -531,17 +536,12 @@ fn try_inline_templates_in_expr(
                 idx.val += 1
                 match tag_tok {
                   Token::TagSelfClose(t) =>
-                    local_children.push(
-                      MbxAST::ElementNode(t.tag, t.attrs, []),
-                    )
+                    local_children.push(MbxAST::ElementNode(t.tag, t.attrs, []))
                   Token::TagOpen(t) => {
                     let kids = parse_nodes_inline(tokens, idx, len)
                     if idx.val < len {
                       match tokens[idx.val] {
-                        Token::TagClose(c) =>
-                          if c.tag == t.tag {
-                            idx.val += 1
-                          }
+                        Token::TagClose(c) => if c.tag == t.tag { idx.val += 1 }
                         _ => ()
                       }
                     }
@@ -580,10 +580,7 @@ fn try_inline_templates_in_expr(
               let children = parse_nodes_inline(tokens, idx, len)
               if idx.val < len {
                 match tokens[idx.val] {
-                  Token::TagClose(c) =>
-                    if c.tag == t.tag {
-                      idx.val += 1
-                    }
+                  Token::TagClose(c) => if c.tag == t.tag { idx.val += 1 }
                   _ => ()
                 }
               }
@@ -632,7 +629,9 @@ fn try_inline_templates_in_expr(
             MbxAST::ElementNode(etag, _, _) => {
               guard is_builtin(etag) else { return None }
               let island = [c]
-              let code = compile_template_island(island, tmpl_counter, cache_decls)
+              let code = compile_template_island(
+                island, tmpl_counter, cache_decls,
+              )
               guard code != "" else { return None }
               result.write(code)
             }
@@ -653,8 +652,16 @@ fn try_inline_templates_in_expr(
 /// elements (e.g. <tr> inside <ForEach children={...}>).  Modifies the
 /// AST in-place so that the main compilation pass sees template-based
 /// code instead of inline View trees.
-fn preprocess_ast(ast : Array[MbxAST], tc : Ref[Int], cache_decls : StringBuilder) -> Unit {
-  fn preprocess_node(node : MbxAST, tc : Ref[Int], cache_decls : StringBuilder) -> Unit {
+fn preprocess_ast(
+  ast : Array[MbxAST],
+  tc : Ref[Int],
+  cache_decls : StringBuilder,
+) -> Unit {
+  fn preprocess_node(
+    node : MbxAST,
+    tc : Ref[Int],
+    cache_decls : StringBuilder,
+  ) -> Unit {
     match node {
       MbxAST::ElementNode(tag, attrs, children) => {
         // Try to extract templates from Expr attrs of non-built-in elements
@@ -662,12 +669,11 @@ fn preprocess_ast(ast : Array[MbxAST], tc : Ref[Int], cache_decls : StringBuilde
           for j = 0; j < attrs.length(); j = j + 1 {
             let (attr, val) = attrs[j]
             match val {
-              AttrValue::Expr(expr_str) => {
+              AttrValue::Expr(expr_str) =>
                 match try_inline_templates_in_expr(expr_str, tc, cache_decls) {
                   Some(new_expr) => attrs[j] = (attr, AttrValue::Expr(new_expr))
                   None => ()
                 }
-              }
               _ => ()
             }
           }
@@ -677,11 +683,10 @@ fn preprocess_ast(ast : Array[MbxAST], tc : Ref[Int], cache_decls : StringBuilde
           preprocess_node(child, tc, cache_decls)
         }
       }
-      MbxAST::DynamicCode(inner) => {
+      MbxAST::DynamicCode(inner) =>
         for child in inner {
           preprocess_node(child, tc, cache_decls)
         }
-      }
       _ => ()
     }
   }
@@ -743,7 +748,7 @@ pub fn CodeGenTmp::generate(self : CodeGenTmp) -> String {
         fc.write(self.buf.to_string())
         self.buf.reset()
       }
-      MbxAST::ElementNode(tag, _, _) => {
+      MbxAST::ElementNode(tag, _, _) =>
         // Non-built-in elements (custom components like <Btn>, <ForEach>)
         // cannot be part of a template island. Flush the current island
         // first, then process the non-built-in element via standard codegen.
@@ -759,7 +764,6 @@ pub fn CodeGenTmp::generate(self : CodeGenTmp) -> String {
           isl.push(node)
           island.val = isl
         }
-      }
       _ => {
         let isl = island.val
         isl.push(node)

@@ -224,14 +224,7 @@ fn app() -> &View {
                   }
                   val
                 }
-                None => {
-                  @Arcelyth/aitne/src/ffi.dom_set_attr(
-                    @Arcelyth/aitne/src/ffi.cast_node_to_element(_n0),
-                    "class",
-                    val,
-                  )
-                  val
-                }
+                None => val
               }
             })
             let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(
@@ -255,11 +248,18 @@ fn app() -> &View {
               _n2,
               @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
             )
-            let _ = @reactive.Effect::new(fn(_) {
-              @Arcelyth/aitne/src/ffi.dom_set_text(
-                @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
-                (() => row.label.get())(),
-              )
+            let _ = @reactive.RenderEffect::new(fn(prev) {
+              let val = (() => row.label.get())()
+              match prev {
+                Some(_) => {
+                  @Arcelyth/aitne/src/ffi.dom_set_text(
+                    @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
+                    val,
+                  )
+                  val
+                }
+                None => val
+              }
             })
             let _ = @Arcelyth/aitne/src/dom.add_event_listener(
               @Arcelyth/aitne/src/ffi.cast_node_to_element(_n3),

@@ -154,6 +154,33 @@ fn walk(node : MbxAST, ctx : WalkCtx) -> Unit {
             if s.to_owned().trim() != "" {
               dom_kids.push(ci)
             }
+          MbxAST::DynamicCode(dc) => {
+            let mut has_el = false
+            for c in dc {
+              match c {
+                MbxAST::ElementNode(_) => {
+                  has_el = true
+                  break
+                }
+                _ => ()
+              }
+            }
+            if !has_el && dc.length() > 0 {
+              match dc[0] {
+                MbxAST::PureCode(s) | MbxAST::RawText(s) =>
+                  if is_code_closure(s) {
+                    let snap : Array[DomStep] = []
+                    for st in ctx.steps {
+                      snap.push(st)
+                    }
+                    ctx.binds.push(new_text_bind(snap, s.to_owned()))
+                    continue
+                  }
+                _ => ()
+              }
+            }
+            dom_kids.push(ci)
+          }
           _ => dom_kids.push(ci)
         }
       }
@@ -200,7 +227,8 @@ fn walk(node : MbxAST, ctx : WalkCtx) -> Unit {
         match children[0] {
           MbxAST::PureCode(s) | MbxAST::RawText(s) =>
             if is_code_closure(s) {
-              ctx.html.write("<!>")
+              // Text binding at top level (not inside an element) —
+              // still capture the binding but no <!> placeholder.
               let snap : Array[DomStep] = []
               for st in ctx.steps {
                 snap.push(st)
@@ -277,38 +305,25 @@ fn compile_template_island(
   let safe = escape_moonbit_str(ctx.html.to_string())
 
   // Emit module-level cache variable (created once, reused across calls)
-  cache_decls.write("let ")
-  cache_decls.write(cache_var)
-  cache_decls.write(
-    " : Ref[@Arcelyth/aitne/src/ffi.TemplateElement?] = Ref(None)\n",
-  )
+  cache_decls <+
+    "let \{cache_var} : Ref[@Arcelyth/aitne/src/ffi.TemplateElement?] = Ref(None)\n"
 
   // Emit inline code that uses the module-level cache
   let c = StringBuilder::new()
-  c.write("let ")
-  c.write(tmpl_var)
-  c.write(" = match ")
-  c.write(cache_var)
-  c.write(".val {\n")
-  c.write("  Some(t) => t\n")
-  c.write("  None => {\n")
-  c.write("    let _t = @Arcelyth/aitne/src/ffi.create_template()\n")
-  c.write("    @Arcelyth/aitne/src/ffi.set_inner_html(_t, \"")
-  c.write(safe)
-  c.write("\")\n")
-  c.write("    ")
-  c.write(cache_var)
-  c.write(".val = Some(_t)\n")
-  c.write("    _t\n")
-  c.write("  }\n")
-  c.write("}\n")
-  c.write("\n  {\n")
-  c.write("    let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(")
-  c.write(tmpl_var)
-  c.write(")\n")
-  c.write(
-    "    let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(@Arcelyth/aitne/src/ffi.cast_element_to_node(_frag))\n",
-  )
+  c <+ "let \{tmpl_var} = match \{cache_var}.val {\n"
+  c <+ "  Some(t) => t\n"
+  c <+ "  None => {\n"
+  c <+ "    let _t = @Arcelyth/aitne/src/ffi.create_template()\n"
+  c <+ "    @Arcelyth/aitne/src/ffi.set_inner_html(_t, \"\{safe}\")\n"
+  c <+ "    \{cache_var}.val = Some(_t)\n"
+  c <+ "    _t\n"
+  c <+ "  }\n"
+  c <+ "}\n"
+  c <+ "\n  {\n"
+  c <+
+    "    let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(\{tmpl_var})\n"
+  c <+
+    "    let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(@Arcelyth/aitne/src/ffi.cast_element_to_node(_frag))\n"
 
   // Flat approach: each unique step sequence gets a full chain from root
   // Node caching: identical step sequences share the same variable
@@ -330,13 +345,10 @@ fn compile_template_island(
       vc = vc + 1
       var_map.push((key, vn))
       if b.steps.length() == 0 {
-        c.write("    let ")
-        c.write(vn)
-        c.write(" = @Arcelyth/aitne/src/ffi.cast_element_to_node(_root)\n")
+        c <+
+          "    let \{vn} = @Arcelyth/aitne/src/ffi.cast_element_to_node(_root)\n"
       } else {
-        c.write("    let ")
-        c.write(vn)
-        c.write(" = ")
+        c <+ "    let \{vn} = "
         let mut si = b.steps.length()
         while si > 0 {
           si = si - 1
@@ -363,22 +375,14 @@ fn compile_template_island(
 
     match b.kind {
       0 => {
-        c.write("    let _t_parent = @Arcelyth/aitne/src/ffi.dom_parent(")
-        c.write(vn)
-        c.write(")\n")
         c.write(
           "    let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(@Arcelyth/aitne/src/dom.document(), (",
         )
         c.write(b.code)
         c.write(")())\n")
-        c.write(
-          "    @Arcelyth/aitne/src/ffi.dom_insert_before(_t_parent, @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text), ",
-        )
+        c.write("    @Arcelyth/aitne/src/ffi.dom_append(")
         c.write(vn)
-        c.write(")\n")
-        c.write("    @Arcelyth/aitne/src/ffi.dom_remove(")
-        c.write(vn)
-        c.write(")\n")
+        c.write(", @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text))\n")
         if is_code_closure(b.code) && has_signal_read(b.code) {
           c.write("    let _ = @reactive.Effect::new(fn(_) {\n")
           c.write(
@@ -391,14 +395,37 @@ fn compile_template_island(
       }
       1 =>
         if is_code_closure(b.code) {
-          c.write("    let _ = @reactive.Effect::new(fn(_) {\n")
           c.write(
-            "      @Arcelyth/aitne/src/ffi.dom_set_attr(@Arcelyth/aitne/src/ffi.cast_node_to_element(",
+            "    @Arcelyth/aitne/src/ffi.dom_set_attr(@Arcelyth/aitne/src/ffi.cast_node_to_element(",
           )
           c.write(vn)
           c.write("), \"class\", (")
           c.write(b.code)
           c.write(")())\n")
+          c.write("    let _ = @reactive.RenderEffect::new(fn(prev) {\n")
+          c.write("      let val = (")
+          c.write(b.code)
+          c.write(")()\n")
+          c.write("      match prev {\n")
+          c.write("        Some(old) => {\n")
+          c.write("          if val != old {\n")
+          c.write(
+            "            @Arcelyth/aitne/src/ffi.dom_set_attr(@Arcelyth/aitne/src/ffi.cast_node_to_element(",
+          )
+          c.write(vn)
+          c.write("), \"class\", val)\n")
+          c.write("          }\n")
+          c.write("          val\n")
+          c.write("        }\n")
+          c.write("        None => {\n")
+          c.write(
+            "          @Arcelyth/aitne/src/ffi.dom_set_attr(@Arcelyth/aitne/src/ffi.cast_node_to_element(",
+          )
+          c.write(vn)
+          c.write("), \"class\", val)\n")
+          c.write("          val\n")
+          c.write("        }\n")
+          c.write("      }\n")
           c.write("    })\n")
         } else {
           c.write(

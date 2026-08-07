@@ -228,6 +228,17 @@ fn walk(node : MbxAST, ctx : WalkCtx) -> Unit {
 }
 
 ///|
+/// Heuristic: checks whether a code expression likely reads a reactive
+/// signal by looking for `.get(` patterns.  If the expression is static
+/// (e.g. `() => row_id.to_string()` where row_id is a plain Int), we
+/// skip creating an Effect for the text binding.
+fn has_signal_read(code : String) -> Bool {
+  // Fast check: does the code contain `.get(` or `.selected(`?
+  // These are the primary ways to read reactive values.
+  code.contains(".get(") || code.contains(".selected(")
+}
+
+///|
 fn emit_one_step(step : DomStep, code : StringBuilder) -> Unit {
   match step {
     FirstChild => code.write("@Arcelyth/aitne/src/ffi.prim_first_child(")
@@ -368,7 +379,7 @@ fn compile_template_island(
         c.write("    @Arcelyth/aitne/src/ffi.dom_remove(")
         c.write(vn)
         c.write(")\n")
-        if is_code_closure(b.code) {
+        if is_code_closure(b.code) && has_signal_read(b.code) {
           c.write("    let _ = @reactive.Effect::new(fn(_) {\n")
           c.write(
             "      @Arcelyth/aitne/src/ffi.dom_set_text(@Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text), (",

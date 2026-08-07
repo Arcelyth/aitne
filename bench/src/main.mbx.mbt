@@ -58,9 +58,6 @@ fn btn(id~: String, text~: String, on_click~: (@ffi.Event) -> Unit) -> &View {
     let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(@Arcelyth/aitne/src/dom.document(), (() => text)())
     @Arcelyth/aitne/src/ffi.dom_insert_before(_t_parent, @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text), _n1)
     @Arcelyth/aitne/src/ffi.dom_remove(_n1)
-    let _ = @reactive.Effect::new(fn(_) {
-      @Arcelyth/aitne/src/ffi.dom_set_text(@Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text), (() => text)())
-    })
     @Arcelyth/aitne/src/dom.raw_node(@Arcelyth/aitne/src/ffi.cast_element_to_node(_root))
   }
 
@@ -135,9 +132,6 @@ fn app() -> &View {
     let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(@Arcelyth/aitne/src/dom.document(), (() => row_id.to_string())())
     @Arcelyth/aitne/src/ffi.dom_insert_before(_t_parent, @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text), _n1)
     @Arcelyth/aitne/src/ffi.dom_remove(_n1)
-    let _ = @reactive.Effect::new(fn(_) {
-      @Arcelyth/aitne/src/ffi.dom_set_text(@Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text), (() => row_id.to_string())())
-    })
     let _ = @Arcelyth/aitne/src/dom.add_event_listener(@Arcelyth/aitne/src/ffi.cast_node_to_element(_n2), "click", _ => set_selected.set(row_id))
     let _t_parent = @Arcelyth/aitne/src/ffi.dom_parent(_n3)
     let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(@Arcelyth/aitne/src/dom.document(), (() => row.label.get())())

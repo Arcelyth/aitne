@@ -107,12 +107,6 @@ fn btn(id~ : String, text~ : String, on_click~ : (@ffi.Event) -> Unit) -> &View 
     _n1,
   )
   @Arcelyth/aitne/src/ffi.dom_remove(_n1)
-  let _ = @reactive.Effect::new(fn(_) {
-    @Arcelyth/aitne/src/ffi.dom_set_text(
-      @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
-      (() => text)(),
-    )
-  })
   @Arcelyth/aitne/src/dom.raw_node(
     @Arcelyth/aitne/src/ffi.cast_element_to_node(_root),
   )
@@ -243,12 +237,6 @@ fn app() -> &View {
               _n1,
             )
             @Arcelyth/aitne/src/ffi.dom_remove(_n1)
-            let _ = @reactive.Effect::new(fn(_) {
-              @Arcelyth/aitne/src/ffi.dom_set_text(
-                @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
-                (() => row_id.to_string())(),
-              )
-            })
             let _ = @Arcelyth/aitne/src/dom.add_event_listener(
               @Arcelyth/aitne/src/ffi.cast_node_to_element(_n2),
               "click",

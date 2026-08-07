@@ -1,4 +1,10 @@
 ///|
+let __tmpl_cache_0 : Ref[@Arcelyth/aitne/src/ffi.TemplateElement?] = Ref(None)
+
+///|
+let __tmpl_cache_1 : Ref[@Arcelyth/aitne/src/ffi.TemplateElement?] = Ref(None)
+
+///|
 using @dom {trait View}
 
 ///|
@@ -31,12 +37,16 @@ fn header_section() -> &View {
 
 ///|
 fn interactive_section() -> &View {
-  let __tmpl_0 = {
-    let _t = @Arcelyth/aitne/src/ffi.create_template()
-    @Arcelyth/aitne/src/ffi.set_inner_html(
-      _t, "<div class=\"interactive_section\"><button style=\"padding: 0.75rem 1.5rem; width: 100%; background-color: #2563eb; color: #ffffff; font-weight: 600; border-radius: 0.75rem; border: none; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); font-size: 1rem; transition: background-color 0.2s;\">\n      Start\n    </button></div>",
-    )
-    _t
+  let __tmpl_0 = match __tmpl_cache_0.val {
+    Some(t) => t
+    None => {
+      let _t = @Arcelyth/aitne/src/ffi.create_template()
+      @Arcelyth/aitne/src/ffi.set_inner_html(
+        _t, "<div class=\"interactive_section\"><button style=\"padding: 0.75rem 1.5rem; width: 100%; background-color: #2563eb; color: #ffffff; font-weight: 600; border-radius: 0.75rem; border: none; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4); font-size: 1rem; transition: background-color 0.2s;\">\n      Start\n    </button></div>",
+      )
+      __tmpl_cache_0.val = Some(_t)
+      _t
+    }
   }
   let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(__tmpl_0)
   let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(
@@ -57,12 +67,16 @@ fn interactive_section() -> &View {
 
 ///|
 fn footer_section() -> &View {
-  let __tmpl_1 = {
-    let _t = @Arcelyth/aitne/src/ffi.create_template()
-    @Arcelyth/aitne/src/ffi.set_inner_html(
-      _t, "<div class=\"footer_section\"><a href=\"#\" style=\"color: #64748b; font-size: 0.875rem; text-decoration: none;\">\n      document\n    </a></div>",
-    )
-    _t
+  let __tmpl_1 = match __tmpl_cache_1.val {
+    Some(t) => t
+    None => {
+      let _t = @Arcelyth/aitne/src/ffi.create_template()
+      @Arcelyth/aitne/src/ffi.set_inner_html(
+        _t, "<div class=\"footer_section\"><a href=\"#\" style=\"color: #64748b; font-size: 0.875rem; text-decoration: none;\">\n      document\n    </a></div>",
+      )
+      __tmpl_cache_1.val = Some(_t)
+      _t
+    }
   }
   let _frag = @Arcelyth/aitne/src/ffi.clone_template_content(__tmpl_1)
   let _root = @Arcelyth/aitne/src/ffi.prim_first_element_child(

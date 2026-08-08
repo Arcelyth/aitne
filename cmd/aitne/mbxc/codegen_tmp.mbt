@@ -362,6 +362,11 @@ fn compile_template_island(
       }
     }
   }
+  // Collect reactive bindings to merge into a single RenderEffect.
+  // Each entry: (kind, vn, code, text_var_name_for_kind_0)
+  let merged : Array[(Int, String, String, String)] = []
+  let mut text_counter = 0
+
   for bi = 0; bi < ctx.binds.length(); bi = bi + 1 {
     let b = ctx.binds[bi]
     let key = steps_key(b.steps)
@@ -375,29 +380,18 @@ fn compile_template_island(
 
     match b.kind {
       0 => {
+        let tv = "_t_text_" + text_counter.to_string()
+        text_counter = text_counter + 1
         c.write(
-          "    let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(@Arcelyth/aitne/src/dom.document(), (",
+          "    let \{tv} = @Arcelyth/aitne/src/ffi.prim_create_text_node(@Arcelyth/aitne/src/dom.document(), (",
         )
         c.write(b.code)
         c.write(")())\n")
         c.write("    @Arcelyth/aitne/src/ffi.dom_append(")
         c.write(vn)
-        c.write(", @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text))\n")
+        c.write(", @Arcelyth/aitne/src/ffi.cast_text_to_node(\{tv}))\n")
         if is_code_closure(b.code) && has_signal_read(b.code) {
-          c.write("    let _ = @reactive.RenderEffect::new(fn(prev) {\n")
-          c.write("      let val = (")
-          c.write(b.code)
-          c.write(")()\n")
-          c.write("      match prev {\n")
-          c.write("        Some(_) => {\n")
-          c.write(
-            "          @Arcelyth/aitne/src/ffi.dom_set_text(@Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text), val)\n",
-          )
-          c.write("          val\n")
-          c.write("        }\n")
-          c.write("        None => val\n")
-          c.write("      }\n")
-          c.write("    })\n")
+          merged.push((0, vn, b.code, tv))
         }
       }
       1 =>
@@ -409,24 +403,7 @@ fn compile_template_island(
           c.write("), \"class\", (")
           c.write(b.code)
           c.write(")())\n")
-          c.write("    let _ = @reactive.RenderEffect::new(fn(prev) {\n")
-          c.write("      let val = (")
-          c.write(b.code)
-          c.write(")()\n")
-          c.write("      match prev {\n")
-          c.write("        Some(old) => {\n")
-          c.write("          if val != old {\n")
-          c.write(
-            "            @Arcelyth/aitne/src/ffi.dom_set_attr(@Arcelyth/aitne/src/ffi.cast_node_to_element(",
-          )
-          c.write(vn)
-          c.write("), \"class\", val)\n")
-          c.write("          }\n")
-          c.write("          val\n")
-          c.write("        }\n")
-          c.write("        None => val\n")
-          c.write("      }\n")
-          c.write("    })\n")
+          merged.push((1, vn, b.code, ""))
         } else {
           c.write(
             "    @Arcelyth/aitne/src/ffi.dom_set_attr(@Arcelyth/aitne/src/ffi.cast_node_to_element(",
@@ -472,6 +449,64 @@ fn compile_template_island(
       _ => ()
     }
   }
+
+  // Emit a single merged RenderEffect for all reactive bindings.
+  if merged.length() > 0 {
+    c.write("    let _ = @reactive.RenderEffect::new(fn(prev) {\n")
+    // Read all reactive values
+    for i = 0; i < merged.length(); i = i + 1 {
+      let (_, _, code, _) = merged[i]
+      c.write("      let val_\{i} = (")
+      c.write(code)
+      c.write(")()\n")
+    }
+    c.write("      match prev {\n")
+    c.write("        Some((")
+    for i = 0; i < merged.length(); i = i + 1 {
+      if i > 0 {
+        c.write(", ")
+      }
+      c.write("old_\{i}")
+    }
+    c.write(")) => {\n")
+    // Update each if changed
+    for i = 0; i < merged.length(); i = i + 1 {
+      let (kind, vn, _, tv) = merged[i]
+      if kind == 0 {
+        c.write("          if val_\{i} != old_\{i} {\n")
+        c.write(
+          "            @Arcelyth/aitne/src/ffi.dom_set_text(@Arcelyth/aitne/src/ffi.cast_text_to_node(\{tv}), val_\{i})\n",
+        )
+        c.write("          }\n")
+      } else {
+        c.write("          if val_\{i} != old_\{i} {\n")
+        c.write(
+          "            @Arcelyth/aitne/src/ffi.dom_set_attr(@Arcelyth/aitne/src/ffi.cast_node_to_element(\{vn}), \"class\", val_\{i})\n",
+        )
+        c.write("          }\n")
+      }
+    }
+    c.write("          (")
+    for i = 0; i < merged.length(); i = i + 1 {
+      if i > 0 {
+        c.write(", ")
+      }
+      c.write("val_\{i}")
+    }
+    c.write(")\n")
+    c.write("        }\n")
+    c.write("        None => (")
+    for i = 0; i < merged.length(); i = i + 1 {
+      if i > 0 {
+        c.write(", ")
+      }
+      c.write("val_\{i}")
+    }
+    c.write(")\n")
+    c.write("      }\n")
+    c.write("    })\n")
+  }
+
   c.write(
     "    @Arcelyth/aitne/src/dom.raw_node(@Arcelyth/aitne/src/ffi.cast_element_to_node(_root))\n  }\n",
   )

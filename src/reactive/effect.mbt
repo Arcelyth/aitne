@@ -13,7 +13,7 @@ pub struct EffectInner[T] {
   id : UInt
   mut stale : Bool
   cb : (T?) -> T
-  mut sources : HashSet[ASource]
+  mut sources : HashSet[ASource]?
   mut schedule : (() -> Unit)?
 }
 
@@ -23,7 +23,7 @@ pub fn[T] EffectInner::new(cb : (T?) -> T) -> EffectInner[T] {
     id: next_effect_id(),
     stale: false,
     cb,
-    sources: HashSet([]),
+    sources: None,
     schedule: None,
   }
 }
@@ -55,7 +55,10 @@ pub impl[T] ReactiveNode for Ref[EffectInner[T]] with fn update_value(self) {
     self.val.stale = false
     return true
   }
-  self.val.sources.iter().any(s => s.update_value())
+  match self.val.sources {
+    Some(srcs) => srcs.iter().any(s => s.update_value())
+    None => false
+  }
 }
 
 ///|
@@ -63,7 +66,14 @@ pub impl[T] Subscriber for Ref[EffectInner[T]] with fn add_source(
   self,
   source : ASource,
 ) -> Unit {
-  self.val.sources.add(source)
+  match self.val.sources {
+    Some(srcs) => srcs.add(source)
+    None => {
+      let srcs = HashSet([])
+      srcs.add(source)
+      self.val.sources = Some(srcs)
+    }
+  }
 }
 
 ///|
@@ -76,17 +86,22 @@ pub impl[T] Subscriber for Ref[EffectInner[T]] with fn clean_sources(
   self,
   subscriber : ASubscriber,
 ) -> Unit {
-  for source in self.val.sources {
-    source.remove_sub(subscriber)
+  match self.val.sources {
+    Some(srcs) => {
+      for source in srcs {
+        source.remove_sub(subscriber)
+      }
+      self.val.sources = None
+    }
+    None => ()
   }
-  self.val.sources = HashSet([])
 }
 
 ///|
 pub struct RenderEffect[T] {
   mut value : T?
   inner : Ref[EffectInner[T]]
-  owner : Ref[Owner]
+  owner : Owner
 }
 
 ///|
@@ -105,8 +120,16 @@ pub fn[T] RenderEffect::new_with_value(
   let value = Some(
     owner.with_(() => Observer::with_replace(Some(sub), () => fun(init_val))),
   )
-  let e = RenderEffect::{ value, inner, owner: Ref(owner) }
+  let e = RenderEffect::{ value, inner, owner }
   let ref_e = Ref(e)
+
+  // Remove from signal subscribers when owner is disposed
+  owner.with_(fn() {
+    on_cleanup(fn() {
+      let subscriber_trait = inner as &Subscriber
+      subscriber_trait.clean_sources(sub)
+    })
+  })
 
   inner.val.schedule = Some(() => schedule_effect(ref_e as &EffectRunner))
   ref_e
@@ -121,7 +144,7 @@ pub fn[T] RenderEffect::new_isomorphic(fun : (T?) -> T) -> Ref[RenderEffect[T]] 
     owner.with_(() => Observer::with_replace(Some(sub), () => fun(None))),
   )
 
-  let e = RenderEffect::{ value, inner, owner: Ref(owner) }
+  let e = RenderEffect::{ value, inner, owner }
   let ref_e = Ref(e)
 
   inner.val.schedule = Some(() => schedule_effect(ref_e as &EffectRunner))
@@ -146,7 +169,7 @@ pub fn[T] RenderEffect::run(effect : RenderEffect[T]) -> Unit {
 
   let subscriber_trait = inner as &Subscriber
   subscriber_trait.clean_sources(sub)
-  effect.owner.val.with_cleanup(() => {
+  effect.owner.with_cleanup(() => {
     Observer::with_replace(Some(sub), fn() {
       let next_value = (inner.val.cb)(effect.value)
 
@@ -158,15 +181,23 @@ pub fn[T] RenderEffect::run(effect : RenderEffect[T]) -> Unit {
 ///|
 pub struct Effect[T] {
   inner : Ref[EffectInner[T]]
-  owner : Ref[Owner]
+  owner : Owner
 }
 
 ///|
 pub fn[T] Effect::new(cb : (T?) -> T) -> Effect[T] {
   let inner = Ref(EffectInner::new(cb))
-  let owner = Ref(Owner::new())
+  let owner = Owner::new()
   let e = Effect::{ inner, owner }
   let ref_e = Ref(e)
+  let sub : ASubscriber = { id: inner.val.id, sub: Some(inner as &Subscriber) }
+  // Remove from signal subscribers when owner is disposed
+  owner.with_(fn() {
+    on_cleanup(fn() {
+      let subscriber_trait = inner as &Subscriber
+      subscriber_trait.clean_sources(sub)
+    })
+  })
   inner.val.schedule = Some(() => schedule_effect(ref_e as &EffectRunner))
   schedule_effect(ref_e as &EffectRunner)
   e
@@ -183,7 +214,7 @@ pub fn[T] Effect::run(effect : Effect[T]) -> Unit {
 
   let subscriber_trait = inner as &Subscriber
   subscriber_trait.clean_sources(sub)
-  e.owner.val.with_cleanup(() => {
+  e.owner.with_cleanup(() => {
     Observer::with_replace(Some(sub), fn() { let _ = (inner.val.cb)(None) })
   })
 }
@@ -227,7 +258,7 @@ pub impl[T] EffectRunner for RenderEffect[T] with fn run_effect(self) -> Unit {
 ///|
 pub fn[T] create_effect(cb : (T?) -> T) -> Unit {
   let inner = Ref(EffectInner::new(cb))
-  let owner = Ref(Owner::new())
+  let owner = Owner::new()
   let e = Effect::{ inner, owner }
   let ref_e = Ref(e)
   inner.val.schedule = Some(() => schedule_effect(ref_e as &EffectRunner))

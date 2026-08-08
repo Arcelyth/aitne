@@ -256,7 +256,10 @@ pub fn[T, V : Render] apply_diff(
   if diff.clear {
     for child in children {
       match child {
-        Some((_, state)) => state.unmount()
+        Some((dispose, state)) => {
+          dispose(0)
+          state.unmount()
+        }
         None => ()
       }
     }
@@ -269,7 +272,8 @@ pub fn[T, V : Render] apply_diff(
   for op in diff.removed {
     if op.at < children.length() {
       match children[op.at] {
-        Some((_, state)) => {
+        Some((dispose, state)) => {
+          dispose(0)
           state.unmount()
           children[op.at] = None
         }

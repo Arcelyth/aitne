@@ -84,7 +84,7 @@ pub impl Source for Trigger with fn clear_subs(self) {
 
 ///|
 pub impl ToASource for Trigger with fn to_asource(self) {
-  { id: self.id, src: Some(self as &Source) }
+  { id: self.id, src: Some(self) }
 }
 
 ///|

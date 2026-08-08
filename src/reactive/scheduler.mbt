@@ -19,7 +19,7 @@ pub let scheduler : Ref[Scheduler] = @ref.new(Scheduler::{
 ///|
 /// Schedule an effect for execution.
 /// The same effect will only be queued once per flush cycle.
-pub fn schedule_effect(effect : &EffectRunner) -> Unit {
+pub fn[T : EffectRunner] schedule_effect(effect : T) -> Unit {
   guard !scheduler.val.queued.contains(effect.get_id()) else { return }
 
   scheduler.val.queued.add(effect.get_id())

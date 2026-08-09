@@ -6,6 +6,7 @@ suberror EireneError {
 ///|
 pub enum CfgTarget {
   Js
+  WasmGc
 } derive(Debug)
 
 ///|
@@ -92,6 +93,7 @@ pub fn load_config(toml_content : String) -> Config raise EireneError {
   }
 
   let target = match get_string(build_table, "target", "js") {
+    "wasm-gc" => CfgTarget::WasmGc
     _ => CfgTarget::Js
   }
 

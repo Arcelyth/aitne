@@ -14,7 +14,7 @@ pub fn compile_css(String, String, @ref.Ref[StringBuilder], @ref.Ref[StringBuild
 
 pub fn expand_css(String, String) -> String
 
-pub fn from_file(String, show? : Bool, to? : String?, tmp? : Bool, @ref.Ref[StringBuilder]) -> String?
+pub fn from_file(String, show? : Bool, to? : String?, not_tmp? : Bool, @ref.Ref[StringBuilder]) -> String?
 
 pub fn gen_style_struct(Array[String], String, String, @ref.Ref[StringBuilder], @ref.Ref[StringBuilder]) -> Unit
 

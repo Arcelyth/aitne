@@ -206,30 +206,43 @@ pub fn window_remove_event_listener(String, (Event) -> Unit) -> Unit
 // Errors
 
 // Types and methods
+#external
 pub type AnimationFrameHandle
 
+#external
 pub type Comment
 
+#external
 pub type Document
 
+#external
 pub type Element
 
+#external
 pub type Event
 
+#external
 pub type EventHandle
 
+#external
 pub type IntervalHandle
 
+#external
 pub type JsArray
 
+#external
 pub type Node
 
+#external
 pub type TemplateElement
 
+#external
 pub type Text
 
+#external
 pub type TimeoutHandle
 
+#external
 pub type Window
 
 // Type aliases

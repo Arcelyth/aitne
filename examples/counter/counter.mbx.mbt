@@ -44,27 +44,14 @@ pub fn counter() -> &View {
       ),
     ),
   )
-  let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(
+  let _t_text_0 = @Arcelyth/aitne/src/ffi.prim_create_text_node(
     @Arcelyth/aitne/src/dom.document(),
     (() => count.get().to_string())(),
   )
   @Arcelyth/aitne/src/ffi.dom_append(
     _n0,
-    @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
+    @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text_0),
   )
-  let _ = @reactive.RenderEffect::new(fn(prev) {
-    let val = (() => count.get().to_string())()
-    match prev {
-      Some(_) => {
-        @Arcelyth/aitne/src/ffi.dom_set_text(
-          @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
-          val,
-        )
-        val
-      }
-      None => val
-    }
-  })
   let _ = @Arcelyth/aitne/src/dom.add_event_listener(
     @Arcelyth/aitne/src/ffi.cast_node_to_element(_n1),
     "click",
@@ -75,6 +62,21 @@ pub fn counter() -> &View {
     "click",
     _ => set_count.update(v => v - 1),
   )
+  let _ = @reactive.RenderEffect::new(fn(prev) {
+    let val_0 = (() => count.get().to_string())()
+    match prev {
+      Some(old_0) => {
+        if val_0 != old_0 {
+          @Arcelyth/aitne/src/ffi.dom_set_text(
+            @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text_0),
+            val_0,
+          )
+        }
+        val_0
+      }
+      None => val_0
+    }
+  })
   @Arcelyth/aitne/src/dom.raw_node(
     @Arcelyth/aitne/src/ffi.cast_element_to_node(_root),
   )

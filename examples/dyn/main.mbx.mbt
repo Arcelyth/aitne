@@ -41,41 +41,35 @@ fn app() -> &View {
     "class",
     (() => if selected.get() { "danger" } else { "" })(),
   )
-  let _ = @reactive.RenderEffect::new(fn(prev) {
-    let val = (() => if selected.get() { "danger" } else { "" })()
-    match prev {
-      Some(old) => {
-        if val != old {
-          @Arcelyth/aitne/src/ffi.dom_set_attr(
-            @Arcelyth/aitne/src/ffi.cast_node_to_element(_n1),
-            "class",
-            val,
-          )
-        }
-        val
-      }
-      None => val
-    }
-  })
-  let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(
+  let _t_text_0 = @Arcelyth/aitne/src/ffi.prim_create_text_node(
     @Arcelyth/aitne/src/dom.document(),
     (() => if selected.get() { "selected" } else { "normal" })(),
   )
   @Arcelyth/aitne/src/ffi.dom_append(
     _n1,
-    @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
+    @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text_0),
   )
   let _ = @reactive.RenderEffect::new(fn(prev) {
-    let val = (() => if selected.get() { "selected" } else { "normal" })()
+    let val_0 = (() => if selected.get() { "danger" } else { "" })()
+    let val_1 = (() => if selected.get() { "selected" } else { "normal" })()
     match prev {
-      Some(_) => {
-        @Arcelyth/aitne/src/ffi.dom_set_text(
-          @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
-          val,
-        )
-        val
+      Some((old_0, old_1)) => {
+        if val_0 != old_0 {
+          @Arcelyth/aitne/src/ffi.dom_set_attr(
+            @Arcelyth/aitne/src/ffi.cast_node_to_element(_n1),
+            "class",
+            val_0,
+          )
+        }
+        if val_1 != old_1 {
+          @Arcelyth/aitne/src/ffi.dom_set_text(
+            @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text_0),
+            val_1,
+          )
+        }
+        (val_0, val_1)
       }
-      None => val
+      None => (val_0, val_1)
     }
   })
   @Arcelyth/aitne/src/dom.raw_node(

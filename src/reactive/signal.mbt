@@ -124,7 +124,7 @@ pub impl[T] Source for WriteSignal[T] with fn clear_subs(self) {
 
 ///|
 pub impl[T] ToASource for WriteSignal[T] with fn to_asource(self) {
-  { id: self.inner.val.id, src: Some(self as &Source) }
+  { id: self.inner.val.id, src: Some(self) }
 }
 
 ///|
@@ -265,7 +265,7 @@ pub impl[T] Source for ReadSignal[T] with fn clear_subs(self) {
 
 ///|
 pub impl[T] ToASource for ReadSignal[T] with fn to_asource(self) {
-  { id: self.inner.val.id, src: Some(self as &Source) }
+  { id: self.inner.val.id, src: Some(self) }
 }
 
 ///|
@@ -399,7 +399,7 @@ pub impl[T] Source for RwSignal[T] with fn clear_subs(self) {
 
 ///|
 pub impl[T] ToASource for RwSignal[T] with fn to_asource(self) {
-  { id: self.inner.val.id, src: Some(self as &Source) }
+  { id: self.inner.val.id, src: Some(self) }
 }
 
 ///|

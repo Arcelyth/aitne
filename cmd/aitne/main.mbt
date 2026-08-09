@@ -2,7 +2,7 @@
 fn compile_mbx_file(
   path : String,
   show : Bool,
-  tmp : Bool,
+  not_tmp : Bool,
   out_dir : String?,
   style_buffer : Ref[StringBuilder],
 ) -> Unit {
@@ -24,7 +24,13 @@ fn compile_mbx_file(
       }
       None => path + ".mbt"
     }
-    let _ = @mbxc.from_file(path, show~, to=Some(target), tmp~, style_buffer)
+    let _ = @mbxc.from_file(
+      path,
+      show~,
+      to=Some(target),
+      not_tmp~,
+      style_buffer,
+    )
   }
 }
 
@@ -32,7 +38,7 @@ fn compile_mbx_file(
 pub fn walk_and_compile(
   dir : String,
   show? : Bool = false,
-  tmp? : Bool = false,
+  not_tmp? : Bool = false,
   out_dir : String?,
   style_buffer : Ref[StringBuilder],
   style_root : Array[String],
@@ -49,9 +55,9 @@ pub fn walk_and_compile(
     }
     let path = dir + "/" + file
     if @fs.is_dir(path) {
-      walk_and_compile(path, show~, tmp~, out_dir, style_buffer, style_root)
+      walk_and_compile(path, show~, not_tmp~, out_dir, style_buffer, style_root)
     } else if path.has_suffix(".mbx") {
-      compile_mbx_file(path, show, tmp, out_dir, style_buffer)
+      compile_mbx_file(path, show, not_tmp, out_dir, style_buffer)
     }
   }
 }
@@ -81,7 +87,7 @@ async fn main {
         err => debug("Config Error: \{to_repr(err)}")
       }
       let mut show = false
-      let mut tmp = false
+      let mut not_tmp = false
       let mut _help = false
       let target_dir = "."
       let mut out_dir : String? = None
@@ -98,7 +104,7 @@ async fn main {
         let arg = args[i]
         match arg {
           "--show" | "-s" => show = true
-          "--template" | "-t" => tmp = true
+          "--no-template" | "-n" => not_tmp = true
           "--out-dir" | "-o" =>
             if i + 1 < args.length() {
               out_dir = Some(args[i + 1])
@@ -142,12 +148,12 @@ async fn main {
 
       match target_file {
         Some(file) =>
-          compile_mbx_file(file, show, tmp, out_dir, Ref(style_buffer))
+          compile_mbx_file(file, show, not_tmp, out_dir, Ref(style_buffer))
         None =>
           walk_and_compile(
             target_dir,
             show~,
-            tmp~,
+            not_tmp~,
             out_dir,
             Ref(style_buffer),
             style_root,
@@ -294,7 +300,7 @@ fn show_mbxc_help() -> Unit {
     #| 
     #|options: 
     #|  --show, -s              output the compile process information
-    #|  --template, -t          use template mode [WIP]
+    #|  --no-template, -n       not generate template code
     #|  --out-dir, -o <path>    the output path
     #|  --style-dir <path>      the style's path
     #|  --file, -f <file>       compile a specific MBX file

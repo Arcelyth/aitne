@@ -3,7 +3,7 @@ pub fn from_file(
   path : String,
   show? : Bool = false,
   to? : String? = None,
-  tmp? : Bool = false,
+  not_tmp? : Bool = false,
   output_style : Ref[StringBuilder],
   //  style_root? : Array[String] = [],
 ) -> String? {
@@ -30,14 +30,14 @@ pub fn from_file(
     debug(asts)
   }
 
-  let gen = if tmp {
-    let codegen = CodeGenTmp::new(asts)
-    codegen.generate()
-  } else {
+  let gen = if not_tmp {
     let codegen = CodeGen::new(path~)
     let res = codegen.generate(asts)
     output_style.val.write_string(codegen.output_style())
     res
+  } else {
+    let codegen = CodeGenTmp::new(asts)
+    codegen.generate()
   }
   match to {
     Some(target) => {

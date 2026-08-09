@@ -13,7 +13,7 @@ pub struct Owner {
   id : Int
   mut parent : Owner?
   mut cleanups : Array[() -> Unit]?
-  mut children : HashMap[Int, Owner]?
+  mut children : Array[Owner]?
   mut contexts : HashMap[String, Any]?
   mut disposed : Bool
 }
@@ -35,44 +35,10 @@ let next_owner_id : @ref.Ref[Int] = @ref.new(0)
 let current_owner : @ref.Ref[Owner?] = @ref.new(None)
 
 ///|
-/// Registry: owner id -> owner.
-let owner_registry : @ref.Ref[HashMap[Int, Owner]] = @ref.new(HashMap([]))
-
-///|
 fn next_id() -> Int {
   let id = next_owner_id.val
   next_owner_id.val = id + 1
   id
-}
-
-///|
-pub fn owner_state_of(id : Int) -> Owner? {
-  owner_registry.val.get(id)
-}
-
-///|
-pub fn owner_exists(id : Int) -> Bool {
-  match owner_state_of(id) {
-    Some(owner) => !owner.disposed
-    None => false
-  }
-}
-
-///|
-fn remove_owner_from_registry(id : Int) -> Unit {
-  owner_registry.val.remove(id)
-}
-
-///|
-pub fn remove_child_from_parent(parent_id : Int, child_id : Int) -> Unit {
-  match owner_state_of(parent_id) {
-    Some(parent) =>
-      match parent.children {
-        Some(children) => children.remove(child_id)
-        None => ()
-      }
-    None => ()
-  }
 }
 
 ///|
@@ -87,18 +53,12 @@ pub fn Owner::new() -> Owner {
     disposed: false,
   }
 
-  owner_registry.val[id] = owner
-
-  match Owner::current() {
+  match current_owner.val {
     Some(parent) =>
       if !parent.disposed {
         match parent.children {
-          Some(c) => c.set(id, owner)
-          None => {
-            let c = HashMap([])
-            c.set(id, owner)
-            parent.children = Some(c)
-          }
+          Some(children) => children.push(owner)
+          None => parent.children = Some([owner])
         }
         owner.parent = Some(parent)
       }
@@ -121,16 +81,10 @@ pub fn Owner::child(self : Owner) -> Owner {
     disposed: false,
   }
 
-  owner_registry.val[id] = owner
-
   if !self.disposed {
     match self.children {
-      Some(c) => c.set(id, owner)
-      None => {
-        let c = HashMap([])
-        c.set(id, owner)
-        self.children = Some(c)
-      }
+      Some(c) => c.push(owner)
+      None => self.children = Some([owner])
     }
   }
 
@@ -175,6 +129,7 @@ pub fn Owner::unset(self : Owner) -> Unit {
 
 ///|
 /// Runs `fun` under this owner, then restores the previous owner.
+#inline
 pub fn[T] Owner::with_(self : Owner, fun : () -> T) -> T {
   let prev = current_owner.val
   current_owner.val = Some(self)
@@ -191,16 +146,24 @@ fn Owner::drain_owner(self : Owner) -> Unit {
     return
   }
 
+  // Detach children first, then cleanup — avoids child modifying parent
+  let children = self.children
+  self.children = None
+
+  match children {
+    Some(c) =>
+      for child in c {
+        if !child.disposed {
+          child.cleanup_light()
+        }
+      }
+    None => ()
+  }
+
   let cleanups = match self.cleanups {
     Some(c) => c
     None => []
   }
-
-  match self.children {
-    Some(c) => c.each(fn(_, child) { if !child.disposed { child.cleanup() } })
-    None => ()
-  }
-  self.children = None
   self.cleanups = None
 
   let mut j = 0
@@ -245,17 +208,44 @@ pub fn Owner::cleanup(self : Owner) -> Unit {
 
   self.disposed = true
 
-  let parent = self.parent
+  // Remove self from parent's children array (linear scan — individual
+  // cleanup is rare; bulk paths use cleanup_light + clean_disposed_from_children)
+  match self.parent {
+    Some(p) =>
+      match p.children {
+        Some(pchildren) => {
+          let mut i = 0
+          while i < pchildren.length() {
+            if pchildren[i].id == self.id {
+              let _ = pchildren.remove(i)
+              break
+            }
+            i = i + 1
+          }
+        }
+        None => ()
+      }
+    None => ()
+  }
+
+  // Detach children first, then cleanup — avoids child modifying parent
+  let children = self.children
+  self.children = None
+
+  match children {
+    Some(c) =>
+      for child in c {
+        if !child.disposed {
+          child.cleanup_light()
+        }
+      }
+    None => ()
+  }
+
   let cleanups = match self.cleanups {
     Some(c) => c
     None => []
   }
-
-  match self.children {
-    Some(c) => c.each(fn(_, child) { if !child.disposed { child.cleanup() } })
-    None => ()
-  }
-  self.children = None
   self.cleanups = None
 
   let mut j = 0
@@ -264,17 +254,7 @@ pub fn Owner::cleanup(self : Owner) -> Unit {
     j = j + 1
   }
 
-  match parent {
-    Some(p) =>
-      match p.children {
-        Some(pchildren) => pchildren.remove(self.id)
-        None => ()
-      }
-    None => ()
-  }
-
-  remove_owner_from_registry(self.id)
-
+  // Clear current_owner if it points to self
   match current_owner.val {
     Some(owner) => if owner.id == self.id { current_owner.val = None }
     None => ()
@@ -282,10 +262,10 @@ pub fn Owner::cleanup(self : Owner) -> Unit {
 }
 
 ///|
-/// Disposes this owner without removing from parent's children array
-/// or the global registry. For use in bulk-clear paths where the parent's
-/// children array is cleared afterwards and registry entries are
-/// batch-removed.
+/// Disposes this owner without modifying parent.
+/// For use in bulk-clear paths where the parent has already detached
+/// its children array, or will sweep disposed entries afterwards via
+/// `clean_disposed_from_children`.
 pub fn Owner::cleanup_light(self : Owner) -> Unit {
   if self.disposed {
     return
@@ -293,17 +273,24 @@ pub fn Owner::cleanup_light(self : Owner) -> Unit {
 
   self.disposed = true
 
+  // Detach children first, then cleanup — avoids child modifying parent
+  let children = self.children
+  self.children = None
+
+  match children {
+    Some(c) =>
+      for child in c {
+        if !child.disposed {
+          child.cleanup_light()
+        }
+      }
+    None => ()
+  }
+
   let cleanups = match self.cleanups {
     Some(c) => c
     None => []
   }
-
-  match self.children {
-    Some(c) =>
-      c.each(fn(_, child) { if !child.disposed { child.cleanup_light() } })
-    None => ()
-  }
-  self.children = None
   self.cleanups = None
 
   let mut j = 0
@@ -314,20 +301,39 @@ pub fn Owner::cleanup_light(self : Owner) -> Unit {
 }
 
 ///|
-pub fn[T : TypeName] Owner::provide_context(self : Owner, value : T) -> Unit {
-  match owner_state_of(self.id) {
-    Some(owner) => {
-      let any = @any.of(value)
-      match owner.contexts {
-        Some(ctx) => ctx.set(T::get_ty(), any)
-        None => {
-          let ctx = HashMap([])
-          ctx.set(T::get_ty(), any)
-          owner.contexts = Some(ctx)
+/// Removes disposed children from the children array.
+/// Call this after bulk `cleanup_light()` on children to compact
+/// the array in one pass.
+pub fn Owner::clean_disposed_from_children(self : Owner) -> Unit {
+  match self.children {
+    Some(children) => {
+      let mut i = 0
+      while i < children.length() {
+        if children[i].disposed {
+          let _ = children.remove(i)
+          // Don't increment i — remove shifts elements left
+        } else {
+          i = i + 1
         }
       }
     }
     None => ()
+  }
+}
+
+///|
+pub fn[T : TypeName] Owner::provide_context(self : Owner, value : T) -> Unit {
+  if self.disposed {
+    return
+  }
+  let any = @any.of(value)
+  match self.contexts {
+    Some(ctx) => ctx.set(T::get_ty(), any)
+    None => {
+      let ctx = HashMap([])
+      ctx.set(T::get_ty(), any)
+      self.contexts = Some(ctx)
+    }
   }
 }
 
@@ -451,7 +457,10 @@ fn[T : TypeName] Owner::find_context_in_children(self : Owner) -> T? {
   let to_search : Array[Owner] = []
 
   match self.children {
-    Some(children) => children.each(fn(_, child) { to_search.push(child) })
+    Some(children) =>
+      for child in children {
+        to_search.push(child)
+      }
     None => ()
   }
 
@@ -476,7 +485,9 @@ fn[T : TypeName] Owner::find_context_in_children(self : Owner) -> T? {
 
       match child.children {
         Some(grandchildren) =>
-          grandchildren.each(fn(_, gc) { to_search.push(gc) })
+          for gc in grandchildren {
+            to_search.push(gc)
+          }
         None => ()
       }
     }

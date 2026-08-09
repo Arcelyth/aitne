@@ -91,13 +91,13 @@ fn btn(id~ : String, text~ : String, on_click~ : (@ffi.Event) -> Unit) -> &View 
     "click",
     on_click,
   )
-  let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(
+  let _t_text_0 = @Arcelyth/aitne/src/ffi.prim_create_text_node(
     @Arcelyth/aitne/src/dom.document(),
     (() => text)(),
   )
   @Arcelyth/aitne/src/ffi.dom_append(
     _n0,
-    @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
+    @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text_0),
   )
   @Arcelyth/aitne/src/dom.raw_node(
     @Arcelyth/aitne/src/ffi.cast_element_to_node(_root),
@@ -205,62 +205,27 @@ fn app() -> &View {
               "class",
               (() => if selector.selected(row_id) { "danger" } else { "" })(),
             )
-            let _ = @reactive.RenderEffect::new(fn(prev) {
-              let val = (() => {
-                if selector.selected(row_id) {
-                  "danger"
-                } else {
-                  ""
-                }
-              })()
-              match prev {
-                Some(old) => {
-                  if val != old {
-                    @Arcelyth/aitne/src/ffi.dom_set_attr(
-                      @Arcelyth/aitne/src/ffi.cast_node_to_element(_n0),
-                      "class",
-                      val,
-                    )
-                  }
-                  val
-                }
-                None => val
-              }
-            })
-            let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(
+            let _t_text_0 = @Arcelyth/aitne/src/ffi.prim_create_text_node(
               @Arcelyth/aitne/src/dom.document(),
               (() => row_id.to_string())(),
             )
             @Arcelyth/aitne/src/ffi.dom_append(
               _n1,
-              @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
+              @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text_0),
             )
             let _ = @Arcelyth/aitne/src/dom.add_event_listener(
               @Arcelyth/aitne/src/ffi.cast_node_to_element(_n2),
               "click",
               _ => set_selected.set(row_id),
             )
-            let _t_text = @Arcelyth/aitne/src/ffi.prim_create_text_node(
+            let _t_text_1 = @Arcelyth/aitne/src/ffi.prim_create_text_node(
               @Arcelyth/aitne/src/dom.document(),
               (() => row.label.get())(),
             )
             @Arcelyth/aitne/src/ffi.dom_append(
               _n2,
-              @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
+              @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text_1),
             )
-            let _ = @reactive.RenderEffect::new(fn(prev) {
-              let val = (() => row.label.get())()
-              match prev {
-                Some(_) => {
-                  @Arcelyth/aitne/src/ffi.dom_set_text(
-                    @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text),
-                    val,
-                  )
-                  val
-                }
-                None => val
-              }
-            })
             let _ = @Arcelyth/aitne/src/dom.add_event_listener(
               @Arcelyth/aitne/src/ffi.cast_node_to_element(_n3),
               "click",
@@ -269,6 +234,35 @@ fn app() -> &View {
                 set_data.set(filtered)
               },
             )
+            let _ = @reactive.RenderEffect::new(fn(prev) {
+              let val_0 = (() => {
+                if selector.selected(row_id) {
+                  "danger"
+                } else {
+                  ""
+                }
+              })()
+              let val_1 = (() => row.label.get())()
+              match prev {
+                Some((old_0, old_1)) => {
+                  if val_0 != old_0 {
+                    @Arcelyth/aitne/src/ffi.dom_set_attr(
+                      @Arcelyth/aitne/src/ffi.cast_node_to_element(_n0),
+                      "class",
+                      val_0,
+                    )
+                  }
+                  if val_1 != old_1 {
+                    @Arcelyth/aitne/src/ffi.dom_set_text(
+                      @Arcelyth/aitne/src/ffi.cast_text_to_node(_t_text_1),
+                      val_1,
+                    )
+                  }
+                  (val_0, val_1)
+                }
+                None => (val_0, val_1)
+              }
+            })
             @Arcelyth/aitne/src/dom.raw_node(
               @Arcelyth/aitne/src/ffi.cast_element_to_node(_root),
             )

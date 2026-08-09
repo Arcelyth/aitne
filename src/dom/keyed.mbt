@@ -254,7 +254,7 @@ pub fn[T, V : Render] apply_diff(
   items : Array[T?],
 ) -> Unit {
   if diff.clear {
-    for child in children {
+    children.each(child => {
       match child {
         Some((dispose, state)) => {
           dispose(0)
@@ -262,7 +262,8 @@ pub fn[T, V : Render] apply_diff(
         }
         None => ()
       }
-    }
+    })
+
     children.clear()
     if diff.added.is_empty() {
       return

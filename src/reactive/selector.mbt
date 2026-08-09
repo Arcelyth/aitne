@@ -38,18 +38,20 @@ pub fn[T : Eq + Hash] Selector::new(source : () -> T) -> Selector[T] {
     match prev {
       Some(prev_val) =>
         if prev_val != next_val {
-          subs.each(fn(key : T, signal : RwSignal[Bool]) {
-            if key == next_val || key == prev_val {
-              signal.update(fn(_) { true })
-            }
-          })
+          match subs.get(next_val) {
+            Some(signal) => signal.update(fn(_) { true })
+            None => ()
+          }
+          match subs.get(prev_val) {
+            Some(signal) => signal.update(fn(_) { true })
+            None => ()
+          }
         }
       None =>
-        subs.each(fn(key : T, signal : RwSignal[Bool]) {
-          if key == next_val {
-            signal.update(fn(_) { true })
-          }
-        })
+        match subs.get(next_val) {
+          Some(signal) => signal.update(fn(_) { true })
+          None => ()
+        }
     }
     next_val
   })

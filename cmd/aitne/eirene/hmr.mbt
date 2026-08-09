@@ -75,8 +75,6 @@ pub fn start_hmr_watcher(
   if !state.enabled {
     return
   }
-  println("HMR: watching \{watch_dir} for changes...")
-
   group.spawn_bg(async fn() {
     try {
       let watcher = @async_fs.Watcher::Watcher(

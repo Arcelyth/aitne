@@ -138,7 +138,7 @@ pub fn counter_btn(incr?: Int = 1) -> &View {
 
 ## Eirene
 
-Eirene is a simple web server built in MoonBit, specifically designed to serve static assets and handle Single Page Application (SPA) routing fallbacks for the Aitne ecosystem. <br>
+Eirene is an efficient, lightweight web server built in MoonBit, specifically for the Aitne ecosystem. It designed for serving static assets, handling Single Page Application (SPA) routing fallbacks, and providing Hot Module Replacement (HMR) during development.
 An example 'eirene.toml' config file:
 ```toml
 [app]
@@ -154,6 +154,7 @@ out_dir = "."
 [server]
 host = "127.0.0.1"
 port = 8000
+hmr_enabled = false
 ```
 
 ## Learn more

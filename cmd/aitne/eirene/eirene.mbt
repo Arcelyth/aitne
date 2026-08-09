@@ -8,6 +8,10 @@ pub async fn start_server(cfg : Config) -> Unit {
 
   @async.with_task_group(async fn(group) {
     start_hmr_watcher(hmr_state, group, ".")
+    println("  Local:   http://\{cfg.server.host}:\{cfg.server.port}/")
+    println(
+      "  HMR:     \{if hmr_state.enabled { "enabled" } else { "disabled" }}",
+    )
 
     @http.Server(@socket.Addr::parse("\{cfg.server.host}:\{cfg.server.port}")).run_forever((
         request,
@@ -15,7 +19,6 @@ pub async fn start_server(cfg : Config) -> Unit {
         conn,
       ) => {
         let path = request.path
-
         if hmr_state.enabled && path == "/__hmr" {
           let is_ws = match request.headers.get("upgrade") {
             Some(v) => v.to_lower() == "websocket"

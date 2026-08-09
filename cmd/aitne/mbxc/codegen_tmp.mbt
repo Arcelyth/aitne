@@ -9,6 +9,13 @@ pub(all) struct CodeGenTmp {
 }
 
 ///|
+
+///|
+pub fn CodeGenTmp::output_style(self : CodeGenTmp) -> String {
+  self.style.to_string()
+}
+
+///|
 pub fn CodeGenTmp::new(ast : Array[MbxAST], path? : String = "") -> CodeGenTmp {
   {
     ast,
@@ -756,7 +763,7 @@ pub fn CodeGenTmp::generate(self : CodeGenTmp) -> String {
       if code == "" {
         let fb = CodeGen::new(path=self.path)
         fc.write(fb.generate(isl))
-        fc.write(fb.output_style())
+        self.style.write_string(fb.output_style())
       } else {
         fc.write(code)
       }
@@ -793,7 +800,7 @@ pub fn CodeGenTmp::generate(self : CodeGenTmp) -> String {
           let single = [node]
           let fb = CodeGen::new(path=self.path)
           fc.write(fb.generate(single))
-          fc.write(fb.output_style())
+          self.style.write_string(fb.output_style())
         } else {
           let isl = island.val
           isl.push(node)
@@ -807,6 +814,8 @@ pub fn CodeGenTmp::generate(self : CodeGenTmp) -> String {
     }
   }
   flush(self, fc, island, tc)
+  // Emit module-level style struct definitions after all code
+  fc.write_string(self.last_buf.to_string())
   // Emit module-level template cache declarations first,
   // then the main generated code.
   let result = StringBuilder::new()

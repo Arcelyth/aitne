@@ -36,8 +36,10 @@ pub fn from_file(
     output_style.val.write_string(codegen.output_style())
     res
   } else {
-    let codegen = CodeGenTmp::new(asts)
-    codegen.generate()
+    let codegen = CodeGenTmp::new(asts, path~)
+    let res = codegen.generate()
+    output_style.val.write_string(codegen.output_style())
+    res
   }
   match to {
     Some(target) => {

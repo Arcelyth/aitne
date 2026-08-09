@@ -7,5 +7,5 @@ import {
 pkgtype(kind: "executable")
 
 options(
-  supported_targets: "js",
+  supported_targets: "js+wasm+wasm-gc",
 )

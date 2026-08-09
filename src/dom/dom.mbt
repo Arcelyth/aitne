@@ -44,7 +44,12 @@ pub fn dom_create_text_node(text : String) -> @ffi.Text {
 /// Get an element by id.
 #inline
 pub fn dom_get_element_by_id(id : String) -> @ffi.Node? {
-  @ffi.prim_get_element_by_id(document(), id)
+  let node = @ffi.prim_get_element_by_id(document(), id)
+  if @ffi.prim_is_null(node) {
+    None
+  } else {
+    Some(node)
+  }
 }
 
 ///|
@@ -60,8 +65,8 @@ pub fn on_window_event(
   ev_name : String,
   cb : (@ffi.Event) -> Unit,
 ) -> () -> Unit {
-  @ffi.window_add_event_listener(ev_name, cb)
-  fn() { @ffi.window_remove_event_listener(ev_name, cb) }
+  let handle = @ffi.window_add_event_listener(ev_name, cb)
+  fn() { @ffi.window_remove_event_listener(handle) }
 }
 
 ///|

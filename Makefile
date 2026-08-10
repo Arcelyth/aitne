@@ -61,3 +61,18 @@ build_cmd:
 	
 build_cmd_r: 
 	moon build cmd/aitne --target=native --release
+
+# WASM targets
+build_wasm:
+	moon build --target=wasm-gc
+
+build_wasm_release:
+	moon build --target=wasm-gc --release
+
+check_wasm:
+	moon check --target=wasm-gc
+
+exp_bench_wasm:
+	moon build ./examples/bench --target=wasm-gc
+	chmod +x ./examples/bench/run_wasm.sh
+	./examples/bench/run_wasm.sh

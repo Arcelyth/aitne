@@ -162,7 +162,7 @@ fn app() -> &View {
       @Arcelyth/aitne/src/dom.tbody(children=[
         for_each(
           each=() => data.get().iter(),
-          key=row => { return row.id.to_string() },
+          key=row => { return @ffi.int_to_string(row.id) },
           children=row => {
             let row_id = row.id
             let __tmpl_0 = match __tmpl_cache_0.val {
@@ -207,7 +207,7 @@ fn app() -> &View {
             )
             let _t_text_0 = @Arcelyth/aitne/src/ffi.prim_create_text_node(
               @Arcelyth/aitne/src/dom.document(),
-              (() => row_id.to_string())(),
+              (() => @ffi.int_to_string(row_id))(),
             )
             @Arcelyth/aitne/src/ffi.dom_append(
               _n1,

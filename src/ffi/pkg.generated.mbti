@@ -114,7 +114,7 @@ pub fn event_target_checked(Event) -> Bool
 
 pub fn event_target_value(Event) -> String
 
-pub fn first_child_skip_comments(Node) -> Node?
+pub fn first_child_skip_comments(Node) -> Node
 
 pub fn get_bool_property(Element, String) -> Bool
 
@@ -124,6 +124,8 @@ pub fn history_push_state(String) -> Unit
 
 pub fn history_replace_state(String) -> Unit
 
+pub fn int_to_string(Int) -> String
+
 pub fn is_comment_node(Node) -> Bool
 
 pub fn is_text_node(Node) -> Bool
@@ -132,13 +134,13 @@ pub fn js_array_get(JsArray, Int) -> Node
 
 pub fn js_array_length(JsArray) -> Int
 
-pub fn next_sibling_skip_comments(Node) -> Node?
+pub fn next_sibling_skip_comments(Node) -> Node
 
 pub fn node_is_anchor(Node) -> Bool
 
-pub fn on_popstate(() -> Unit) -> () -> Unit
+pub fn on_popstate(() -> Unit) -> EventHandle
 
-pub fn parent_node(Node) -> Node?
+pub fn parent_node(Node) -> Node
 
 pub fn prim_add_event_listener(Element, String, (Event) -> Unit) -> EventHandle
 
@@ -162,7 +164,7 @@ pub fn prim_first_element_child(Node) -> Element
 
 pub fn prim_get_body(Document) -> Node
 
-pub fn prim_get_element_by_id(Document, String) -> Node?
+pub fn prim_get_element_by_id(Document, String) -> Node
 
 #alias(dom_is_null)
 pub fn prim_is_null(Node) -> Bool
@@ -197,11 +199,11 @@ pub fn url_path_from_base(String, String) -> String
 
 pub fn url_search_from_base(String, String) -> String
 
-pub fn window_add_event_listener(String, (Event) -> Unit) -> Unit
+pub fn window_add_event_listener(String, (Event) -> Unit) -> EventHandle
 
 pub fn window_event_listener(String, (Event) -> Unit) -> EventHandle
 
-pub fn window_remove_event_listener(String, (Event) -> Unit) -> Unit
+pub fn window_remove_event_listener(EventHandle) -> Unit
 
 // Errors
 

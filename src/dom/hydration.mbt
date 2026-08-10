@@ -60,25 +60,25 @@ pub fn Cursor::set(self : Cursor, node : @ffi.Node) -> Unit {
 
 ///|
 pub fn Cursor::child(self : Cursor) -> Unit {
-  match @ffi.first_child_skip_comments(self.inner.val) {
-    Some(node) => self.inner.val = node
-    None => ()
+  let node = @ffi.first_child_skip_comments(self.inner.val)
+  if !@ffi.prim_is_null(node) {
+    self.inner.val = node
   }
 }
 
 ///|
 pub fn Cursor::sibling(self : Cursor) -> Unit {
-  match @ffi.next_sibling_skip_comments(self.inner.val) {
-    Some(node) => self.inner.val = node
-    None => ()
+  let node = @ffi.next_sibling_skip_comments(self.inner.val)
+  if !@ffi.prim_is_null(node) {
+    self.inner.val = node
   }
 }
 
 ///|
 pub fn Cursor::parent(self : Cursor) -> Unit {
-  match @ffi.parent_node(self.inner.val) {
-    Some(node) => self.inner.val = node
-    None => ()
+  let node = @ffi.parent_node(self.inner.val)
+  if !@ffi.prim_is_null(node) {
+    self.inner.val = node
   }
 }
 

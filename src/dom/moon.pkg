@@ -10,5 +10,5 @@ import {
 }
 
 options(
-  supported_targets: "js",
+  supported_targets: "js+wasm-gc",
 )

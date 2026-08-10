@@ -6,5 +6,6 @@ import {
 pkgtype(kind: "executable")
 
 options(
-  supported_targets: "js",
+  supported_targets: "js+wasm-gc",
+  link: { "wasm-gc": { "use-js-builtin-string": true } },
 )

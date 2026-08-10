@@ -131,6 +131,12 @@ pub fn counter_btn(incr?: Int = 1) -> &View {
 }
 ```
 
+## WebAssembly (Experimental)
+
+Aitne also offers experimental support for compiling applications to WebAssembly GC, delivering significant performance gains.
+
+> **Experimental:** WebAssembly support is currently experimental and may be unstable. APIs, runtime behavior, and build configuration may change without notice. It is **not recommended for production use** at this stage.
+
 ## Editor Support
 - [Neovim](https://github.com/aitne-dev/mbx.nvim)
 - [Zed](https://github.com/aitne-dev/mbx-zed)

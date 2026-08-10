@@ -1,6 +1,6 @@
 name = "Arcelyth/aitne"
 
-version = "0.4.18"
+version = "0.4.19"
 
 import {
   "moonbitlang/x@0.4.47",
@@ -22,7 +22,7 @@ description = "A lightweight and high-performance reactive web framework."
 
 preferred_target = "js"
 
-supported_targets = [ "js", "native" ]
+supported_targets = "all"
 
 options(
   exclude: [ "examples", "bench" ],

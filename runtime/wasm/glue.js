@@ -528,23 +528,23 @@ async function boot(wasmUrl) {
     console: {
       log: (...args) => console.log(...args),
     },
-  }
+  };
 
   const compileOptions = {
     builtins: ["js-string"],
     importedStringConstants: "_",
-  }
+  };
 
   const { instance } = await WebAssembly.instantiateStreaming(
     fetch(wasmUrl),
     importObject,
     compileOptions,
-  )
+  );
 
   if (instance.exports._start) {
-    instance.exports._start()
+    instance.exports._start();
   }
-  return instance
+  return instance;
 }
 
 // --- Auto-boot when loaded as module ---

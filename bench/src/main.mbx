@@ -102,11 +102,11 @@ fn app() -> &View {
       <tbody>
         <ForEach 
           each={()=>data.get().iter()}
-          key={(row)=>{return @ffi.int_to_string(row.id)}}
+          key={(row)=>{return row.id.to_string()}}
           children={(row)=>{
             let row_id = row.id
             <tr class={() => if selector.selected(row_id) {"danger"} else {""}}>
-              <td class="col-md-1"> {() => @ffi.int_to_string(row_id)} </td>
+              <td class="col-md-1"> {() => row_id.to_string()} </td>
               <td class="col-md-4">
                 <a on:click={_ => set_selected.set(row_id)}> {() => row.label.get()} </a>
               </td>

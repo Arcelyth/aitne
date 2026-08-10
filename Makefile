@@ -76,3 +76,18 @@ exp_bench_wasm:
 	moon build ./examples/bench --target=wasm-gc
 	chmod +x ./examples/bench/run_wasm.sh
 	./examples/bench/run_wasm.sh
+
+exp_counter_wasm:
+	moon build ./examples/counter --target=wasm-gc
+	chmod +x ./examples/counter/run_wasm.sh
+	./examples/counter/run_wasm.sh
+
+exp_page_wasm:
+	moon build ./examples/page --target=wasm-gc
+	chmod +x ./examples/page/run_wasm.sh
+	./examples/page/run_wasm.sh
+
+exp_todo_wasm:
+	moon build ./examples/todo --target=wasm-gc
+	chmod +x ./examples/todo/run_wasm.sh
+	./examples/todo/run_wasm.sh

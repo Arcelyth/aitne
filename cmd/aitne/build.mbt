@@ -36,7 +36,11 @@ async fn handle_build() -> Unit {
 
   println("aitne mbxc done")
   let _ = @async.with_task_group(async fn(group) {
-    let process = @process.spawn(group, "moon", ["build"]) catch {
+    let args = match cfg.build.target {
+      @eirene.CfgTarget::WasmGc => ["build", "--target=wasm-gc"]
+      @eirene.CfgTarget::Js => ["build", "--target=js"]
+    }
+    let process = @process.spawn(group, "moon", args) catch {
       _ => {
         println("Failed to build.")
         return

@@ -49,6 +49,7 @@ pub(all) struct CodeGenTmp {
 }
 pub fn CodeGenTmp::generate(Self) -> String
 pub fn CodeGenTmp::new(Array[MbxAST], path? : String) -> Self
+pub fn CodeGenTmp::output_style(Self) -> String
 
 pub struct DocTag {
 } derive(Eq, @debug.Debug)

@@ -8,408 +8,408 @@
 
 // --- DOM operations (mirrors src/ffi/dom.mbt) ---
 function prim_document() {
-  return document
+  return document;
 }
 
 function prim_get_body(doc) {
-  return doc.body
+  return doc.body;
 }
 
 function prim_get_element_by_id(doc, id) {
-  return doc.getElementById(id) // null when missing — matches prim_is_null
+  return doc.getElementById(id); // null when missing — matches prim_is_null
 }
 
 function prim_create_element(doc, tag) {
-  return doc.createElement(tag)
+  return doc.createElement(tag);
 }
 
 function prim_create_text_node(doc, text) {
-  return doc.createTextNode(text)
+  return doc.createTextNode(text);
 }
 
 function dom_create_comment(text) {
-  return document.createComment(text)
+  return document.createComment(text);
 }
 
 function prim_create_template(html) {
-  const tpl = document.createElement("template")
-  tpl.innerHTML = html
-  return tpl.content
+  const tpl = document.createElement("template");
+  tpl.innerHTML = html;
+  return tpl.content;
 }
 
 function dom_null_node() {
-  return null
+  return null;
 }
 
 function dom_append(parent, child) {
-  parent.appendChild(child)
+  parent.appendChild(child);
 }
 
 function dom_insert_before(parent, new_child, ref_child) {
-  parent.insertBefore(new_child, ref_child)
+  parent.insertBefore(new_child, ref_child);
 }
 
 function dom_remove_child(parent, child) {
-  parent.removeChild(child)
+  parent.removeChild(child);
 }
 
 function dom_remove_self(node) {
   if (node && node.parentNode) {
-    node.parentNode.removeChild(node)
+    node.parentNode.removeChild(node);
   }
 }
 
 function dom_remove(node) {
-  node.remove()
+  node.remove();
 }
 
 function dom_clear_children(node) {
-  while (node.firstChild) node.removeChild(node.firstChild)
+  while (node.firstChild) node.removeChild(node.firstChild);
 }
 
 function prim_clone_node(node) {
-  return node.cloneNode(true)
+  return node.cloneNode(true);
 }
 
 function dom_remove_range(start, end) {
-  const range = document.createRange()
-  range.setStartAfter(start)
-  range.setEndBefore(end)
-  range.deleteContents()
+  const range = document.createRange();
+  range.setStartAfter(start);
+  range.setEndBefore(end);
+  range.deleteContents();
 }
 
 function prim_node_eq(a, b) {
-  return a === b
+  return a === b;
 }
 
 function prim_is_null(node) {
-  return node === null || node === undefined
+  return node === null || node === undefined;
 }
 
 function element_is_null(el) {
-  return el === null || el === undefined
+  return el === null || el === undefined;
 }
 
 function prim_first_child(node) {
-  return node.firstChild
+  return node.firstChild;
 }
 
 function prim_first_element_child(node) {
-  return node.firstElementChild
+  return node.firstElementChild;
 }
 
 function prim_next_sibling(node) {
-  return node.nextSibling
+  return node.nextSibling;
 }
 
 function dom_parent(node) {
-  return node.parentNode
+  return node.parentNode;
 }
 
 function dom_tag_name(node) {
-  return node.tagName?.toLowerCase() ?? ""
+  return node.tagName?.toLowerCase() ?? "";
 }
 
 function dom_set_attr(el, key, val) {
-  el.setAttribute(key, val)
+  el.setAttribute(key, val);
 }
 
 function dom_set_attribute(el, key, value) {
-  el.setAttribute(key, value)
+  el.setAttribute(key, value);
 }
 
 function dom_remove_attr(el, key) {
-  el.removeAttribute(key)
+  el.removeAttribute(key);
 }
 
 function dom_remove_attribute(el, key) {
-  el.removeAttribute(key)
+  el.removeAttribute(key);
 }
 
 function dom_add_class(node, cls) {
-  node.classList.add(cls)
+  node.classList.add(cls);
 }
 
 function dom_set_text(node, text) {
-  node.textContent = text
+  node.textContent = text;
 }
 
 function set_property(el, prop_name, value) {
-  el[prop_name] = value
+  el[prop_name] = value;
 }
 
 function dom_set_prop(node, key, val) {
-  node[key] = val
+  node[key] = val;
 }
 
 function remove_property(el, prop_name) {
-  delete el[prop_name]
+  delete el[prop_name];
 }
 
 function get_property(el, prop_name) {
-  return String(el[prop_name] || "")
+  return String(el[prop_name] || "");
 }
 
 function get_bool_property(el, key) {
-  const v = el[key]
-  return typeof v === "boolean" ? v : false
+  const v = el[key];
+  return typeof v === "boolean" ? v : false;
 }
 
 function dom_set_property_bool(el, key, value) {
-  el[key] = value
+  el[key] = value;
 }
 
 function is_text_node(node) {
-  return node.nodeType === 3
+  return node.nodeType === 3;
 }
 
 // --- Event operations (mirrors src/ffi/event.mbt) ---
 function dom_add_event(node, ev, handler) {
-  node.addEventListener(ev, handler)
+  node.addEventListener(ev, handler);
 }
 
 function prim_add_event_listener(el, name, cb) {
-  el.addEventListener(name, cb)
-  return () => el.removeEventListener(name, cb)
+  el.addEventListener(name, cb);
+  return () => el.removeEventListener(name, cb);
 }
 
 function prim_add_event_listener_capture(el, name, cb) {
-  el.addEventListener(name, cb, true)
-  return () => el.removeEventListener(name, cb, true)
+  el.addEventListener(name, cb, true);
+  return () => el.removeEventListener(name, cb, true);
 }
 
 function prim_call_event_handle(handle) {
-  handle()
+  handle();
 }
 
 function event_target_value(ev) {
-  return ev.target ? (ev.target.value || "") : ""
+  return ev.target ? ev.target.value || "" : "";
 }
 
 function event_target_checked(ev) {
-  return ev.target ? !!ev.target.checked : false
+  return ev.target ? !!ev.target.checked : false;
 }
 
 function event_default_prevented(ev) {
-  return ev.defaultPrevented
+  return ev.defaultPrevented;
 }
 
 function event_prevent_default(ev) {
-  ev.preventDefault()
+  ev.preventDefault();
 }
 
 function event_button(ev) {
-  return ev.button
+  return ev.button;
 }
 
 function event_meta_key(ev) {
-  return ev.metaKey
+  return ev.metaKey;
 }
 
 function event_alt_key(ev) {
-  return ev.altKey
+  return ev.altKey;
 }
 
 function event_ctrl_key(ev) {
-  return ev.ctrlKey
+  return ev.ctrlKey;
 }
 
 function event_shift_key(ev) {
-  return ev.shiftKey
+  return ev.shiftKey;
 }
 
 function event_composed_path(ev) {
-  return ev.composedPath()
+  return ev.composedPath();
 }
 
 function js_array_length(arr) {
-  return arr.length
+  return arr.length;
 }
 
 function js_array_get(arr, idx) {
-  return arr[idx]
+  return arr[idx];
 }
 
 // --- Template operations (mirrors src/ffi/template.mbt) ---
 function create_template() {
-  return document.createElement("template")
+  return document.createElement("template");
 }
 
 function clone_node_shallow(tpl) {
-  return tpl.cloneNode(false)
+  return tpl.cloneNode(false);
 }
 
 function clone_template_content(tpl) {
-  return tpl.content.cloneNode(true)
+  return tpl.content.cloneNode(true);
 }
 
 function set_inner_html(tpl, html) {
-  tpl.innerHTML = html
+  tpl.innerHTML = html;
 }
 
 function first_child_skip_comments(node) {
-  let curr = node.firstChild
+  let curr = node.firstChild;
   while (
     curr &&
     curr.nodeType === 8 &&
     (curr.textContent.startsWith("bo") || curr.textContent.startsWith("bc"))
   ) {
-    curr = curr.nextSibling
+    curr = curr.nextSibling;
   }
-  return curr || null
+  return curr || null;
 }
 
 function next_sibling_skip_comments(node) {
-  let curr = node.nextSibling
+  let curr = node.nextSibling;
   while (
     curr &&
     curr.nodeType === 8 &&
     (curr.textContent.startsWith("bo") || curr.textContent.startsWith("bc"))
   ) {
-    curr = curr.nextSibling
+    curr = curr.nextSibling;
   }
-  return curr || null
+  return curr || null;
 }
 
 function parent_node(node) {
-  return node.parentNode || null
+  return node.parentNode || null;
 }
 
 function is_comment_node(node) {
-  return node.nodeType === 8
+  return node.nodeType === 8;
 }
 
 function console_error(msg1, node, msg2) {
-  console.error(msg1, node, msg2)
+  console.error(msg1, node, msg2);
 }
 
 // --- Window/timer operations (mirrors src/ffi/window.mbt) ---
 function prim_window() {
-  return window
+  return window;
 }
 
 function set_window_href(href) {
-  window.location.href = href
+  window.location.href = href;
 }
 
 function window_add_event_listener(ev_name, cb) {
-  const f = (e) => cb(e)
-  window.addEventListener(ev_name, f)
-  return () => window.removeEventListener(ev_name, f)
+  const f = (e) => cb(e);
+  window.addEventListener(ev_name, f);
+  return () => window.removeEventListener(ev_name, f);
 }
 
 function window_remove_event_listener(handle) {
-  handle()
+  handle();
 }
 
 function window_event_listener(event, callback) {
-  window.addEventListener(event, callback)
-  return () => window.removeEventListener(event, callback)
+  window.addEventListener(event, callback);
+  return () => window.removeEventListener(event, callback);
 }
 
 function set_timeout(cb, ms) {
-  return setTimeout(cb, ms)
+  return setTimeout(cb, ms);
 }
 
 function clear_timeout(handle) {
-  clearTimeout(handle)
+  clearTimeout(handle);
 }
 
 function set_interval(cb, ms) {
-  return setInterval(cb, ms)
+  return setInterval(cb, ms);
 }
 
 function clear_interval(handle) {
-  clearInterval(handle)
+  clearInterval(handle);
 }
 
 function request_animation_frame(cb) {
-  return requestAnimationFrame(cb)
+  return requestAnimationFrame(cb);
 }
 
 function cancel_animation_frame(handle) {
-  cancelAnimationFrame(handle)
+  cancelAnimationFrame(handle);
 }
 
 // --- Router/location operations (mirrors src/ffi/router.mbt) ---
 function current_origin() {
-  return location.origin
+  return location.origin;
 }
 
 function current_pathname() {
-  return location.pathname
+  return location.pathname;
 }
 
 function current_search() {
-  return location.search
+  return location.search;
 }
 
 function current_hash() {
-  return location.hash
+  return location.hash;
 }
 
 function history_push_state(url) {
-  history.pushState(null, "", url)
+  history.pushState(null, "", url);
 }
 
 function history_replace_state(url) {
-  history.replaceState(null, "", url)
+  history.replaceState(null, "", url);
 }
 
 function on_popstate(cb) {
-  const f = () => cb()
-  window.addEventListener("popstate", f)
-  return () => window.removeEventListener("popstate", f)
+  const f = () => cb();
+  window.addEventListener("popstate", f);
+  return () => window.removeEventListener("popstate", f);
 }
 
 function node_is_anchor(node) {
-  return node instanceof HTMLAnchorElement
+  return node instanceof HTMLAnchorElement;
 }
 
 function anchor_href(el) {
-  return el.href
+  return el.href;
 }
 
 function anchor_target(el) {
-  return el.target
+  return el.target;
 }
 
 function anchor_has_attr(el, name) {
-  return el.hasAttribute(name)
+  return el.hasAttribute(name);
 }
 
 function anchor_get_attr(el, name) {
-  return el.getAttribute(name) ?? ""
+  return el.getAttribute(name) ?? "";
 }
 
 function url_can_parse(href, base) {
   try {
-    new URL(href, base)
-    return true
+    new URL(href, base);
+    return true;
   } catch (e) {
-    return false
+    return false;
   }
 }
 
 function url_origin_from_base(href, base) {
-  return new URL(href, base).origin
+  return new URL(href, base).origin;
 }
 
 function url_path_from_base(href, base) {
-  return new URL(href, base).pathname
+  return new URL(href, base).pathname;
 }
 
 function url_search_from_base(href, base) {
-  return new URL(href, base).search
+  return new URL(href, base).search;
 }
 
 function url_hash_from_base(href, base) {
-  return new URL(href, base).hash
+  return new URL(href, base).hash;
 }
 
 // --- Reactive bridge (mirrors src/ffi/reactive.mbt) ---
 function dom_create_effect(cb) {
-  if (globalThis.reactive) globalThis.reactive.create_effect(cb)
+  if (globalThis.reactive) globalThis.reactive.create_effect(cb);
 }
 
 // --- Cast operations (mirrors src/ffi/cast_wasm.mbt) ---
@@ -517,96 +517,30 @@ const aitneImports = {
   // Reactive
   dom_create_effect,
   int_to_string: (n) => String(n),
-}
+};
 
-// --- Boot loader ---
 async function boot(wasmUrl) {
-  let response
-  try {
-    response = await fetch(wasmUrl)
-  } catch (err) {
-    console.error(
-      "[aitne] Failed to fetch WASM module. Is the dev server running?\n" +
-        "  cd <project-root> && python3 -m http.server 8000\n" +
-        "  Then open http://localhost:8000/<path-to-example>/\n" +
-        "  Attempted URL: " + wasmUrl,
-    )
-    throw err
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `[aitne] WASM module not found (HTTP ${response.status}). ` +
-        `Did you run 'moon build <example> --target=wasm-gc' first?\n` +
-        `  Attempted URL: ${wasmUrl}`,
-    )
-  }
-
-  const buffer = await response.arrayBuffer()
-  const module = await WebAssembly.compile(buffer)
-
-  // Build the string constants module from wasm imports.
-  // Each "_" global import name IS its own value (a string constant).
-  const allImports = WebAssembly.Module.imports(module)
-  const stringConstants = allImports.filter((i) => i.module === "_")
-  let constantsModule
-  if (stringConstants.length > 0) {
-    try {
-      constantsModule = new WebAssembly.Module({
-        kind: "module",
-        imports: [],
-        exports: ["_"],
-        declarations: stringConstants.map((i) => ({
-          type: "string",
-          value: i.name,
-        })),
-        builtins: ["js-string"],
-      })
-    } catch (_e) {
-      // Engine doesn't support descriptor form — build a plain object fallback
-      const globals = {}
-      for (const imp of stringConstants) {
-        globals[imp.name] = imp.name
-      }
-      constantsModule = globals
-    }
-  }
-
   const importObject = {
     aitne: aitneImports,
     "moonbit:ffi": {
       make_closure: (fnref, closure) => fnref.bind(null, closure),
     },
-    "wasm:js-string": {
-      length: (s) => s.length,
-      charCodeAt: (s, i) => s.charCodeAt(i),
-      equals: (a, b) => a === b,
-      concat: (a, b) => a + b,
-      fromCharCodeArray: (_arr, _start, _len) => {
-        // WASM GC arrays are inaccessible from JS.
-        // Use `int_to_string` FFI or `String(n)` for number→string.
-        return ""
-      },
-    },
     console: {
       log: (...args) => console.log(...args),
     },
-    spectest: {
-      print_char: (() => {
-        let buf = ""
-        return (c) => {
-          if (c === 10) {
-            buf = ""
-          } else {
-            buf += String.fromCharCode(c)
-          }
-        }
-      })(),
-    },
   }
-  importObject._ = constantsModule
 
-  const instance = await WebAssembly.instantiate(module, importObject)
+  const compileOptions = {
+    builtins: ["js-string"],
+    importedStringConstants: "_",
+  }
+
+  const { instance } = await WebAssembly.instantiateStreaming(
+    fetch(wasmUrl),
+    importObject,
+    compileOptions,
+  )
+
   if (instance.exports._start) {
     instance.exports._start()
   }
@@ -614,10 +548,8 @@ async function boot(wasmUrl) {
 }
 
 // --- Auto-boot when loaded as module ---
-const wasmUrl =
-  globalThis.AITNE_WASM_URL ||
-  "./app.wasm"
+const wasmUrl = globalThis.AITNE_WASM_URL || "./app.wasm";
 
 boot(wasmUrl).catch((err) => {
-  console.error("[aitne] Boot failed:", err.message || err)
-})
+  console.error("[aitne] Boot failed:", err.message || err);
+});

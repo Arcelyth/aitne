@@ -35,6 +35,12 @@ pub struct WriteSignal[T] {
 }
 
 ///|
+extend WriteSignal with ReactiveNode::{mark_stale, mark_all_pending}
+
+///|
+extend WriteSignal with IsDisposed::{is_disposed}
+
+///|
 pub impl[T] Hash for WriteSignal[T] with fn hash_combine(self, hasher : Hasher) {
   hasher.combine_uint(self.inner.val.id)
 }
@@ -54,7 +60,7 @@ pub impl[T : Debug] Debug for WriteSignal[T] with fn to_repr(self) -> Repr {
     @debug.Repr::string("value"),
     self.inner.val.value.to_repr(),
     @debug.Repr::string("subs"),
-    to_repr(self.inner.val.subs),
+    Repr(self.inner.val.subs),
   ])
 }
 
@@ -132,8 +138,8 @@ pub impl[T] Track for WriteSignal[T] with fn track(self) -> Unit {
   guard !self.is_disposed() else { return }
   match Observer::get() {
     Some(sub) => {
-      sub.add_source(self.to_asource())
-      self.add_sub(sub)
+      Subscriber::add_source(sub, ToASource::to_asource(self))
+      Source::add_sub(self, sub)
     }
     None => ()
   }
@@ -184,6 +190,15 @@ pub struct ReadSignal[T] {
 }
 
 ///|
+extend ReadSignal with ReactiveNode::{mark_all_pending}
+
+///|
+extend ReadSignal with Track::{track}
+
+///|
+extend ReadSignal with IsDisposed::{is_disposed}
+
+///|
 pub impl[T] Hash for ReadSignal[T] with fn hash_combine(self, hasher : Hasher) {
   hasher.combine_uint(self.inner.val.id)
 }
@@ -203,7 +218,7 @@ pub impl[T : Debug] Debug for ReadSignal[T] with fn to_repr(self) -> Repr {
     @debug.Repr::string("value"),
     self.inner.val.value.to_repr(),
     @debug.Repr::string("subs"),
-    to_repr(self.inner.val.subs),
+    Repr(self.inner.val.subs),
   ])
 }
 
@@ -273,8 +288,8 @@ pub impl[T] Track for ReadSignal[T] with fn track(self) -> Unit {
   guard !self.is_disposed() else { return }
   match Observer::get() {
     Some(sub) => {
-      sub.add_source(self.to_asource())
-      self.add_sub(sub)
+      Subscriber::add_source(sub, ToASource::to_asource(self))
+      Source::add_sub(self, sub)
     }
     None => ()
   }
@@ -315,6 +330,15 @@ pub struct RwSignal[T] {
 }
 
 ///|
+extend RwSignal with ReactiveNode::{mark_stale, mark_all_pending}
+
+///|
+extend RwSignal with Track::{track}
+
+///|
+extend RwSignal with IsDisposed::{is_disposed}
+
+///|
 pub impl[T] Hash for RwSignal[T] with fn hash_combine(self, hasher : Hasher) {
   hasher.combine_uint(self.inner.val.id)
 }
@@ -333,7 +357,7 @@ pub impl[T : Debug] Debug for RwSignal[T] with fn to_repr(self) -> Repr {
     @debug.Repr::string("value"),
     self.inner.val.value.to_repr(),
     @debug.Repr::string("subs"),
-    to_repr(self.inner.val.subs),
+    Repr(self.inner.val.subs),
   ])
 }
 
@@ -407,8 +431,8 @@ pub impl[T] Track for RwSignal[T] with fn track(self) -> Unit {
   guard !self.is_disposed() else { return }
   match Observer::get() {
     Some(sub) => {
-      sub.add_source(self.to_asource())
-      self.add_sub(sub)
+      Subscriber::add_source(sub, ToASource::to_asource(self))
+      Source::add_sub(self, sub)
     }
     None => ()
   }

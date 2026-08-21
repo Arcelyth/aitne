@@ -15,6 +15,12 @@ pub struct Trigger {
 } derive(Debug)
 
 ///|
+extend Trigger with ReactiveNode::{mark_all_pending}
+
+///|
+extend Trigger with Notify::{notify}
+
+///|
 pub fn Trigger::new() -> Trigger {
   Trigger::{ id: next_trigger_id(), subs: @hashset.HashSet([]) }
 }
@@ -89,11 +95,11 @@ pub impl ToASource for Trigger with fn to_asource(self) {
 
 ///|
 pub impl Track for Trigger with fn track(self) -> Unit {
-  guard !self.is_disposed() else { return }
+  guard !IsDisposed::is_disposed(self) else { return }
   match Observer::get() {
     Some(sub) => {
-      sub.add_source(self.to_asource())
-      self.add_sub(sub)
+      Subscriber::add_source(sub, ToASource::to_asource(self))
+      Source::add_sub(self, sub)
     }
     _ => ()
   }

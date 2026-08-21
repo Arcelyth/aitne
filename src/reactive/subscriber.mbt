@@ -19,6 +19,9 @@ pub struct ASubscriber {
 }
 
 ///|
+extend ASubscriber with ReactiveNode::{mark_stale}
+
+///|
 pub impl Hash for ASubscriber with fn hash_combine(self, hasher : Hasher) {
   hasher.combine_uint(self.id)
 }
@@ -145,3 +148,12 @@ pub impl ReactiveNode for @hashset.HashSet[ASubscriber] with fn update_value(
 pub impl Notify for @hashset.HashSet[ASubscriber] with fn notify(self) -> Unit {
   self.each(s => s.mark_stale())
 }
+
+///|
+pub extend ASubscriber with Notify::{notify}
+
+///|
+pub extend ASubscriber with ReactiveNode::{mark_pending}
+
+///|
+pub extend ASubscriber with Subscriber::{add_source}

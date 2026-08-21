@@ -65,7 +65,7 @@ pub fn walk_and_compile(
 ///|
 #cfg(target="native")
 async fn main {
-  let args = @sys.get_cli_args()
+  let args = @env.args()
   let arg_len = args.length()
   let cmd = if arg_len == 1 { "help" } else { args[1] }
 
@@ -84,7 +84,7 @@ async fn main {
         let cfg = @eirene.load_config(content)
         style_root = cfg.build.style_root
       } catch {
-        err => debug("Config Error: \{to_repr(err)}")
+        err => debug("Config Error: \{Repr(err)}")
       }
       let mut show = false
       let mut not_tmp = false
@@ -206,10 +206,10 @@ async fn main {
       try {
         let cfg = @eirene.load_config(content)
         @eirene.start_server(cfg) catch {
-          err => debug("Server Error: \{to_repr(err)}")
+          err => debug("Server Error: \{Repr(err)}")
         }
       } catch {
-        err => debug("Config Error: \{to_repr(err)}")
+        err => debug("Config Error: \{Repr(err)}")
       }
     }
     "init" => {

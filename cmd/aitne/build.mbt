@@ -8,7 +8,7 @@ async fn handle_build() -> Unit {
   }
   let cfg = @eirene.load_config(content) catch {
     err => {
-      debug("Config Error: \{to_repr(err)}")
+      debug("Config Error: \{Repr(err)}")
       return
     }
   }

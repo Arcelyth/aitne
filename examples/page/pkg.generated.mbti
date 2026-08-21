@@ -15,4 +15,3 @@ pub fn page() -> &@dom.View
 // Type aliases
 
 // Traits
-

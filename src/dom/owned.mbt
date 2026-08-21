@@ -36,6 +36,11 @@ pub fn OwnedViewState::new(
 }
 
 ///|
+
+///|
+pub extend OwnedViewState with Mountable::{unmount, mount, insert_before}
+
+///|
 pub impl Mountable for OwnedViewState with fn mount(
   self,
   parent : @ffi.Node,

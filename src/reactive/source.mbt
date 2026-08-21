@@ -93,3 +93,9 @@ pub impl Source for ASource with fn clear_subs(self) -> Unit {
     None => ()
   }
 }
+
+///|
+pub extend ASource with ReactiveNode::{update_value}
+
+///|
+pub extend ASource with Source::{remove_sub}

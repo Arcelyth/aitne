@@ -146,11 +146,11 @@ pub(all) struct NestedRouteView[D] {
 pub impl[D] Debug for NestedRouteView[D] with fn to_repr(self) -> Repr {
   @debug.Repr::tuple([
     @debug.Repr::string("location"),
-    to_repr(self.location),
+    Repr(self.location),
     @debug.Repr::string("outer_owner"),
-    to_repr(self.outer_owner),
+    Repr(self.outer_owner),
     @debug.Repr::string("base"),
-    to_repr(self.base),
+    Repr(self.base),
   ])
 }
 

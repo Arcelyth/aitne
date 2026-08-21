@@ -6,6 +6,14 @@ pub(all) struct Keyed[T, V] {
 }
 
 ///|
+
+///|
+pub extend Keyed with Render::{build, rebuild}
+
+///|
+pub extend Keyed with RenderHtml::{hydrate}
+
+///|
 pub impl[T, V : Render] Render for Keyed[T, V] with fn build(self) -> RenderState {
   let items = (self.items)()
   let keys = Ref(@utils.IndexSet::new())

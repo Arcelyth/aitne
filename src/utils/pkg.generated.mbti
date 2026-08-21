@@ -29,4 +29,3 @@ pub fn[K : Hash + Eq] IndexSet::swap_remove(Self[K], K) -> Bool
 // Type aliases
 
 // Traits
-

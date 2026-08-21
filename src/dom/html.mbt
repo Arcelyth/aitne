@@ -106,6 +106,9 @@ pub impl Attribute for AttrList with fn add_attr(self, attr : &Attribute) -> &At
   self.push(attr)
 }
 
+///|
+pub extend AttrList with Attribute::{html_len, hydrate, to_html, build, rebuild}
+
 // ----- Render impl for HtmlElement -----
 
 ///|

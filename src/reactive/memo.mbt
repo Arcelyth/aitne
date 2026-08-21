@@ -58,6 +58,17 @@ pub impl[T] ReactiveNode for Memo[T] with fn mark_stale(self) -> Unit {
 
 ///|
 /// Reactive node: mark this node as needing a check.
+
+///|
+pub extend Memo with ReactiveNode::{mark_stale, mark_all_pending}
+
+///|
+pub extend Memo with Source::{add_sub, clear_subs}
+
+///|
+pub extend Memo with Subscriber::{clean_sources}
+
+///|
 pub impl[T] ReactiveNode for Memo[T] with fn mark_pending(self) -> Unit {
   guard !self.disposed else { return }
 

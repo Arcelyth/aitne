@@ -25,4 +25,3 @@ pub fn users_page() -> &@dom.View
 // Type aliases
 
 // Traits
-

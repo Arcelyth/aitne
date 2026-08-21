@@ -346,7 +346,12 @@ pub impl[K : AttributeKey, V : AttributeValue] Attribute for Attr[K, V]
 pub(all) struct AttrList {
   items : Array[&Attribute]
 }
+pub fn AttrList::build(Self, @ffi.Element) -> AttrState
+pub fn AttrList::html_len(Self) -> Int
+pub fn AttrList::hydrate(Self, @ffi.Element) -> AttrState
 pub fn AttrList::new() -> Self
+pub fn AttrList::rebuild(Self, @ref.Ref[AttrState]) -> Unit
+pub fn AttrList::to_html(Self, StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
 pub impl Attribute for AttrList
 
 pub enum AttrState {
@@ -494,6 +499,9 @@ pub(all) struct Keyed[T, V] {
   key_fn : (T) -> String
   view_fn : (Int, T) -> ((Int) -> Unit, V)
 }
+pub fn[T, V : Render] Keyed::build(Self[T, V]) -> RenderState
+pub fn[T, V : Render + RenderHtml] Keyed::hydrate(Self[T, V], Cursor, PositionState) -> RenderState
+pub fn[T, V : Render] Keyed::rebuild(Self[T, V], @ref.Ref[RenderState]) -> Unit
 pub impl[T, V : Render] Render for Keyed[T, V]
 pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V]
 pub impl[T, V : View] View for Keyed[T, V]
@@ -596,7 +604,10 @@ pub struct OwnedViewState {
   state : @ref.Ref[RenderState]
   owner : @reactive.Owner
 }
+pub fn OwnedViewState::insert_before(Self, &Mountable) -> Bool
+pub fn OwnedViewState::mount(Self, @ffi.Node, @ffi.Node) -> Unit
 pub fn OwnedViewState::new(RenderState, @reactive.Owner) -> Self
+pub fn OwnedViewState::unmount(Self) -> Unit
 pub impl Mountable for OwnedViewState
 
 pub struct Params(Array[(String, Array[String])]) derive(Eq, @debug.Debug)
@@ -657,6 +668,10 @@ pub enum RenderState {
   OwnedViewState(OwnedViewState)
   RawNode(@ffi.Node)
 }
+pub fn RenderState::elements(Self) -> Array[@ffi.Node]
+pub fn RenderState::insert_before(Self, &Mountable) -> Bool
+pub fn RenderState::mount(Self, @ffi.Node, @ffi.Node) -> Unit
+pub fn RenderState::unmount(Self) -> Unit
 pub impl Mountable for RenderState
 
 pub(all) struct RouteContext {
@@ -1296,4 +1311,3 @@ pub trait View : Render + RenderHtml {
 }
 pub impl View for Unit
 pub impl View for String
-

@@ -335,6 +335,9 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[@ffi.Node] {
   }
 }
 
+///|
+pub extend RenderState with Mountable::{unmount, mount, insert_before, elements}
+
 // ----- Unit impls -----
 
 ///|

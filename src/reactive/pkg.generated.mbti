@@ -35,6 +35,8 @@ pub struct ASource {
   id : UInt
   src : &Source?
 }
+pub fn ASource::remove_sub(Self, ASubscriber) -> Unit
+pub fn ASource::update_value(Self) -> Bool
 pub impl ReactiveNode for ASource
 pub impl Source for ASource
 pub impl Eq for ASource
@@ -45,6 +47,9 @@ pub struct ASubscriber {
   id : UInt
   sub : &Subscriber?
 }
+pub fn ASubscriber::add_source(Self, ASource) -> Unit
+pub fn ASubscriber::mark_pending(Self) -> Unit
+pub fn ASubscriber::notify(Self) -> Unit
 pub impl Notify for ASubscriber
 pub impl ReactiveNode for ASubscriber
 pub impl Subscriber for ASubscriber
@@ -80,11 +85,16 @@ pub struct Memo[T] {
   compute : (T?) -> T
   changed : (T?, T?) -> Bool
 } derive(@debug.Debug)
+pub fn[T] Memo::add_sub(Self[T], ASubscriber) -> Unit
+pub fn[T] Memo::clean_sources(Self[T], ASubscriber) -> Unit
+pub fn[T] Memo::clear_subs(Self[T]) -> Unit
 pub fn[T] Memo::dispose(Self[T]) -> Unit
 pub fn[T] Memo::get(Self[T]) -> T
 pub fn[T] Memo::get_untracked(Self[T]) -> T
 pub fn[T] Memo::has_value(Self[T]) -> Bool
 pub fn[T] Memo::is_disposed(Self[T]) -> Bool
+pub fn[T] Memo::mark_all_pending(Self[T]) -> Unit
+pub fn[T] Memo::mark_stale(Self[T]) -> Unit
 pub fn[T : Eq] Memo::new((T?) -> T) -> Self[T]
 pub fn[T] Memo::new_owning((T?) -> T, (T?, T?) -> Bool) -> Self[T]
 pub fn[T] Memo::new_with_compare((T?) -> T, (T?, T?) -> Bool) -> Self[T]
@@ -329,4 +339,3 @@ pub impl TypeName for String
 pub impl[T : TypeName] TypeName for T?
 pub impl[T : TypeName] TypeName for Array[T]
 pub impl[A : TypeName, B : TypeName] TypeName for (A, B)
-

@@ -3,7 +3,7 @@ import {
   "Arcelyth/aitne/cmd/aitne/eirene",
   "moonbitlang/x/fs",
   "moonbitlang/core/json",
-  "moonbitlang/x/sys",
+  "moonbitlang/core/env",
   "moonbitlang/async",
   "moonbitlang/async/http",
   "moonbitlang/async/process",

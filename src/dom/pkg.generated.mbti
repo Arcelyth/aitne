@@ -1296,4 +1296,3 @@ pub trait View : Render + RenderHtml {
 }
 pub impl View for Unit
 pub impl View for String
-

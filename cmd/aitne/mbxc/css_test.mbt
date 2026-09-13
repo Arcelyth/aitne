@@ -29,8 +29,8 @@
 test "gen_style_struct" {
   let classes = ["btn", "nav-links", "card_title"]
   let suffix = "a1b2c3d4"
-  let code = Ref(StringBuilder::new())
-  let def_code = Ref(StringBuilder::new())
+  let code = Ref(StringBuilder())
+  let def_code = Ref(StringBuilder())
 
   gen_style_struct(classes, suffix, "Style_test", code, def_code)
 
@@ -59,9 +59,9 @@ test "compile_css_and_gen_style_struct" {
     #|  display: flex;
     #|}
 
-  let style = Ref(StringBuilder::new())
-  let code = Ref(StringBuilder::new())
-  let def_code = Ref(StringBuilder::new())
+  let style = Ref(StringBuilder())
+  let code = Ref(StringBuilder())
+  let def_code = Ref(StringBuilder())
 
   compile_css(css, "src/components/Header.mbx", style, code, def_code)
 

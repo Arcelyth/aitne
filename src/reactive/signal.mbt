@@ -54,7 +54,7 @@ pub impl[T : Debug] Debug for WriteSignal[T] with fn to_repr(self) -> Repr {
     @debug.Repr::string("value"),
     self.inner.val.value.to_repr(),
     @debug.Repr::string("subs"),
-    to_repr(self.inner.val.subs),
+    Repr(self.inner.val.subs),
   ])
 }
 
@@ -124,7 +124,7 @@ pub impl[T] Source for WriteSignal[T] with fn clear_subs(self) {
 
 ///|
 pub impl[T] ToASource for WriteSignal[T] with fn to_asource(self) {
-  { id: self.inner.val.id, src: Some(self) }
+  { id: self.inner.val.id, src: Some(self), }
 }
 
 ///|
@@ -141,7 +141,7 @@ pub impl[T] Track for WriteSignal[T] with fn track(self) -> Unit {
 
 ///|
 pub fn[T] WriteSignal::new(value : T) -> WriteSignal[T] {
-  WriteSignal::{ inner: SignalInner::new(value) }
+  WriteSignal::{ inner: SignalInner::new(value), }
 }
 
 ///|
@@ -203,7 +203,7 @@ pub impl[T : Debug] Debug for ReadSignal[T] with fn to_repr(self) -> Repr {
     @debug.Repr::string("value"),
     self.inner.val.value.to_repr(),
     @debug.Repr::string("subs"),
-    to_repr(self.inner.val.subs),
+    Repr(self.inner.val.subs),
   ])
 }
 
@@ -265,7 +265,7 @@ pub impl[T] Source for ReadSignal[T] with fn clear_subs(self) {
 
 ///|
 pub impl[T] ToASource for ReadSignal[T] with fn to_asource(self) {
-  { id: self.inner.val.id, src: Some(self) }
+  { id: self.inner.val.id, src: Some(self), }
 }
 
 ///|
@@ -304,7 +304,7 @@ pub fn[T] ReadSignal::get_untracked(self : ReadSignal[T]) -> T {
 
 ///|
 pub fn[T] ReadSignal::new(value : T) -> ReadSignal[T] {
-  ReadSignal::{ inner: SignalInner::new(value) }
+  ReadSignal::{ inner: SignalInner::new(value), }
 }
 
 // ----- RwSignal -----
@@ -333,7 +333,7 @@ pub impl[T : Debug] Debug for RwSignal[T] with fn to_repr(self) -> Repr {
     @debug.Repr::string("value"),
     self.inner.val.value.to_repr(),
     @debug.Repr::string("subs"),
-    to_repr(self.inner.val.subs),
+    Repr(self.inner.val.subs),
   ])
 }
 
@@ -399,7 +399,7 @@ pub impl[T] Source for RwSignal[T] with fn clear_subs(self) {
 
 ///|
 pub impl[T] ToASource for RwSignal[T] with fn to_asource(self) {
-  { id: self.inner.val.id, src: Some(self) }
+  { id: self.inner.val.id, src: Some(self), }
 }
 
 ///|
@@ -416,19 +416,19 @@ pub impl[T] Track for RwSignal[T] with fn track(self) -> Unit {
 
 ///|
 pub fn[T] RwSignal::new(value : T) -> RwSignal[T] {
-  RwSignal::{ inner: SignalInner::new(value) }
+  RwSignal::{ inner: SignalInner::new(value), }
 }
 
 ///|
 #inline
 pub fn[T] RwSignal::read_only(self : RwSignal[T]) -> ReadSignal[T] {
-  ReadSignal::{ inner: self.inner }
+  ReadSignal::{ inner: self.inner, }
 }
 
 ///|
 #inline
 pub fn[T] RwSignal::write_only(self : RwSignal[T]) -> WriteSignal[T] {
-  WriteSignal::{ inner: self.inner }
+  WriteSignal::{ inner: self.inner, }
 }
 
 ///|
@@ -444,7 +444,7 @@ pub fn[T] RwSignal::unite(
   write : WriteSignal[T],
 ) -> RwSignal[T]? {
   if read.inner.val.id == write.inner.val.id {
-    Some(RwSignal::{ inner: read.inner })
+    Some(RwSignal::{ inner: read.inner, })
   } else {
     None
   }
@@ -481,7 +481,7 @@ pub fn[T] RwSignal::get_untracked(self : RwSignal[T]) -> T {
 pub fn[T] RwSignal::try_update(self : RwSignal[T], f : (T) -> T) -> Unit? {
   let current_inner = self.inner.val
   let new_value = f(current_inner.value)
-  self.inner.val = { ..current_inner, value: new_value }
+  self.inner.val = { ..current_inner, value: new_value, }
   self.mark_stale()
   Some(())
 }

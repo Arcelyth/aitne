@@ -15,4 +15,3 @@ pub fn counter() -> &@dom.View
 // Type aliases
 
 // Traits
-

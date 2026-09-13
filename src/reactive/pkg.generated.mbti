@@ -329,4 +329,3 @@ pub impl TypeName for String
 pub impl[T : TypeName] TypeName for T?
 pub impl[T : TypeName] TypeName for Array[T]
 pub impl[A : TypeName, B : TypeName] TypeName for (A, B)
-

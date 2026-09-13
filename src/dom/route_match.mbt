@@ -23,15 +23,15 @@ pub(all) struct NestedRoute {
 pub impl Debug for NestedRoute with fn to_repr(self) -> Repr {
   @debug.Repr::tuple([
     @debug.Repr::string("id"),
-    to_repr(self.id),
+    Repr(self.id),
     @debug.Repr::string("path"),
-    to_repr(self.path),
+    Repr(self.path),
   ])
 }
 
 ///|
 pub fn NestedRoute::new(path : String, view : ViewFn) -> NestedRoute {
-  NestedRoute::{ id: next_route_id(), path, child: [], view }
+  NestedRoute::{ id: next_route_id(), path, child: [], view, }
 }
 
 ///|
@@ -55,11 +55,11 @@ pub(all) struct NestedMatch {
 pub impl Debug for NestedMatch with fn to_repr(self) -> Repr {
   @debug.Repr::tuple([
     @debug.Repr::string("id"),
-    to_repr(self.id),
+    Repr(self.id),
     @debug.Repr::string("matched"),
-    to_repr(self.matched),
+    Repr(self.matched),
     @debug.Repr::string("params"),
-    to_repr(self.params),
+    Repr(self.params),
   ])
 }
 
@@ -312,7 +312,7 @@ pub struct RouteDefs[Ch] {
 
 ///|
 pub impl[Ch] Debug for RouteDefs[Ch] with fn to_repr(self) -> Repr {
-  @debug.Repr::tuple([@debug.Repr::string("base"), to_repr(self.base)])
+  @debug.Repr::tuple([@debug.Repr::string("base"), Repr(self.base)])
 }
 
 ///|

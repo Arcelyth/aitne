@@ -22,7 +22,7 @@ pub(all) struct Parser {
 
 ///|
 pub fn Parser::new(tokens : Array[Token]) -> Parser {
-  Parser::{ tokens, cur: 0 }
+  Parser::{ tokens, cur: 0, }
 }
 
 ///|
@@ -87,7 +87,7 @@ fn Parser::parse_node(self : Parser) -> MbxAST? raise MbxcError {
             self.advance()
             let mut brace_depth = 1
             let local_children = []
-            let code_buf = StringBuilder::new()
+            let code_buf = StringBuilder()
 
             while brace_depth > 0 && !self.is_end() {
               match self.peek().unwrap() {

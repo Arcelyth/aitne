@@ -16,7 +16,7 @@ pub struct Trigger {
 
 ///|
 pub fn Trigger::new() -> Trigger {
-  Trigger::{ id: next_trigger_id(), subs: @hashset.HashSet([]) }
+  Trigger::{ id: next_trigger_id(), subs: @hashset.HashSet([]), }
 }
 
 ///|
@@ -84,7 +84,7 @@ pub impl Source for Trigger with fn clear_subs(self) {
 
 ///|
 pub impl ToASource for Trigger with fn to_asource(self) {
-  { id: self.id, src: Some(self) }
+  { id: self.id, src: Some(self), }
 }
 
 ///|

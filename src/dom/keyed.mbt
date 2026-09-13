@@ -29,7 +29,7 @@ pub impl[T, V : Render] Render for Keyed[T, V] with fn rebuild(
   state : Ref[RenderState],
 ) -> Unit {
   match state.val {
-    RenderState::KeyedState({ parent, marker, keys, rendered_items }) => {
+    RenderState::KeyedState({ parent, marker, keys, rendered_items, }) => {
       let new_items = (self.items)()
       let new_keys = @utils.IndexSet::new()
       let items = []
@@ -155,19 +155,25 @@ pub fn diff(
   to : @utils.IndexSet[String],
 ) -> Diff {
   if from.is_empty() && to.is_empty() {
-    return { removed: [], moved: [], added: [], items_to_move: 0, clear: false }
+    return {
+      removed: [],
+      moved: [],
+      added: [],
+      items_to_move: 0,
+      clear: false,
+    }
   }
 
   if to.is_empty() {
-    return { removed: [], moved: [], added: [], items_to_move: 0, clear: true }
+    return { removed: [], moved: [], added: [], items_to_move: 0, clear: true, }
   }
 
   if from.is_empty() {
     let added = []
     for i = 0; i < to.length(); i = i + 1 {
-      added.push({ at: i, mode: Append })
+      added.push({ at: i, mode: Append, })
     }
-    return { removed: [], moved: [], added, items_to_move: 0, clear: false }
+    return { removed: [], moved: [], added, items_to_move: 0, clear: false, }
   }
 
   let removed : Array[DiffOpRemove] = []
@@ -186,14 +192,14 @@ pub fn diff(
 
     if from_item != to_item {
       match from_item {
-        Some(key) => if !to.contains(key) { removed.push({ at: index }) }
+        Some(key) => if !to.contains(key) { removed.push({ at: index, }) }
         None => ()
       }
 
       match to_item {
         Some(key) =>
           if !from.contains(key) {
-            added.push({ at: index, mode: Normal })
+            added.push({ at: index, mode: Normal, })
           }
         None => ()
       }
@@ -205,7 +211,7 @@ pub fn diff(
               let moves_forward_by = to_index - index
               let move_in_dom = moves_forward_by !=
                 added.length() - removed.length()
-              moved.push({ from: index, to: to_index, len: 1, move_in_dom })
+              moved.push({ from: index, to: to_index, len: 1, move_in_dom, })
             }
             None => ()
           }
@@ -241,7 +247,7 @@ pub fn diff(
     items_to_move = items_to_move + m.len
   }
 
-  { removed, moved: grouped_moved, added, items_to_move, clear: false }
+  { removed, moved: grouped_moved, added, items_to_move, clear: false, }
 }
 
 ///|

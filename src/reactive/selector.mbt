@@ -55,7 +55,7 @@ pub fn[T : Eq + Hash] Selector::new(source : () -> T) -> Selector[T] {
     }
     next_val
   })
-  Selector::{ subs, effect }
+  Selector::{ subs, effect, }
 }
 
 ///|

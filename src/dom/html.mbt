@@ -28,7 +28,7 @@ pub(all) struct AttrList {
 
 ///|
 pub fn AttrList::new() -> AttrList {
-  AttrList::{ items: [] }
+  AttrList::{ items: [], }
 }
 
 ///|
@@ -80,7 +80,7 @@ pub impl Attribute for AttrList with fn build(self, el : @ffi.Element) -> AttrSt
 ///|
 pub impl Attribute for AttrList with fn rebuild(self, state : Ref[AttrState]) -> Unit {
   let mut rem = state.val
-  let r = Ref::{ val: AttrState::None }
+  let r = Ref::{ val: AttrState::None, }
   for item in self.items {
     match rem {
       AttrState::Pair(first, rest) => {
@@ -116,7 +116,7 @@ pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C] with fn build
   let attrs = self.attrs.build(el)
   let children = self.children.build()
   children.mount(@ffi.el_as_node(el), @ffi.dom_null_node())
-  RenderState::Element(ElementState::{ el, attrs, children })
+  RenderState::Element(ElementState::{ el, attrs, children, })
 }
 
 ///|
@@ -126,11 +126,11 @@ pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C] with fn rebui
 ) -> Unit {
   match state.val {
     RenderState::Element(el_state) => {
-      let attr_ref = Ref::{ val: el_state.attrs }
+      let attr_ref = Ref::{ val: el_state.attrs, }
       self.attrs.rebuild(attr_ref)
       el_state.attrs = attr_ref.val
 
-      let children_ref = Ref::{ val: el_state.children }
+      let children_ref = Ref::{ val: el_state.children, }
       self.children.rebuild(children_ref)
       el_state.children = children_ref.val
     }
@@ -188,7 +188,7 @@ pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with 
 
   pos.set(Position::NextChild)
 
-  RenderState::Element(ElementState::{ el, attrs, children })
+  RenderState::Element(ElementState::{ el, attrs, children, })
 }
 
 ///|
@@ -201,9 +201,9 @@ pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with 
   buf.write_string("<")
   buf.write_string(tag_name)
 
-  let class_buf = StringBuilder::new()
-  let style_buf = StringBuilder::new()
-  let inner_buf = StringBuilder::new()
+  let class_buf = StringBuilder()
+  let style_buf = StringBuilder()
+  let inner_buf = StringBuilder()
 
   self.attrs.to_html(buf, class_buf, style_buf, inner_buf)
 
@@ -241,7 +241,7 @@ pub fn[T, C] HtmlElement::children(
   self : HtmlElement[T, C],
   kids : Array[&View],
 ) -> HtmlElement[T, Array[&View]] {
-  HtmlElement::{ tag: self.tag, attrs: self.attrs, children: kids }
+  HtmlElement::{ tag: self.tag, attrs: self.attrs, children: kids, }
 }
 
 ///|
@@ -289,7 +289,7 @@ pub fn[T, C] HtmlElement::on(
   ev : EventType,
   fun : (@ffi.Event) -> Unit,
 ) -> HtmlElement[T, C] {
-  let desp = EventDesp::{ name: ev.to_string(), bubbles: true, capture: false }
+  let desp = EventDesp::{ name: ev.to_string(), bubbles: true, capture: false, }
   self.add_attr(on(desp, fun))
 }
 
@@ -310,7 +310,7 @@ pub impl Render for Array[&View] with fn build(self) -> RenderState {
   for kid in self {
     states.push(kid.build())
   }
-  RenderState::Fragment(FragmentState::{ children: states })
+  RenderState::Fragment(FragmentState::{ children: states, })
 }
 
 ///|
@@ -318,7 +318,7 @@ pub impl Render for Array[&View] with fn rebuild(self, state : Ref[RenderState])
   match state.val {
     RenderState::Fragment(frag) => {
       let len = self.length()
-      let child_ref = Ref::{ val: RenderState::None }
+      let child_ref = Ref::{ val: RenderState::None, }
       for i in 0..<len {
         child_ref.val = frag.children[i]
         self[i].rebuild(child_ref)
@@ -350,7 +350,7 @@ pub impl RenderHtml for Array[&View] with fn hydrate(
     states.push(RenderHtml::hydrate(kid, cursor, pos))
   }
 
-  RenderState::Fragment(FragmentState::{ children: states })
+  RenderState::Fragment(FragmentState::{ children: states, })
 }
 
 ///|
@@ -370,13 +370,13 @@ pub struct TextNode {
 
 ///|
 pub fn text(s : String) -> TextNode {
-  TextNode::{ val: s }
+  TextNode::{ val: s, }
 }
 
 ///|
 pub impl Render for TextNode with fn build(self) -> RenderState {
   let node = @ffi.prim_create_text_node(document(), self.val)
-  RenderState::Text(TextState::{ node, text: self.val })
+  RenderState::Text(TextState::{ node, text: self.val, })
 }
 
 ///|
@@ -414,7 +414,7 @@ pub impl RenderHtml for TextNode with fn hydrate(
 
   pos.set(Position::NextChildAfterText)
 
-  RenderState::Text(TextState::{ node, text: _self.val })
+  RenderState::Text(TextState::{ node, text: _self.val, })
 }
 
 ///|
@@ -432,7 +432,7 @@ pub struct DynTextNode {
 
 ///|
 pub fn text_dyn(f : () -> String) -> DynTextNode {
-  DynTextNode::{ getter: f }
+  DynTextNode::{ getter: f, }
 }
 
 ///|
@@ -443,7 +443,7 @@ pub impl Render for DynTextNode with fn build(self) -> RenderState {
   let _ = @reactive.Effect::new(fn(_) {
     @ffi.dom_set_text(@ffi.text_as_node(node), getter())
   })
-  RenderState::Text(TextState::{ node, text: initial })
+  RenderState::Text(TextState::{ node, text: initial, })
 }
 
 ///|
@@ -486,7 +486,7 @@ pub impl RenderHtml for DynTextNode with fn hydrate(
 
   pos.set(Position::NextChildAfterText)
 
-  RenderState::Text(TextState::{ node, text: getter() })
+  RenderState::Text(TextState::{ node, text: getter(), })
 }
 
 ///|

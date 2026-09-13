@@ -23,7 +23,3 @@ description = "A lightweight and high-performance reactive web framework."
 preferred_target = "js"
 
 supported_targets = "all"
-
-options(
-  exclude: [ "examples", "bench" ],
-)

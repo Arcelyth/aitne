@@ -6,13 +6,13 @@ pub struct PositionState {
 ///|
 #inline
 pub fn PositionState::new(pos : Position) -> PositionState {
-  { state: Ref(pos) }
+  { state: Ref(pos), }
 }
 
 ///|
 #inline
 pub fn PositionState::default() -> PositionState {
-  { state: Ref(Position::FirstChild) }
+  { state: Ref(Position::FirstChild), }
 }
 
 ///|
@@ -30,7 +30,7 @@ pub fn PositionState::get(self : PositionState) -> Position {
 ///|
 #inline
 pub fn PositionState::deep_clone(self : PositionState) -> PositionState {
-  { state: Ref(self.state.val) }
+  { state: Ref(self.state.val), }
 }
 
 ///|
@@ -40,12 +40,12 @@ pub struct Cursor {
 
 ///|
 pub fn Cursor::new(root : @ffi.Node) -> Cursor {
-  { inner: Ref(root) }
+  { inner: Ref(root), }
 }
 
 ///|
 pub fn Cursor::clone(self : Cursor) -> Cursor {
-  { inner: self.inner }
+  { inner: self.inner, }
 }
 
 ///|

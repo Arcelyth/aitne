@@ -131,7 +131,7 @@ pub fn load_config(toml_content : String) -> Config raise EireneError {
     inject_scripts: get_string_array(assets_table, "inject_scripts"),
   }
 
-  Config::{ app, build, server, assets }
+  Config::{ app, build, server, assets, }
 }
 
 ///|

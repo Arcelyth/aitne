@@ -136,7 +136,7 @@ pub fn[V : ToTemplate] get_template(_self : V) -> TemplateElement {
     None => {
       let tpl = @ffi.clone_node_shallow(get_base_template())
 
-      let buf = StringBuilder::new()
+      let buf = StringBuilder()
       V::to_template(buf)
       @ffi.set_inner_html(tpl, buf.to_string())
 

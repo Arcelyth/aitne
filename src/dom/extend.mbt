@@ -14,7 +14,7 @@ pub fn[T, K : Hash + Eq] for_node(
   key : (T) -> K,
   children : (T) -> &View,
 ) -> &View {
-  ForNode::{ each, key, children }
+  ForNode::{ each, key, children, }
 }
 
 ///|
@@ -180,7 +180,7 @@ pub fn[T] for_each(
   key~ : (T) -> String,
   children~ : (T) -> &View,
 ) -> &View {
-  ForEach::{ each, key, children }
+  ForEach::{ each, key, children, }
 }
 
 ///|
@@ -199,7 +199,7 @@ pub impl[T] Render for ForEach[T] with fn build(self) -> RenderState {
     let dispose = _ => child_owner.cleanup()
     (dispose, OwnedView::new_with_owner(child_owner, view))
   }
-  let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c }
+  let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c, }
   let state_ref : Ref[RenderState] = Ref(keyed.build())
 
   let do_reconcile = fn(_) {
@@ -212,7 +212,7 @@ pub impl[T] Render for ForEach[T] with fn build(self) -> RenderState {
           let dispose = _ => child_owner.cleanup()
           (dispose, OwnedView::new_with_owner(child_owner, view))
         }
-        let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c }
+        let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c, }
         keyed.rebuild(state_ref)
       }
       _ => ()
@@ -277,7 +277,7 @@ pub impl[T] RenderHtml for ForEach[T] with fn hydrate(
     (dispose, OwnedView::new_with_owner(child_owner, view))
   }
 
-  let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c }
+  let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c, }
 
   let state_ref : Ref[RenderState] = Ref(keyed.hydrate(cursor, pos))
 
@@ -291,7 +291,7 @@ pub impl[T] RenderHtml for ForEach[T] with fn hydrate(
           let dispose = _ => child_owner.cleanup()
           (dispose, OwnedView::new_with_owner(child_owner, view))
         }
-        let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c }
+        let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c, }
         keyed.rebuild(state_ref)
       }
       _ => ()

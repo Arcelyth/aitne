@@ -13,9 +13,9 @@ pub struct CodeGen {
 ///|
 pub fn CodeGen::new(path? : String = "") -> CodeGen {
   {
-    buf: StringBuilder::new(),
-    style: StringBuilder::new(),
-    last_buf: StringBuilder::new(),
+    buf: StringBuilder(),
+    style: StringBuilder(),
+    last_buf: StringBuilder(),
     path,
   }
 }
@@ -69,7 +69,7 @@ fn CodeGen::gen_expr_code(self : CodeGen, expr_str : StringView) -> Unit {
           idx[0] += 1
           let mut brace_depth = 1
           let local_children = []
-          let code_buf = StringBuilder::new()
+          let code_buf = StringBuilder()
 
           while brace_depth > 0 && idx[0] < len {
             match tokens[idx[0]] {
@@ -395,7 +395,7 @@ fn CodeGen::gen_style(self : CodeGen, style : StringView) -> Unit {
 
 ///|
 fn to_camelcase(s : String) -> String {
-  let b = StringBuilder::new()
+  let b = StringBuilder()
   let mut capitalize_next = true
 
   s
@@ -478,7 +478,7 @@ fn is_code_closure(s : StringView) -> Bool {
 
 ///|
 fn to_snakecase(s : String) -> String {
-  let b = StringBuilder::new()
+  let b = StringBuilder()
   let mut is_first = true
 
   s

@@ -10,7 +10,7 @@ pub struct IndexSet[K] {
 ///|
 #inline
 pub fn[K : Hash + Eq] IndexSet::new() -> IndexSet[K] {
-  { keys: [], key_index: HashMap([]) }
+  { keys: [], key_index: HashMap([]), }
 }
 
 ///|

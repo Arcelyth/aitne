@@ -1,5 +1,5 @@
 ///|
-let next_client_id : Ref[Int] = { val: 0 }
+let next_client_id : Ref[Int] = { val: 0, }
 
 ///|
 pub(all) struct HmrState {
@@ -21,7 +21,7 @@ let hmr_client_script : String =
 
 ///|
 pub fn HmrState::new(cfg~ : Config, enabled~ : Bool) -> HmrState {
-  { clients: [], watcher: None, cfg, enabled }
+  { clients: [], watcher: None, cfg, enabled, }
 }
 
 ///|

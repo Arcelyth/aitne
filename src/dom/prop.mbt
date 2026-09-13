@@ -10,7 +10,7 @@ pub struct Property[P] {
 
 ///|
 pub fn[P] prop(key : String, value : P) -> Property[P] {
-  Property::{ key, value }
+  Property::{ key, value, }
 }
 
 ///|

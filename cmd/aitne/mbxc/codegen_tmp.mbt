@@ -19,9 +19,9 @@ pub fn CodeGenTmp::output_style(self : CodeGenTmp) -> String {
 pub fn CodeGenTmp::new(ast : Array[MbxAST], path? : String = "") -> CodeGenTmp {
   {
     ast,
-    buf: StringBuilder::new(),
-    style: StringBuilder::new(),
-    last_buf: StringBuilder::new(),
+    buf: StringBuilder(),
+    style: StringBuilder(),
+    last_buf: StringBuilder(),
     path,
     tmpl_id: Ref(0),
   }
@@ -68,17 +68,17 @@ priv struct TBind {
 
 ///|
 fn new_text_bind(steps : Array[DomStep], code : String) -> TBind {
-  { steps, kind: 0, name: "", code }
+  { steps, kind: 0, name: "", code, }
 }
 
 ///|
 fn new_class_bind(steps : Array[DomStep], code : String) -> TBind {
-  { steps, kind: 1, name: "class", code }
+  { steps, kind: 1, name: "class", code, }
 }
 
 ///|
 fn new_attr_bind(steps : Array[DomStep], name : String, code : String) -> TBind {
-  { steps, kind: 2, name, code }
+  { steps, kind: 2, name, code, }
 }
 
 ///|
@@ -87,7 +87,7 @@ fn new_event_bind(
   name : String,
   code : String,
 ) -> TBind {
-  { steps, kind: 3, name, code }
+  { steps, kind: 3, name, code, }
 }
 
 ///|
@@ -287,12 +287,7 @@ fn compile_template_island(
   tmpl_counter : Ref[Int],
   cache_decls : StringBuilder,
 ) -> String {
-  let ctx = WalkCtx::{
-    html: StringBuilder::new(),
-    binds: [],
-    ok: true,
-    steps: [],
-  }
+  let ctx = WalkCtx::{ html: StringBuilder(), binds: [], ok: true, steps: [], }
   for i = 0; i < nodes.length(); i = i + 1 {
     guard ctx.ok else { break }
     // Root element is _root itself, so steps start empty for first node
@@ -316,7 +311,7 @@ fn compile_template_island(
     "let \{cache_var} : Ref[@Arcelyth/aitne/src/ffi.TemplateElement?] = Ref(None)\n"
 
   // Emit inline code that uses the module-level cache
-  let c = StringBuilder::new()
+  let c = StringBuilder()
   c <+ "let \{tmpl_var} = match \{cache_var}.val {\n"
   c <+ "  Some(t) => t\n"
   c <+ "  None => {\n"
@@ -553,7 +548,7 @@ fn try_inline_templates_in_expr(
           idx.val += 1
           let mut brace_depth = 1
           let local_children = []
-          let code_buf = StringBuilder::new()
+          let code_buf = StringBuilder()
           while brace_depth > 0 && idx.val < len {
             match tokens[idx.val] {
               Token::BraceOpen => {
@@ -650,7 +645,7 @@ fn try_inline_templates_in_expr(
 
   // Rebuild the expression string, replacing any top-level
   // ElementNode with the template-based code block.
-  let result = StringBuilder::new()
+  let result = StringBuilder()
   for i = 0; i < nodes.length(); i = i + 1 {
     match nodes[i] {
       MbxAST::ElementNode(tag, _, _) => {
@@ -740,14 +735,14 @@ fn preprocess_ast(
 
 ///|
 pub fn CodeGenTmp::generate(self : CodeGenTmp) -> String {
-  let cache_decls = StringBuilder::new()
+  let cache_decls = StringBuilder()
 
   // Pre-process: extract template candidates from Expr attributes
   // of non-built-in elements BEFORE island accumulation.
   // This increments self.tmpl_id for each extracted template.
   preprocess_ast(self.ast, self.tmpl_id, cache_decls)
 
-  let fc = StringBuilder::new()
+  let fc = StringBuilder()
   let island : Ref[Array[MbxAST]] = Ref([])
   // Share the same counter so template variable names are unique.
   let tc : Ref[Int] = self.tmpl_id
@@ -818,7 +813,7 @@ pub fn CodeGenTmp::generate(self : CodeGenTmp) -> String {
   fc.write_string(self.last_buf.to_string())
   // Emit module-level template cache declarations first,
   // then the main generated code.
-  let result = StringBuilder::new()
+  let result = StringBuilder()
   result.write(cache_decls.to_string())
   result.write(fc.to_string())
   result.to_string()

@@ -78,7 +78,7 @@ pub impl[T] Subscriber for Ref[EffectInner[T]] with fn add_source(
 
 ///|
 pub impl[T] ToASubscriber for Ref[EffectInner[T]] with fn to_asubscriber(self) {
-  { id: self.val.id, sub: Some(self) }
+  { id: self.val.id, sub: Some(self), }
 }
 
 ///|
@@ -120,7 +120,7 @@ pub fn[T] RenderEffect::new_with_value(
   let value = Some(
     owner.with_(() => Observer::with_replace(Some(sub), () => fun(init_val))),
   )
-  let e = RenderEffect::{ value, inner, owner }
+  let e = RenderEffect::{ value, inner, owner, }
   let ref_e = Ref(e)
 
   // Remove from signal subscribers when owner is disposed
@@ -141,7 +141,7 @@ pub fn[T] RenderEffect::new_isomorphic(fun : (T?) -> T) -> Ref[RenderEffect[T]] 
     owner.with_(() => Observer::with_replace(Some(sub), () => fun(None))),
   )
 
-  let e = RenderEffect::{ value, inner, owner }
+  let e = RenderEffect::{ value, inner, owner, }
   let ref_e = Ref(e)
 
   inner.val.schedule = Some(() => schedule_effect(ref_e))
@@ -182,7 +182,7 @@ pub struct Effect[T] {
 pub fn[T] Effect::new(cb : (T?) -> T) -> Effect[T] {
   let inner = Ref(EffectInner::new(cb))
   let owner = Owner::new()
-  let e = Effect::{ inner, owner }
+  let e = Effect::{ inner, owner, }
   let ref_e = Ref(e)
   let sub = ToASubscriber::to_asubscriber(inner)
   // Remove from signal subscribers when owner is disposed
@@ -248,7 +248,7 @@ pub impl[T] EffectRunner for RenderEffect[T] with fn run_effect(self) -> Unit {
 pub fn[T] create_effect(cb : (T?) -> T) -> Unit {
   let inner = Ref(EffectInner::new(cb))
   let owner = Owner::new()
-  let e = Effect::{ inner, owner }
+  let e = Effect::{ inner, owner, }
   let ref_e = Ref(e)
   inner.val.schedule = Some(() => schedule_effect(ref_e))
   schedule_effect(ref_e)

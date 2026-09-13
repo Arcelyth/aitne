@@ -12,7 +12,7 @@ pub struct On {
 ///|
 /// Create an event listener attribute.
 pub fn on(event : EventDesp, fun : (@ffi.Event) -> Unit) -> On {
-  On::{ event, owner: Owner::current_with_default(), fun }
+  On::{ event, owner: Owner::current_with_default(), fun, }
 }
 
 ///|

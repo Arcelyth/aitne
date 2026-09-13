@@ -351,8 +351,8 @@ pub impl[A : Attribute, B : Attribute] Attribute for (A, B) with fn rebuild(
 ) -> Unit {
   match state.val {
     AttrState::Pair(s0, s1) => {
-      let r0 = Ref::{ val: s0 }
-      let r1 = Ref::{ val: s1 }
+      let r0 = Ref::{ val: s0, }
+      let r1 = Ref::{ val: s1, }
       self.0.rebuild(r0)
       self.1.rebuild(r1)
       state.val = AttrState::Pair(r0.val, r1.val)

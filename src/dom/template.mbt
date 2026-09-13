@@ -11,7 +11,7 @@ pub(open) trait ToTemplate {
 }
 
 ///|
-let base_template_element : Ref[TemplateElement?] = { val: None }
+let base_template_element : Ref[TemplateElement?] = { val: None, }
 
 ///|
 let templates_cache : HashMap[String, TemplateElement] = HashMap([])

@@ -13,12 +13,12 @@ pub fn[T] OwnedView::new(view : T) -> OwnedView[T] {
       panic()
     }
   }
-  OwnedView::{ owner, view }
+  OwnedView::{ owner, view, }
 }
 
 ///|
 pub fn[T] OwnedView::new_with_owner(owner : Owner, view : T) -> OwnedView[T] {
-  OwnedView::{ owner, view }
+  OwnedView::{ owner, view, }
 }
 
 ///|
@@ -32,7 +32,7 @@ pub fn OwnedViewState::new(
   state : RenderState,
   owner : Owner,
 ) -> OwnedViewState {
-  OwnedViewState::{ owner, state: Ref(state) }
+  OwnedViewState::{ owner, state: Ref(state), }
 }
 
 ///|
@@ -75,7 +75,7 @@ pub impl[T : Render] Render for OwnedView[T] with fn rebuild(
 ) -> Unit {
   match state.val {
     RenderState::OwnedViewState(rs) => {
-      let { owner, view } = self
+      let { owner, view, } = self
       owner.with_(() => view.rebuild(rs.state))
     }
     _ => ()

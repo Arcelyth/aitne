@@ -17,7 +17,7 @@ pub trait RenderHtml: Render {
 
 ///|
 impl RenderHtml with fn to_html(self) -> String {
-  let buf = StringBuilder::new(size_hint=self.html_len())
+  let buf = StringBuilder(size_hint=self.html_len())
   self.to_html_with_buf(buf, Ref(Position::FirstChild))
   buf.to_string()
 }
@@ -77,7 +77,7 @@ pub struct TextState {
 
 ///|
 pub fn TextState::new(node : @ffi.Text, text : String) -> TextState {
-  { node, text }
+  { node, text, }
 }
 
 ///|
@@ -121,7 +121,7 @@ pub fn MultiBlockState::set_cleanup(
   self : MultiBlockState,
   f : () -> Unit,
 ) -> MultiBlockState {
-  { ..self, cleanup: Some(f) }
+  { ..self, cleanup: Some(f), }
 }
 
 ///|
@@ -367,7 +367,7 @@ pub impl RenderHtml for Unit with fn to_html_with_buf(_self, _buf, _position) ->
 ///|
 pub impl Render for String with fn build(self) -> RenderState {
   let node = dom_create_text_node(self)
-  RenderState::Text(TextState::{ node, text: self })
+  RenderState::Text(TextState::{ node, text: self, })
 }
 
 ///|
@@ -409,7 +409,7 @@ pub impl RenderHtml for String with fn hydrate(_self, cursor, pos) -> RenderStat
 
   pos.set(Position::NextChildAfterText)
 
-  RenderState::Text(TextState::{ node: text_node, text: _self })
+  RenderState::Text(TextState::{ node: text_node, text: _self, })
 }
 
 ///|

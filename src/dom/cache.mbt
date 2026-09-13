@@ -6,7 +6,7 @@ pub struct DomCache {
 }
 
 ///|
-let cache : Ref[DomCache] = { val: { window: None, document: None } }
+let cache : Ref[DomCache] = { val: { window: None, document: None, }, }
 
 ///|
 pub fn window() -> @ffi.Window {

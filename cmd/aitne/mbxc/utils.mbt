@@ -68,7 +68,7 @@ fn hash_string(dir : String) -> String {
   }
 
   let hex_digits = "0123456789abcdef"
-  let sb = StringBuilder::new()
+  let sb = StringBuilder()
   let mut shift = 28
   while shift >= 0 {
     let digit = ((hash >> shift) & 0xF).reinterpret_as_int()

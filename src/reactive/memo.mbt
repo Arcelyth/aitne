@@ -172,12 +172,12 @@ pub fn[T] Memo::is_disposed(self : Memo[T]) -> Bool {
 
 ///|
 pub fn[T] Memo::to_asource(self : Memo[T]) -> ASource {
-  ASource::{ id: self.id, src: Some(self) }
+  ASource::{ id: self.id, src: Some(self), }
 }
 
 ///|
 pub fn[T] Memo::to_asubscriber(self : Memo[T]) -> ASubscriber {
-  { id: self.id, sub: Some(self) }
+  { id: self.id, sub: Some(self), }
 }
 
 ///|

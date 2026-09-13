@@ -29,7 +29,7 @@ test "generate nested tag in attribute expression" {
   let attrs = []
   attrs.push(
     (
-      TokenAttr::{ ns: None, name: "eat" },
+      TokenAttr::{ ns: None, name: "eat", },
       AttrValue::Expr("() => {<li>{()=>name.get()}</li>}"),
     ),
   )
@@ -78,7 +78,7 @@ test "generate deeply nested tag" {
   let attrs = []
   attrs.push(
     (
-      TokenAttr::{ ns: None, name: "data" },
+      TokenAttr::{ ns: None, name: "data", },
       AttrValue::Expr(
         "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}",
       ),

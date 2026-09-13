@@ -3,7 +3,7 @@ using @hashmap {type HashMap}
 
 ///|
 fn sanitize_field_name(cls : String) -> String {
-  let sb = StringBuilder::new()
+  let sb = StringBuilder()
   let len = cls.length()
   let mut i = 0
   while i < len {
@@ -241,7 +241,7 @@ pub fn compile_css(
 
 ///|
 fn slice_string(s : String, start : Int, end : Int) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   for i = start; i < end; i = i + 1 {
     match s[i].to_char() {
       Some(a) => buf.write_char(a)
@@ -299,7 +299,7 @@ fn resolve_path(base_file_path : String, rel_path : String) -> String {
     }
   }
 
-  let res = StringBuilder::new()
+  let res = StringBuilder()
   if is_abs {
     res.write_string("/")
   }
@@ -322,7 +322,7 @@ fn read_file(file_path : String) -> String {
 ///|
 /// Replace !"path.css" or !'path.css' with the content of the file .
 pub fn expand_css(orig : String, path : String) -> String {
-  let buf = StringBuilder::new()
+  let buf = StringBuilder()
   let len = orig.length()
   let mut i = 0
 
@@ -352,7 +352,7 @@ pub fn expand_css(orig : String, path : String) -> String {
       let quote = orig[i + 1]
       i += 2
 
-      let path_buf = StringBuilder::new()
+      let path_buf = StringBuilder()
       while i < len {
         let ch = orig[i]
         if ch == '\\' && i + 1 < len {

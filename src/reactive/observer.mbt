@@ -50,7 +50,7 @@ pub fn Observer::tobe(observer : ASubscriber) -> Bool {
 /// Passing `None` clears the observer context.
 pub fn Observer::set(observer : ASubscriber?) -> Unit {
   observer_context.val = match observer {
-    Some(sub) => Some({ subscriber: sub, untracked: false })
+    Some(sub) => Some({ subscriber: sub, untracked: false, })
     None => None
   }
 }
@@ -79,7 +79,7 @@ pub fn[T] Observer::with_replace(observer : ASubscriber?, f : () -> T) -> T {
   let prev = observer_context.val
 
   observer_context.val = match observer {
-    Some(sub) => Some({ subscriber: sub, untracked: false })
+    Some(sub) => Some({ subscriber: sub, untracked: false, })
     None => None
   }
 
@@ -92,7 +92,7 @@ pub fn[T] Observer::with_replace(observer : ASubscriber?, f : () -> T) -> T {
 ///|
 pub fn Observer::replace(observer : ASubscriber?) -> Unit {
   observer_context.val = match observer {
-    Some(sub) => Some({ subscriber: sub, untracked: false })
+    Some(sub) => Some({ subscriber: sub, untracked: false, })
     None => None
   }
 }
@@ -110,7 +110,7 @@ pub fn[T] Observer::with_untracked(f : () -> T) -> T {
   let prev = observer_context.val
 
   match prev {
-    Some(state) => observer_context.val = Some({ ..state, untracked: true })
+    Some(state) => observer_context.val = Some({ ..state, untracked: true, })
     None => ()
   }
 

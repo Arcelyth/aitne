@@ -55,7 +55,7 @@ fn build_data(count : Int) -> Array[Row] {
     let nou = nouns[pseudo_random(nouns.length())]
     let label_str = adj + " " + col + " " + nou
     let (label, set_label) = @reactive.create_signal(label_str)
-    res.push(Row::{ id: next_id.val, label, set_label })
+    res.push(Row::{ id: next_id.val, label, set_label, })
     next_id.val += 1
   }
   res

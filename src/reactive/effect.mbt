@@ -56,7 +56,7 @@ pub impl[T] ReactiveNode for Ref[EffectInner[T]] with fn update_value(self) {
     return true
   }
   match self.val.sources {
-    Some(srcs) => srcs.iter().any(s => s.update_value())
+    Some(srcs) => srcs.iter().any(s => ReactiveNode::update_value(s))
     None => false
   }
 }
@@ -89,7 +89,7 @@ pub impl[T] Subscriber for Ref[EffectInner[T]] with fn clean_sources(
   match self.val.sources {
     Some(srcs) => {
       for source in srcs {
-        source.remove_sub(subscriber)
+        Source::remove_sub(source, subscriber)
       }
       self.val.sources = None
     }

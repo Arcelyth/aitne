@@ -207,7 +207,7 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn build(
         router.path.val = new_path
 
         let dom_pos : (@ffi.Node, @ffi.Node?)? = match
-          router.view.val.elements().get(0) {
+          Mountable::elements(router.view.val).get(0) {
           Some(first_el) => {
             let parent = @ffi.dom_parent(first_el)
             if @ffi.dom_is_null(parent) {
@@ -232,12 +232,12 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn build(
         }
 
         // Swap old view with new in the DOM
-        router.view.val.unmount()
+        Mountable::unmount(router.view.val)
         match dom_pos {
           Some((parent, next)) =>
             match next {
-              Some(ref_node) => new_view.mount(parent, ref_node)
-              None => new_view.mount(parent, @ffi.dom_null_node())
+              Some(ref_node) => Mountable::mount(new_view, parent, ref_node)
+              None => Mountable::mount(new_view, parent, @ffi.dom_null_node())
             }
           None => ()
         }
@@ -274,7 +274,7 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn rebuild(
       router.path.val = url.path
 
       let dom_pos : (@ffi.Node, @ffi.Node?)? = match
-        router.view.val.elements().get(0) {
+        Mountable::elements(router.view.val).get(0) {
         Some(first_el) => {
           let parent = @ffi.dom_parent(first_el)
           if @ffi.dom_is_null(parent) {
@@ -303,12 +303,12 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn rebuild(
         }
       }
 
-      router.view.val.unmount()
+      Mountable::unmount(router.view.val)
       match dom_pos {
         Some((parent, next)) =>
           match next {
-            Some(ref_node) => new_view.mount(parent, ref_node)
-            None => new_view.mount(parent, @ffi.dom_null_node())
+            Some(ref_node) => Mountable::mount(new_view, parent, ref_node)
+            None => Mountable::mount(new_view, parent, @ffi.dom_null_node())
           }
         None => ()
       }
@@ -397,7 +397,7 @@ pub impl[D : MatchNestedRoutes] RenderHtml for NestedRouteView[D] with fn hydrat
         router.path.val = new_path
 
         let dom_pos : (@ffi.Node, @ffi.Node?)? = match
-          router.view.val.elements().get(0) {
+          Mountable::elements(router.view.val).get(0) {
           Some(first_el) => {
             let parent = @ffi.dom_parent(first_el)
             if @ffi.dom_is_null(parent) {
@@ -419,12 +419,12 @@ pub impl[D : MatchNestedRoutes] RenderHtml for NestedRouteView[D] with fn hydrat
           }
         }
 
-        router.view.val.unmount()
+        Mountable::unmount(router.view.val)
         match dom_pos {
           Some((parent, next)) =>
             match next {
-              Some(ref_node) => new_view.mount(parent, ref_node)
-              None => new_view.mount(parent, @ffi.dom_null_node())
+              Some(ref_node) => Mountable::mount(new_view, parent, ref_node)
+              None => Mountable::mount(new_view, parent, @ffi.dom_null_node())
             }
           None => ()
         }

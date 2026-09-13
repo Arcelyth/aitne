@@ -63,7 +63,7 @@ pub struct Config {
 ///|
 pub fn load_config(toml_content : String) -> Config raise EireneError {
   let root_ast = @toml.parse(toml_content) catch {
-    err => raise TomlError("Failed to parse toml file \{to_repr(err)}.")
+    err => raise TomlError("Failed to parse toml file \{Repr(err)}.")
   }
 
   let root = match root_ast {

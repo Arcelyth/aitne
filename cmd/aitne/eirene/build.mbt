@@ -2,7 +2,7 @@
 pub async fn build_project(cfg : Config) -> Unit {
   println("aitne mbxc")
   let style_dir = "./dist"
-  let style_buffer = StringBuilder::new()
+  let style_buffer = StringBuilder()
   walk_and_compile(".", None, Ref(style_buffer), cfg.build.style_root) catch {
     e => debug(e)
   }

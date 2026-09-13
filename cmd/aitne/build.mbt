@@ -8,14 +8,14 @@ async fn handle_build() -> Unit {
   }
   let cfg = @eirene.load_config(content) catch {
     err => {
-      debug("Config Error: \{to_repr(err)}")
+      debug("Config Error: \{Repr(err)}")
       return
     }
   }
   style_root = cfg.build.style_root
 
   let style_dir = "./dist"
-  let style_buffer = StringBuilder::new()
+  let style_buffer = StringBuilder()
   walk_and_compile(".", None, Ref(style_buffer), style_root) catch {
     e => debug(e)
   }

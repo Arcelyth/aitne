@@ -48,7 +48,7 @@ run_win:
 
 # tests
 mbxc_test: 
-	moon test src/mbxc --target=native
+	moon test cmd/aitne/mbxc --target=native
 
 mbxc_run: 
 	moon run cmd/aitne --target=native -- mbxc

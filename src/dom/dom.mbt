@@ -5,7 +5,7 @@ pub fn mount_to_body(app : () -> &View) -> RenderState {
   owner.with_(() => {
     let body_node = dom_get_body()
     let state = app().build()
-    state.mount(body_node, @ffi.dom_null_node())
+    Mountable::mount(state, body_node, @ffi.dom_null_node())
     state
   })
 }
@@ -18,7 +18,7 @@ pub fn mount_to_id(id : String, app : () -> &View) -> RenderState? {
       let owner = Owner::new()
       owner.with_(() => {
         let state = app().build()
-        state.mount(parent, @ffi.dom_null_node())
+        Mountable::mount(state, parent, @ffi.dom_null_node())
         Some(state)
       })
     }

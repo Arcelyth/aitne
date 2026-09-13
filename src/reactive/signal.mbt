@@ -69,7 +69,7 @@ pub impl[T : Default] Default for WriteSignal[T] with fn default() -> WriteSigna
 ///|
 /// Implement `ReactiveNode` trait for WriteSignal
 pub impl[T] ReactiveNode for WriteSignal[T] with fn mark_stale(self) {
-  self.mark_all_pending()
+  ReactiveNode::mark_all_pending(self)
 }
 
 ///|
@@ -95,7 +95,7 @@ pub impl[T] ReactiveNode for WriteSignal[T] with fn update_value(_self) {
 ///|
 /// Implement `Notify` trait for WriteSignal
 pub impl[T] Notify for WriteSignal[T] with fn notify(self) -> Unit {
-  self.mark_stale()
+  ReactiveNode::mark_stale(self)
 }
 
 ///|
@@ -129,11 +129,11 @@ pub impl[T] ToASource for WriteSignal[T] with fn to_asource(self) {
 
 ///|
 pub impl[T] Track for WriteSignal[T] with fn track(self) -> Unit {
-  guard !self.is_disposed() else { return }
+  guard !IsDisposed::is_disposed(self) else { return }
   match Observer::get() {
     Some(sub) => {
-      sub.add_source(self.to_asource())
-      self.add_sub(sub)
+      Subscriber::add_source(sub, ToASource::to_asource(self))
+      Source::add_sub(self, sub)
     }
     None => ()
   }
@@ -147,7 +147,7 @@ pub fn[T] WriteSignal::new(value : T) -> WriteSignal[T] {
 ///|
 pub fn[T] WriteSignal::try_update(self : WriteSignal[T], f : (T) -> T) -> Unit? {
   self.inner.val.value = f(self.inner.val.value)
-  self.mark_stale()
+  ReactiveNode::mark_stale(self)
   Some(())
 }
 
@@ -160,7 +160,7 @@ pub fn[T] WriteSignal::update(self : WriteSignal[T], f : (T) -> T) -> Unit {
 pub fn[T] WriteSignal::try_set(self : WriteSignal[T], value : T) -> T? {
   let old_value = self.inner.val.value
   self.inner.val.value = value
-  self.mark_stale()
+  ReactiveNode::mark_stale(self)
   Some(old_value)
 }
 
@@ -224,7 +224,7 @@ pub impl[T] IsDisposed for ReadSignal[T] with fn is_disposed(_self) -> Bool {
 ///|
 /// Implement `ReactiveNode` trait for ReadSignal
 pub impl[T] ReactiveNode for ReadSignal[T] with fn mark_stale(self) {
-  self.mark_all_pending()
+  ReactiveNode::mark_all_pending(self)
 }
 
 ///|
@@ -270,11 +270,11 @@ pub impl[T] ToASource for ReadSignal[T] with fn to_asource(self) {
 
 ///|
 pub impl[T] Track for ReadSignal[T] with fn track(self) -> Unit {
-  guard !self.is_disposed() else { return }
+  guard !IsDisposed::is_disposed(self) else { return }
   match Observer::get() {
     Some(sub) => {
-      sub.add_source(self.to_asource())
-      self.add_sub(sub)
+      Subscriber::add_source(sub, ToASource::to_asource(self))
+      Source::add_sub(self, sub)
     }
     None => ()
   }
@@ -282,7 +282,7 @@ pub impl[T] Track for ReadSignal[T] with fn track(self) -> Unit {
 
 ///|
 pub fn[T, U] ReadSignal::try_with(self : ReadSignal[T], f : (T) -> U) -> U? {
-  self.track()
+  Track::track(self)
   Some(f(self.inner.val.value))
 }
 
@@ -345,7 +345,7 @@ pub impl[T : Default] Default for RwSignal[T] with fn default() -> RwSignal[T] {
 ///|
 /// Implement `ReactiveNode` for RwSignal
 pub impl[T] ReactiveNode for RwSignal[T] with fn mark_stale(self) {
-  self.mark_all_pending()
+  ReactiveNode::mark_all_pending(self)
 }
 
 ///|
@@ -379,7 +379,7 @@ pub impl[T] IsDisposed for RwSignal[T] with fn is_disposed(_self) -> Bool {
 ///|
 /// Implement `Notify` trait for WriteSignal
 pub impl[T] Notify for RwSignal[T] with fn notify(self) -> Unit {
-  self.mark_stale()
+  ReactiveNode::mark_stale(self)
 }
 
 ///|
@@ -404,11 +404,11 @@ pub impl[T] ToASource for RwSignal[T] with fn to_asource(self) {
 
 ///|
 pub impl[T] Track for RwSignal[T] with fn track(self) -> Unit {
-  guard !self.is_disposed() else { return }
+  guard !IsDisposed::is_disposed(self) else { return }
   match Observer::get() {
     Some(sub) => {
-      sub.add_source(self.to_asource())
-      self.add_sub(sub)
+      Subscriber::add_source(sub, ToASource::to_asource(self))
+      Source::add_sub(self, sub)
     }
     None => ()
   }
@@ -452,7 +452,7 @@ pub fn[T] RwSignal::unite(
 
 ///|
 pub fn[T, U] RwSignal::try_with(self : RwSignal[T], f : (T) -> U) -> U? {
-  self.track()
+  Track::track(self)
   Some(f(self.inner.val.value))
 }
 
@@ -482,7 +482,7 @@ pub fn[T] RwSignal::try_update(self : RwSignal[T], f : (T) -> T) -> Unit? {
   let current_inner = self.inner.val
   let new_value = f(current_inner.value)
   self.inner.val = { ..current_inner, value: new_value, }
-  self.mark_stale()
+  ReactiveNode::mark_stale(self)
   Some(())
 }
 
@@ -494,7 +494,7 @@ pub fn[T] RwSignal::update(self : RwSignal[T], f : (T) -> T) -> Unit {
 ///|
 pub fn[T] RwSignal::try_set(self : RwSignal[T], value : T) -> T? {
   self.inner.val.value = value
-  self.mark_stale()
+  ReactiveNode::mark_stale(self)
   None
 }
 

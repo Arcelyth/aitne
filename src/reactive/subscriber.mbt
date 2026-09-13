@@ -90,7 +90,7 @@ pub impl Subscriber for ASubscriber with fn clean_sources(
 
 ///|
 pub impl Notify for ASubscriber with fn notify(self) -> Unit {
-  self.mark_stale()
+  ReactiveNode::mark_stale(self)
 }
 
 ///|
@@ -143,5 +143,5 @@ pub impl ReactiveNode for @hashset.HashSet[ASubscriber] with fn update_value(
 
 ///|
 pub impl Notify for @hashset.HashSet[ASubscriber] with fn notify(self) -> Unit {
-  self.each(s => s.mark_stale())
+  self.each(s => ReactiveNode::mark_stale(s))
 }

@@ -113,9 +113,9 @@ pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C] with fn build
   self,
 ) -> RenderState {
   let el = dom_create_element(self.tag.tag())
-  let attrs = self.attrs.build(el)
+  let attrs = Attribute::build(self.attrs, el)
   let children = self.children.build()
-  children.mount(@ffi.el_as_node(el), @ffi.dom_null_node())
+  Mountable::mount(children, @ffi.el_as_node(el), @ffi.dom_null_node())
   RenderState::Element(ElementState::{ el, attrs, children, })
 }
 
@@ -127,7 +127,7 @@ pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C] with fn rebui
   match state.val {
     RenderState::Element(el_state) => {
       let attr_ref = Ref::{ val: el_state.attrs, }
-      self.attrs.rebuild(attr_ref)
+      Attribute::rebuild(self.attrs, attr_ref)
       el_state.attrs = attr_ref.val
 
       let children_ref = Ref::{ val: el_state.children, }
@@ -146,7 +146,7 @@ pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with 
 ) -> Int {
   let tag_name = self.tag.tag()
   let tag_len = tag_name.length()
-  let attrs_len = self.attrs.html_len()
+  let attrs_len = Attribute::html_len(self.attrs)
   if self.tag.is_self_closing() {
     3 + tag_len + attrs_len
   } else {
@@ -172,7 +172,7 @@ pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with 
 
   let node = cursor.current()
   let el = @ffi.cast_node_to_element(node)
-  let attrs = self.attrs.hydrate(el)
+  let attrs = Attribute::hydrate(self.attrs, el)
 
   let children = if self.tag.is_self_closing() {
     RenderState::None
@@ -205,7 +205,7 @@ pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with 
   let style_buf = StringBuilder()
   let inner_buf = StringBuilder()
 
-  self.attrs.to_html(buf, class_buf, style_buf, inner_buf)
+  Attribute::to_html(self.attrs, buf, class_buf, style_buf, inner_buf)
 
   let class_str = class_buf.to_string()
   if !class_str.is_empty() {

@@ -264,7 +264,7 @@ pub fn[T, V : Render] apply_diff(
       match child {
         Some((dispose, state)) => {
           dispose(0)
-          state.unmount()
+          Mountable::unmount(state)
         }
         None => ()
       }
@@ -281,7 +281,7 @@ pub fn[T, V : Render] apply_diff(
       match children[op.at] {
         Some((dispose, state)) => {
           dispose(0)
-          state.unmount()
+          Mountable::unmount(state)
           children[op.at] = None
         }
         None => ()
@@ -352,9 +352,9 @@ pub fn[T, V : Render] apply_diff(
             Some(p) =>
               match get_next_mounted(to) {
                 Some(target_state) => {
-                  let _ = target_state.insert_before(state)
+                  let _ = Mountable::insert_before(target_state, state)
                 }
-                None => state.mount(@ffi.el_as_node(p), marker)
+                None => Mountable::mount(state, @ffi.el_as_node(p), marker)
               }
             None => ()
           }
@@ -379,11 +379,11 @@ pub fn[T, V : Render] apply_diff(
                 Normal =>
                   match get_next_mounted(add.at) {
                     Some(target_state) => {
-                      let _ = target_state.insert_before(state)
+                      let _ = Mountable::insert_before(target_state, state)
                     }
-                    None => state.mount(@ffi.el_as_node(p), marker)
+                    None => Mountable::mount(state, @ffi.el_as_node(p), marker)
                   }
-                Append => state.mount(@ffi.el_as_node(p), marker)
+                Append => Mountable::mount(state, @ffi.el_as_node(p), marker)
               }
             None => ()
           }

@@ -51,7 +51,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
           used_old_keys.add(k)
           new_cache[k] = old_state
 
-          let nodes = old_state.elements()
+          let nodes = Mountable::elements(old_state)
           for n in nodes {
             let is_match = match current_node_opt {
               Some(cur_n) => @ffi.prim_node_eq(n, cur_n)
@@ -77,8 +77,8 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
           new_cache[k] = child_state
 
           match current_node_opt {
-            Some(cur_n) => child_state.mount(parent, cur_n)
-            None => child_state.mount(parent, end)
+            Some(cur_n) => Mountable::mount(child_state, parent, cur_n)
+            None => Mountable::mount(child_state, parent, end)
           }
         }
       }
@@ -87,7 +87,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
     for old_k in old_cache.keys() {
       guard !used_old_keys.contains(old_k) else { continue }
       match old_cache.get(old_k) {
-        Some(old_state) => old_state.unmount()
+        Some(old_state) => Mountable::unmount(old_state)
         None => ()
       }
     }
@@ -106,7 +106,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
       let k = key_fn(item)
       let child_view = render_fn(item)
       let child_state = child_view.build()
-      child_state.mount(parent, end)
+      Mountable::mount(child_state, parent, end)
       init_cache[k] = child_state
     }
 
@@ -200,7 +200,7 @@ pub impl[T] Render for ForEach[T] with fn build(self) -> RenderState {
     (dispose, OwnedView::new_with_owner(child_owner, view))
   }
   let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c, }
-  let state_ref : Ref[RenderState] = Ref(keyed.build())
+  let state_ref : Ref[RenderState] = Ref(Render::build(keyed))
 
   let do_reconcile = fn(_) {
     let _items = each_fn()
@@ -213,7 +213,7 @@ pub impl[T] Render for ForEach[T] with fn build(self) -> RenderState {
           (dispose, OwnedView::new_with_owner(child_owner, view))
         }
         let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c, }
-        keyed.rebuild(state_ref)
+        Render::rebuild(keyed, state_ref)
       }
       _ => ()
     }
@@ -279,7 +279,9 @@ pub impl[T] RenderHtml for ForEach[T] with fn hydrate(
 
   let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c, }
 
-  let state_ref : Ref[RenderState] = Ref(keyed.hydrate(cursor, pos))
+  let state_ref : Ref[RenderState] = Ref(
+    RenderHtml::hydrate(keyed, cursor, pos),
+  )
 
   let do_reconcile = fn(_) {
     let _items = each_fn() // track
@@ -292,7 +294,7 @@ pub impl[T] RenderHtml for ForEach[T] with fn hydrate(
           (dispose, OwnedView::new_with_owner(child_owner, view))
         }
         let keyed = Keyed::{ items: each_fn, key_fn, view_fn: c, }
-        keyed.rebuild(state_ref)
+        Render::rebuild(keyed, state_ref)
       }
       _ => ()
     }

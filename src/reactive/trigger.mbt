@@ -37,13 +37,13 @@ pub impl Notify for Trigger with fn notify(self) -> Unit {
 ///|
 pub impl Notify for Array[Trigger] with fn notify(self) -> Unit {
   for t in self {
-    t.notify()
+    Notify::notify(t)
   }
 }
 
 ///|
 pub impl ReactiveNode for Trigger with fn mark_stale(self) {
-  self.mark_all_pending()
+  ReactiveNode::mark_all_pending(self)
 }
 
 ///|
@@ -89,11 +89,11 @@ pub impl ToASource for Trigger with fn to_asource(self) {
 
 ///|
 pub impl Track for Trigger with fn track(self) -> Unit {
-  guard !self.is_disposed() else { return }
+  guard !IsDisposed::is_disposed(self) else { return }
   match Observer::get() {
     Some(sub) => {
-      sub.add_source(self.to_asource())
-      self.add_sub(sub)
+      Subscriber::add_source(sub, ToASource::to_asource(self))
+      Source::add_sub(self, sub)
     }
     _ => ()
   }

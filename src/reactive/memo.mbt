@@ -53,7 +53,7 @@ pub impl[T] ReactiveNode for Memo[T] with fn mark_stale(self) -> Unit {
   guard !self.disposed else { return }
 
   self.state = ReactiveNodeState::Stale
-  self.mark_all_pending()
+  ReactiveNode::mark_all_pending(self)
 }
 
 ///|
@@ -64,7 +64,7 @@ pub impl[T] ReactiveNode for Memo[T] with fn mark_pending(self) -> Unit {
   if self.state != ReactiveNodeState::Stale {
     self.state = ReactiveNodeState::Pending
   }
-  self.mark_all_pending()
+  ReactiveNode::mark_all_pending(self)
 }
 
 ///|
@@ -74,7 +74,7 @@ pub impl[T] ReactiveNode for Memo[T] with fn mark_all_pending(self) -> Unit {
 
   let subs = self.subscribers.copy()
   for sub in subs {
-    sub.mark_pending()
+    ReactiveNode::mark_pending(sub)
   }
 }
 
@@ -96,7 +96,7 @@ pub impl[T] Subscriber for Memo[T] with fn clean_sources(
   subscriber : ASubscriber,
 ) -> Unit {
   for source in self.sources {
-    source.remove_sub(subscriber)
+    Source::remove_sub(source, subscriber)
   }
   self.sources.clear()
 }
@@ -104,7 +104,7 @@ pub impl[T] Subscriber for Memo[T] with fn clean_sources(
 ///|
 /// Notify is just mark_stale for memo.
 pub impl[T] Notify for Memo[T] with fn notify(self) -> Unit {
-  self.mark_stale()
+  ReactiveNode::mark_stale(self)
 }
 
 ///|
@@ -158,8 +158,8 @@ pub fn[T] Memo::dispose(self : Memo[T]) -> Unit {
   self.disposed = true
 
   let sub : ASubscriber = self.to_asubscriber()
-  self.clean_sources(sub)
-  self.clear_subs()
+  Subscriber::clean_sources(self, sub)
+  Source::clear_subs(self)
 
   self.value = None
   self.state = ReactiveNodeState::Clean
@@ -187,8 +187,8 @@ pub fn[T] Memo::track(self : Memo[T]) -> Unit {
 
   match Observer::get() {
     Some(sub) => {
-      sub.add_source(self.to_asource())
-      self.add_sub(sub)
+      Subscriber::add_source(sub, self.to_asource())
+      Source::add_sub(self, sub)
     }
     None => ()
   }
@@ -212,7 +212,8 @@ pub fn[T] Memo::update_value(self : Memo[T]) -> Bool {
       let mut any_dirty = false
 
       for source in sources {
-        if source.update_value() || self.state == ReactiveNodeState::Stale {
+        if ReactiveNode::update_value(source) ||
+          self.state == ReactiveNodeState::Stale {
           any_dirty = true
           break
         }
@@ -227,7 +228,7 @@ pub fn[T] Memo::update_value(self : Memo[T]) -> Bool {
 
   let prev = self.value
   let sub : ASubscriber = self.to_asubscriber()
-  self.clean_sources(sub)
+  Subscriber::clean_sources(self, sub)
 
   let new_value = self.owner.with_cleanup(fn() {
     Observer::with_replace(Some(sub), fn() { (self.compute)(prev) })
@@ -243,7 +244,7 @@ pub fn[T] Memo::update_value(self : Memo[T]) -> Bool {
     let subs = self.subscribers.copy()
     for s in subs {
       if !Observer::tobe(s) {
-        s.notify()
+        Notify::notify(s)
       }
     }
   }

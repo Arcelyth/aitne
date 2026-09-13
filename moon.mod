@@ -7,7 +7,7 @@ import {
   "Arcelyth/html_escape@0.3.1",
   "tonyfettes/any@0.1.5",
   "moonbitlang/async@0.20.3",
-  "bobzhang/toml@0.4.2",
+  "bobzhang/toml@0.4.3",
 }
 
 readme = "README.mbt.md"

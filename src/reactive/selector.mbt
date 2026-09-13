@@ -81,7 +81,7 @@ pub fn[T : Eq + Hash] Selector::selected(self : Selector[T], key : T) -> Bool {
     }
   }
 
-  read.track()
+  Track::track(read)
 
   match self.effect.val.value {
     Some(v) => key == v

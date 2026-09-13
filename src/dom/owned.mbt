@@ -41,12 +41,12 @@ pub impl Mountable for OwnedViewState with fn mount(
   parent : @ffi.Node,
   marker : @ffi.Node,
 ) -> Unit {
-  self.state.val.mount(parent, marker)
+  Mountable::mount(self.state.val, parent, marker)
 }
 
 ///|
 pub impl Mountable for OwnedViewState with fn unmount(self) -> Unit {
-  self.state.val.unmount()
+  Mountable::unmount(self.state.val)
 }
 
 ///|
@@ -54,12 +54,12 @@ pub impl Mountable for OwnedViewState with fn insert_before(
   self,
   child : &Mountable,
 ) -> Bool {
-  self.state.val.insert_before(child)
+  Mountable::insert_before(self.state.val, child)
 }
 
 ///|
 pub impl Mountable for OwnedViewState with fn elements(self) -> Array[@ffi.Node] {
-  self.state.val.elements()
+  Mountable::elements(self.state.val)
 }
 
 ///|

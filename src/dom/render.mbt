@@ -142,7 +142,7 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
     Text(s) => @ffi.dom_remove(@ffi.text_as_node(s.node))
     Fragment(s) =>
       for child in s.children {
-        child.unmount()
+        Mountable::unmount(child)
       }
     MultiBlock(s) => {
       // Run cleanup (disposes effects, etc.)
@@ -155,17 +155,17 @@ pub impl Mountable for RenderState with fn unmount(self) -> Unit {
       @ffi.dom_remove(s.start_anchor)
       @ffi.dom_remove(s.end_anchor)
     }
-    Router(s) => s.view.val.unmount()
+    Router(s) => Mountable::unmount(s.view.val)
     KeyedState(s) => {
       @ffi.dom_remove(s.marker)
       for child in s.rendered_items {
         match child {
-          Some((_, child_state)) => child_state.unmount()
+          Some((_, child_state)) => Mountable::unmount(child_state)
           None => ()
         }
       }
     }
-    OwnedViewState(s) => s.unmount()
+    OwnedViewState(s) => Mountable::unmount(s)
     RawNode(n) => @ffi.dom_remove(n)
     None => ()
   }
@@ -192,7 +192,7 @@ pub impl Mountable for RenderState with fn mount(
       }
     Fragment(s) =>
       for child in s.children {
-        child.mount(parent, marker)
+        Mountable::mount(child, parent, marker)
       }
     MultiBlock(s) => {
       if @ffi.dom_is_null(marker) {
@@ -208,18 +208,19 @@ pub impl Mountable for RenderState with fn mount(
         None => ()
       }
     }
-    Router(s) => s.view.val.mount(parent, marker)
+    Router(s) => Mountable::mount(s.view.val, parent, marker)
     KeyedState(s) => {
       s.parent = Some(@ffi.node_as_element(parent))
       @ffi.dom_insert_before(parent, s.marker, marker)
       for child in s.rendered_items {
         match child {
-          Some((_, child_state)) => child_state.mount(parent, s.marker)
+          Some((_, child_state)) =>
+            Mountable::mount(child_state, parent, s.marker)
           None => ()
         }
       }
     }
-    OwnedViewState(s) => s.mount(parent, marker)
+    OwnedViewState(s) => Mountable::mount(s, parent, marker)
     RawNode(n) =>
       if @ffi.dom_is_null(marker) {
         @ffi.dom_append(parent, n)
@@ -263,8 +264,8 @@ pub impl Mountable for RenderState with fn insert_before(
         true
       }
     }
-    Router(s) => s.view.val.insert_before(child)
-    OwnedViewState(s) => s.insert_before(child)
+    Router(s) => Mountable::insert_before(s.view.val, child)
+    OwnedViewState(s) => Mountable::insert_before(s, child)
     RawNode(n) => {
       let p = @ffi.dom_parent(n)
       if @ffi.dom_is_null(p) {
@@ -287,7 +288,7 @@ pub impl Mountable for RenderState with fn insert_before(
       if s.children.is_empty() {
         false
       } else {
-        s.children[0].insert_before(child)
+        Mountable::insert_before(s.children[0], child)
       }
     None => false
   }
@@ -305,7 +306,7 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[@ffi.Node] {
           Element(es) => res.push(@ffi.el_as_node(es.el))
           Text(ts) => res.push(@ffi.text_as_node(ts.node))
           RawNode(n) => res.push(n)
-          _ => res.push_iter(child.elements().iter())
+          _ => res.push_iter(Mountable::elements(child).iter())
         }
       }
       res
@@ -328,7 +329,7 @@ pub impl Mountable for RenderState with fn elements(self) -> Array[@ffi.Node] {
       }
       nodes
     }
-    Router(s) => s.view.val.elements()
+    Router(s) => Mountable::elements(s.view.val)
     RawNode(n) => [n]
     None => []
     _ => []

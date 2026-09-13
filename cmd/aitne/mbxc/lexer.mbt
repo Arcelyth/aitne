@@ -60,7 +60,7 @@ pub(all) struct Lexer {
 
 ///|
 pub fn Lexer::new(src : String) -> Lexer {
-  Lexer::{ src, cur: 0, brace_depth: 0, tag_depth: 0, in_closing_tag: false, }
+  Lexer::{ src, cur: 0, brace_depth: 0, tag_depth: 0, in_closing_tag: false }
 }
 
 ///|
@@ -324,7 +324,7 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
           if !self.is_end() {
             self.cur += 1
           }
-          return Some(Token::DocTag(DocTag::{ }))
+          return Some(Token::DocTag(DocTag::{  }))
         }
         Some('/') => {
           self.cur += 2
@@ -441,20 +441,20 @@ pub fn Lexer::next_token(self : Lexer) -> Token? raise MbxcError {
               }
             }
 
-            attrs.push((TokenAttr::{ ns, name, }, val_attr))
+            attrs.push((TokenAttr::{ ns, name }, val_attr))
           }
 
           if !self.is_end() && self.src[self.cur] == '/' {
             if self.peek(1) == Some('>') {
               self.cur += 2
-              return Some(Token::TagSelfClose(TagSelfClose::{ tag, attrs, }))
+              return Some(Token::TagSelfClose(TagSelfClose::{ tag, attrs }))
             } else {
               raise LexerError("Expected '>' after '/'")
             }
           } else if !self.is_end() && self.src[self.cur] == '>' {
             self.cur += 1
             self.tag_depth += 1
-            return Some(Token::TagOpen(TagOpen::{ tag, attrs, }))
+            return Some(Token::TagOpen(TagOpen::{ tag, attrs }))
           } else {
             raise LexerError("Unexpected character in tag")
           }

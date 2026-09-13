@@ -32,9 +32,6 @@ jobs:
 
       - name: Setup Moonbit
         uses: hustcer/setup-moonbit@v1
-        with: 
-          version: "0.10.4+2cc641edf"
-          core-version: "0.10.4+2cc641edf"
 
       - name: Build Native Cmd Binary
         shell: bash

@@ -2,19 +2,19 @@
 test "parse valid mbx node with attributes and dynamic expression" {
   let div_attrs = []
   div_attrs.push(
-    (TokenAttr::{ ns: None, name: "eat" }, AttrValue::Expr("() => omg()")),
+    (TokenAttr::{ ns: None, name: "eat", }, AttrValue::Expr("() => omg()")),
   )
 
   let tokens = [
     // <div eat={() => omg()}> {() => <div/>} </div>
-    Token::TagOpen({ tag: "div", attrs: div_attrs }),
+    Token::TagOpen({ tag: "div", attrs: div_attrs, }),
     Token::RawText(" "),
     Token::BraceOpen,
     Token::RawText("() => "),
-    Token::TagSelfClose({ tag: "div", attrs: [] }),
+    Token::TagSelfClose({ tag: "div", attrs: [], }),
     Token::BraceClose,
     Token::RawText(" "),
-    Token::TagClose({ tag: "div" }),
+    Token::TagClose({ tag: "div", }),
   ]
 
   let parser = Parser::new(tokens)
@@ -81,18 +81,18 @@ test "parse style block" {
 test "parse nested tag in children" {
   let tokens = [
     // <div>{() => {<li>{()=>name.get()}</li>}}</div>
-    Token::TagOpen({ tag: "div", attrs: [] }),
+    Token::TagOpen({ tag: "div", attrs: [], }),
     Token::BraceOpen,
     Token::RawText("() => "),
     Token::BraceOpen,
-    Token::TagOpen({ tag: "li", attrs: [] }),
+    Token::TagOpen({ tag: "li", attrs: [], }),
     Token::BraceOpen,
     Token::RawText("()=>name.get()"),
     Token::BraceClose,
-    Token::TagClose({ tag: "li" }),
+    Token::TagClose({ tag: "li", }),
     Token::BraceClose,
     Token::BraceClose,
-    Token::TagClose({ tag: "div" }),
+    Token::TagClose({ tag: "div", }),
   ]
 
   let parser = Parser::new(tokens)
@@ -129,7 +129,7 @@ test "parse deeply nested tag" {
   let attrs = []
   attrs.push(
     (
-      TokenAttr::{ ns: None, name: "data" },
+      TokenAttr::{ ns: None, name: "data", },
       AttrValue::Expr(
         "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}",
       ),
@@ -138,7 +138,7 @@ test "parse deeply nested tag" {
 
   let tokens = [
     // <Outer data={() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}}/>
-    Token::TagSelfClose({ tag: "Outer", attrs }),
+    Token::TagSelfClose({ tag: "Outer", attrs, }),
   ]
 
   let parser = Parser::new(tokens)
@@ -170,14 +170,14 @@ test "parse deeply nested tag" {
 test "parse sibling brace expressions" {
   let tokens = [
     // <div>{a}{b}</div>
-    Token::TagOpen({ tag: "div", attrs: [] }),
+    Token::TagOpen({ tag: "div", attrs: [], }),
     Token::BraceOpen,
     Token::RawText("a"),
     Token::BraceClose,
     Token::BraceOpen,
     Token::RawText("b"),
     Token::BraceClose,
-    Token::TagClose({ tag: "div" }),
+    Token::TagClose({ tag: "div", }),
   ]
 
   let parser = Parser::new(tokens)

@@ -40,7 +40,7 @@ pub struct RouterChildren(ViewFn)
 
 ///|
 pub fn router(
-  children? : Array[RouterChildren] = [],
+  children~ : Array[RouterChildren] = [],
   base? : String,
   set_is_routing? : (Bool) -> Unit,
 ) -> &View {
@@ -75,7 +75,7 @@ pub fn router(
 }
 
 ///|
-pub fn route(path? : String = "/", view? : ViewFn = () => ()) -> NestedRoute {
+pub fn route(path~ : String = "/", view~ : ViewFn = () => ()) -> NestedRoute {
   NestedRoute::new(path, view)
 }
 
@@ -84,8 +84,8 @@ type ViewFn = () -> &View
 
 ///|
 pub fn parent_route(
-  path? : String = "/",
-  view? : () -> &View = () => (),
+  path~ : String = "/",
+  view~ : () -> &View = () => (),
   children~ : Array[NestedRoute],
 ) -> NestedRoute {
   NestedRoute::new(path, view).child(children)
@@ -93,7 +93,7 @@ pub fn parent_route(
 
 ///|
 pub fn[Ch : MatchNestedRoutes] routes(
-  fallback? : ViewFn = () => (),
+  fallback~ : ViewFn = () => (),
   children? : Ch,
 ) -> RouterChildren {
   RouterChildren(() => {
@@ -325,7 +325,7 @@ pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D] with fn rebuild(
 ///|
 pub impl[D : MatchNestedRoutes] RenderHtml for NestedRouteView[D] with fn html_len(
   self,
-) -> Int {
+) -> Int32 {
   let url = self.current_url.get_untracked()
   let outlets = Ref([])
   let loaders = Ref([])
@@ -477,7 +477,7 @@ pub impl TypeName for RouterContext with fn get_ty() -> String {
 
 ///|
 pub(all) struct RouteContext {
-  mut id : UInt
+  mut id : UInt32
   url : RwSignal[Url]
   params : RwSignal[Params]
   matched : RwSignal[String]
@@ -556,7 +556,7 @@ pub impl Render for OutletView with fn rebuild(self, state : Ref[RenderState]) -
 }
 
 ///|
-pub impl RenderHtml for OutletView with fn html_len(self) -> Int {
+pub impl RenderHtml for OutletView with fn html_len(self) -> Int32 {
   match self.child {
     Some(c) => {
       let view_fn = c.view_fn.val

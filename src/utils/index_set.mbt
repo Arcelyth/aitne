@@ -4,7 +4,7 @@ using @hashmap {type HashMap}
 ///|
 pub struct IndexSet[K] {
   keys : Array[K]
-  key_index : HashMap[K, Int]
+  key_index : HashMap[K, Int32]
 }
 
 ///|
@@ -15,7 +15,7 @@ pub fn[K : Hash + Eq] IndexSet::new() -> IndexSet[K] {
 
 ///|
 #inline
-pub fn[K] IndexSet::length(self : IndexSet[K]) -> Int {
+pub fn[K] IndexSet::length(self : IndexSet[K]) -> Int32 {
   self.keys.length()
 }
 
@@ -44,13 +44,16 @@ pub fn[K : Hash + Eq] IndexSet::contains(self : IndexSet[K], key : K) -> Bool {
 
 ///|
 #inline
-pub fn[K : Hash + Eq] IndexSet::get_index(self : IndexSet[K], key : K) -> Int? {
+pub fn[K : Hash + Eq] IndexSet::get_index(
+  self : IndexSet[K],
+  key : K,
+) -> Int32? {
   self.key_index.get(key)
 }
 
 ///|
 #inline
-pub fn[K] IndexSet::get(self : IndexSet[K], index : Int) -> K? {
+pub fn[K] IndexSet::get(self : IndexSet[K], index : Int32) -> K? {
   if index >= 0 && index < self.keys.length() {
     Some(self.keys[index])
   } else {

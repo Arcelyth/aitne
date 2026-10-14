@@ -77,7 +77,12 @@ pub async fn start_server(cfg : Config) -> Unit {
             }
           }
           let headers : @http.Headers = Map::from_iter(
-            [(@http.CaseInsensitiveString("Content-Type"), "text/html; charset=utf-8")].iter(),
+            [
+              (
+                @http.CaseInsensitiveString("Content-Type"),
+                "text/html; charset=utf-8",
+              ),
+            ].iter(),
           )
           let response_html = if hmr_state.enabled {
             inject_hmr_script(html_content)

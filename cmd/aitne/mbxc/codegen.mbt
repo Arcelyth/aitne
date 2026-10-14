@@ -11,7 +11,7 @@ pub struct CodeGen {
 }
 
 ///|
-pub fn CodeGen::new(path? : String = "") -> CodeGen {
+pub fn CodeGen::new(path~ : String = "") -> CodeGen {
   {
     buf: StringBuilder(),
     style: StringBuilder(),
@@ -405,7 +405,7 @@ fn to_camelcase(s : String) -> String {
       capitalize_next = true
     } else if capitalize_next {
       let upper_c = if c >= 'a' && c <= 'z' {
-        match Int::to_char(c.to_int() - 32) {
+        match Int32::to_char(c.to_int() - 32) {
           Some(ch) => ch
           _ => c
         }
@@ -491,7 +491,7 @@ fn to_snakecase(s : String) -> String {
         b.write('_')
       }
 
-      let lower_c = match Int::to_char(c.to_int() + 32) {
+      let lower_c = match Int32::to_char(c.to_int() + 32) {
         Some(ch) => ch
         _ => c
       }

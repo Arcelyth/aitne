@@ -2,9 +2,9 @@
 /// Global scheduler used to batch, deduplicate, and flush pending effects.
 pub struct Scheduler {
   mut pending : Array[&EffectRunner]
-  queued : @hashset.HashSet[UInt]
+  queued : @hashset.HashSet[UInt32]
   mut flushing : Bool
-  mut batch_depth : Int
+  mut batch_depth : Int32
 }
 
 ///|

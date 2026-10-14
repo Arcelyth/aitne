@@ -56,8 +56,8 @@ fn normalize_dir(dir : String) -> String {
 ///|
 /// Convert a normalized directory string into a clean hash-based isolated suffix (FNV-1a 32-bit).
 fn hash_string(dir : String) -> String {
-  let mut hash : UInt = 0x811c9dc5
-  let prime : UInt = 0x01000193
+  let mut hash : UInt32 = 0x811c9dc5
+  let prime : UInt32 = 0x01000193
 
   let len = dir.length()
   let mut i = 0

@@ -20,7 +20,7 @@ pub trait AttributeKey {
 ///|
 /// Value half of an attribute.
 pub trait AttributeValue {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(Self, key : String, buf : StringBuilder) -> Unit
   fn build(Self, key : String, el : @ffi.Element) -> AttrState
   fn rebuild(Self, key : String, state : Ref[AttrState]) -> Unit
@@ -31,7 +31,7 @@ pub trait AttributeValue {
 ///|
 /// A complete attribute (key + value pair) that can be attached to an `HtmlElement`.
 pub trait Attribute {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(
     Self,
     buf : StringBuilder,
@@ -49,7 +49,7 @@ pub trait Attribute {
 // ----- Unit attribute (empty) -----
 
 ///|
-pub impl Attribute for Unit with fn html_len(_self) -> Int {
+pub impl Attribute for Unit with fn html_len(_self) -> Int32 {
   0
 }
 
@@ -86,7 +86,7 @@ pub impl Attribute for Unit with fn add_attr(_self, attr : &Attribute) -> &Attri
 // ----- Unit attribute value -----
 
 ///|
-pub impl AttributeValue for Unit with fn html_len(_self) -> Int {
+pub impl AttributeValue for Unit with fn html_len(_self) -> Int32 {
   0
 }
 
@@ -125,7 +125,7 @@ pub impl AttributeKey for String with fn get_key(self) -> String {
 // ----- Bool attribute value -----
 
 ///|
-pub impl AttributeValue for Bool with fn html_len(_self) -> Int {
+pub impl AttributeValue for Bool with fn html_len(_self) -> Int32 {
   0
 }
 
@@ -189,7 +189,7 @@ pub impl AttributeValue for Bool with fn dry_resolve(_self) -> Unit {
 // ----- String attribute value -----
 
 ///|
-pub impl AttributeValue for String with fn html_len(self) -> Int {
+pub impl AttributeValue for String with fn html_len(self) -> Int32 {
   self.length()
 }
 
@@ -253,7 +253,7 @@ pub(all) struct Attr[K, V](K, V)
 ///|
 pub impl[K : AttributeKey, V : AttributeValue] Attribute for Attr[K, V] with fn html_len(
   self,
-) -> Int {
+) -> Int32 {
   self.0.get_key().length() + 3 + self.1.html_len()
 }
 
@@ -312,7 +312,7 @@ pub impl[K : AttributeKey, V : AttributeValue] Attribute for Attr[K, V] with fn 
 ///|
 pub impl[A : Attribute, B : Attribute] Attribute for (A, B) with fn html_len(
   self,
-) -> Int {
+) -> Int32 {
   self.0.html_len() + self.1.html_len()
 }
 

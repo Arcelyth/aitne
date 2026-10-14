@@ -15,7 +15,7 @@ pub extend &Source with ReactiveNode::{
 
 ///|
 pub struct ASource {
-  id : UInt
+  id : UInt32
   src : &Source?
 }
 

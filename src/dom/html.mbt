@@ -38,7 +38,7 @@ fn AttrList::push(self : AttrList, attr : &Attribute) -> AttrList {
 }
 
 ///|
-pub impl Attribute for AttrList with fn html_len(self) -> Int {
+pub impl Attribute for AttrList with fn html_len(self) -> Int32 {
   let mut len = 0
   for item in self.items {
     len += item.html_len()
@@ -143,7 +143,7 @@ pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C] with fn rebui
 ///|
 pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C] with fn html_len(
   self,
-) -> Int {
+) -> Int32 {
   let tag_name = self.tag.tag()
   let tag_len = tag_name.length()
   let attrs_len = Attribute::html_len(self.attrs)
@@ -330,7 +330,7 @@ pub impl Render for Array[&View] with fn rebuild(self, state : Ref[RenderState])
 }
 
 ///|
-pub impl RenderHtml for Array[&View] with fn html_len(self) -> Int {
+pub impl RenderHtml for Array[&View] with fn html_len(self) -> Int32 {
   let mut len = 0
   for kid in self {
     len += kid.html_len()
@@ -385,7 +385,7 @@ pub impl Render for TextNode with fn rebuild(_self, _state) -> Unit {
 }
 
 ///|
-pub impl RenderHtml for TextNode with fn html_len(self) -> Int {
+pub impl RenderHtml for TextNode with fn html_len(self) -> Int32 {
   self.val.length()
 }
 
@@ -452,7 +452,7 @@ pub impl Render for DynTextNode with fn rebuild(_self, _state) -> Unit {
 }
 
 ///|
-pub impl RenderHtml for DynTextNode with fn html_len(_self) -> Int {
+pub impl RenderHtml for DynTextNode with fn html_len(_self) -> Int32 {
   0
 }
 
@@ -563,7 +563,7 @@ pub impl Render for RawNodeView with fn rebuild(
 }
 
 ///|
-pub impl RenderHtml for RawNodeView with fn html_len(_self) -> Int {
+pub impl RenderHtml for RawNodeView with fn html_len(_self) -> Int32 {
   0
 }
 

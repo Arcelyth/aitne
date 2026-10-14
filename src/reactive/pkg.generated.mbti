@@ -2,11 +2,11 @@
 package "Arcelyth/aitne/src/reactive"
 
 import {
+  "Arcelyth/aitne/src/internal/any",
   "moonbitlang/core/debug",
   "moonbitlang/core/hashmap",
   "moonbitlang/core/hashset",
   "moonbitlang/core/ref",
-  "tonyfettes/any",
 }
 
 // Values

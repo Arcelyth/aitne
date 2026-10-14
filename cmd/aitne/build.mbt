@@ -55,7 +55,7 @@ async fn handle_build() -> Unit {
 }
 
 ///|
-pub fn delete_gen_mbt(dir? : String = ".") -> Unit raise @fs.IOError {
+pub fn delete_gen_mbt(dir~ : String = ".") -> Unit raise @fs.IOError {
   let files = @fs.read_dir(dir) catch {
     e => {
       debug(e)

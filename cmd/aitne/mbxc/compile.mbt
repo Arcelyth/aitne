@@ -1,9 +1,9 @@
 ///|
 pub fn from_file(
   path : String,
-  show? : Bool = false,
-  to? : String? = None,
-  not_tmp? : Bool = false,
+  show~ : Bool = false,
+  to~ : String? = None,
+  not_tmp~ : Bool = false,
   output_style : Ref[StringBuilder],
   //  style_root? : Array[String] = [],
 ) -> String? {

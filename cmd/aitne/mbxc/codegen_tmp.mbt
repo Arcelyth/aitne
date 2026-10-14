@@ -5,7 +5,7 @@ pub(all) struct CodeGenTmp {
   style : StringBuilder
   last_buf : StringBuilder
   path : String
-  tmpl_id : Ref[Int]
+  tmpl_id : Ref[Int32]
 }
 
 ///|
@@ -16,7 +16,7 @@ pub fn CodeGenTmp::output_style(self : CodeGenTmp) -> String {
 }
 
 ///|
-pub fn CodeGenTmp::new(ast : Array[MbxAST], path? : String = "") -> CodeGenTmp {
+pub fn CodeGenTmp::new(ast : Array[MbxAST], path~ : String = "") -> CodeGenTmp {
   {
     ast,
     buf: StringBuilder(),
@@ -61,7 +61,7 @@ fn steps_key(steps : Array[DomStep]) -> String {
 /// - generated expression code
 priv struct TBind {
   steps : Array[DomStep]
-  kind : Int
+  kind : Int32
   name : String
   code : String
 }
@@ -150,7 +150,7 @@ fn walk(node : MbxAST, ctx : WalkCtx) -> Unit {
       }
       ctx.html.write(">")
       // Only count children that produce DOM output (skip whitespace-only text)
-      let dom_kids : Array[Int] = []
+      let dom_kids : Array[Int32] = []
       for ci = 0; ci < children.length(); ci = ci + 1 {
         match children[ci] {
           MbxAST::RawText(t) =>
@@ -284,7 +284,7 @@ fn emit_one_step(step : DomStep, code : StringBuilder) -> Unit {
 ///|
 fn compile_template_island(
   nodes : Array[MbxAST],
-  tmpl_counter : Ref[Int],
+  tmpl_counter : Ref[Int32],
   cache_decls : StringBuilder,
 ) -> String {
   let ctx = WalkCtx::{ html: StringBuilder(), binds: [], ok: true, steps: [], }
@@ -366,7 +366,7 @@ fn compile_template_island(
   }
   // Collect reactive bindings to merge into a single RenderEffect.
   // Each entry: (kind, vn, code, text_var_name_for_kind_0)
-  let merged : Array[(Int, String, String, String)] = []
+  let merged : Array[(Int32, String, String, String)] = []
   let mut text_counter = 0
 
   for bi = 0; bi < ctx.binds.length(); bi = bi + 1 {
@@ -523,7 +523,7 @@ fn compile_template_island(
 /// expression.  Returns `None` if the expression cannot be optimized.
 fn try_inline_templates_in_expr(
   expr_str : StringView,
-  tmpl_counter : Ref[Int],
+  tmpl_counter : Ref[Int32],
   cache_decls : StringBuilder,
 ) -> String? {
   let expr = expr_str.to_owned()
@@ -536,8 +536,8 @@ fn try_inline_templates_in_expr(
 
   fn parse_nodes_inline(
     tokens : Array[Token],
-    idx : Ref[Int],
-    len : Int,
+    idx : Ref[Int32],
+    len : Int32,
   ) -> Array[MbxAST] {
     let nodes = []
     while idx.val < len {
@@ -691,12 +691,12 @@ fn try_inline_templates_in_expr(
 /// code instead of inline View trees.
 fn preprocess_ast(
   ast : Array[MbxAST],
-  tc : Ref[Int],
+  tc : Ref[Int32],
   cache_decls : StringBuilder,
 ) -> Unit {
   fn preprocess_node(
     node : MbxAST,
-    tc : Ref[Int],
+    tc : Ref[Int32],
     cache_decls : StringBuilder,
   ) -> Unit {
     match node {
@@ -745,12 +745,12 @@ pub fn CodeGenTmp::generate(self : CodeGenTmp) -> String {
   let fc = StringBuilder()
   let island : Ref[Array[MbxAST]] = Ref([])
   // Share the same counter so template variable names are unique.
-  let tc : Ref[Int] = self.tmpl_id
+  let tc : Ref[Int32] = self.tmpl_id
   fn flush(
     self : CodeGenTmp,
     fc : StringBuilder,
     ir : Ref[Array[MbxAST]],
-    tc : Ref[Int],
+    tc : Ref[Int32],
   ) {
     let isl = ir.val
     if isl.length() > 0 {

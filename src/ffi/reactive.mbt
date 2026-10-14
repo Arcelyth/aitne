@@ -5,5 +5,5 @@ pub extern "js" fn dom_create_effect(cb : () -> Unit) -> Unit =
 
 ///|
 #cfg(target="js")
-pub extern "js" fn int_to_string(n : Int) -> String =
+pub extern "js" fn int_to_string(n : Int32) -> String =
   #|(n) => String(n)

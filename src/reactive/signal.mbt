@@ -1,10 +1,10 @@
 ///|
 /// Simple signal id generator.
-let signal_id_counter : Ref[UInt] = @ref.new(0)
+let signal_id_counter : Ref[UInt32] = @ref.new(0)
 
 ///|
 #inline
-fn next_signal_id() -> UInt {
+fn next_signal_id() -> UInt32 {
   let id = signal_id_counter.val
   signal_id_counter.val = id + 1
   id
@@ -13,7 +13,7 @@ fn next_signal_id() -> UInt {
 ///|
 /// The shared inner state of a signal.
 pub struct SignalInner[T] {
-  id : UInt
+  id : UInt32
   mut value : T
   subs : @hashset.HashSet[ASubscriber]
 }

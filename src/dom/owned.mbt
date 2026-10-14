@@ -83,7 +83,7 @@ pub impl[T : Render] Render for OwnedView[T] with fn rebuild(
 }
 
 ///|
-pub impl[T : RenderHtml] RenderHtml for OwnedView[T] with fn html_len(self) -> Int {
+pub impl[T : RenderHtml] RenderHtml for OwnedView[T] with fn html_len(self) -> Int32 {
   self.view.html_len()
 }
 

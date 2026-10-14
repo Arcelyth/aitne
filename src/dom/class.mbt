@@ -10,7 +10,7 @@ pub fn[C] class_val(class : C) -> Class[C] {
 pub(all) struct Class[C](C)
 
 ///|
-pub impl[C : IntoClass] Attribute for Class[C] with fn html_len(_self) -> Int {
+pub impl[C : IntoClass] Attribute for Class[C] with fn html_len(_self) -> Int32 {
   0
 }
 
@@ -64,7 +64,7 @@ pub impl[C : IntoClass] Attribute for Class[C] with fn add_attr(
 
 ///|
 pub trait IntoClass {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(Self, style : StringBuilder) -> Unit
   fn build(Self, el : @ffi.Element) -> AttrState
   fn rebuild(Self, state : Ref[AttrState]) -> Unit
@@ -73,7 +73,7 @@ pub trait IntoClass {
 }
 
 ///|
-pub impl IntoClass for String with fn html_len(self) -> Int {
+pub impl IntoClass for String with fn html_len(self) -> Int32 {
   self.length()
 }
 
@@ -122,7 +122,7 @@ pub fn[T] rx_class(f : () -> T) -> RxClass[T] {
 }
 
 ///|
-pub impl[T : IntoClass] IntoClass for RxClass[T] with fn html_len(_self) -> Int {
+pub impl[T : IntoClass] IntoClass for RxClass[T] with fn html_len(_self) -> Int32 {
   0
 }
 

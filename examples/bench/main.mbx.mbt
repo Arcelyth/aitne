@@ -28,26 +28,26 @@ let nouns : Array[String] = [
 
 ///|
 struct Row {
-  id : Int
+  id : Int32
   label : @reactive.ReadSignal[String]
   set_label : @reactive.WriteSignal[String]
 }
 
 ///|
-let next_id : Ref[Int] = Ref(1)
+let next_id : Ref[Int32] = Ref(1)
 
 ///|
-let seed : Ref[Int] = Ref(12345)
+let seed : Ref[Int32] = Ref(12345)
 
 ///|
 #inline
-fn pseudo_random(max : Int) -> Int {
+fn pseudo_random(max : Int32) -> Int32 {
   seed.val = (seed.val * 1103515245 + 12345) & 0x7fffffff
   seed.val % max
 }
 
 ///|
-fn build_data(count : Int) -> Array[Row] {
+fn build_data(count : Int32) -> Array[Row] {
   let res = []
   for i = 0; i < count; i = i + 1 {
     let adj = adjectives[pseudo_random(adjectives.length())]

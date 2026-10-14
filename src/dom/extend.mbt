@@ -131,7 +131,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn rebuild(
 }
 
 ///|
-pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn html_len(self) -> Int {
+pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K] with fn html_len(self) -> Int32 {
   let mut len = 0
   let items = (self.each)()
   for item in items {
@@ -233,7 +233,7 @@ pub impl[T] Render for ForEach[T] with fn rebuild(
 }
 
 ///|
-pub impl[T] RenderHtml for ForEach[T] with fn html_len(self) -> Int {
+pub impl[T] RenderHtml for ForEach[T] with fn html_len(self) -> Int32 {
   // <!---->
   let mut len = 7
   let items = (self.each)()

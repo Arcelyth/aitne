@@ -1,8 +1,8 @@
 ///|
-let effect_id_counter : Ref[UInt] = @ref.new(0)
+let effect_id_counter : Ref[UInt32] = @ref.new(0)
 
 ///|
-fn next_effect_id() -> UInt {
+fn next_effect_id() -> UInt32 {
   let id = effect_id_counter.val
   effect_id_counter.val = id + 1
   id
@@ -10,7 +10,7 @@ fn next_effect_id() -> UInt {
 
 ///|
 pub struct EffectInner[T] {
-  id : UInt
+  id : UInt32
   mut stale : Bool
   cb : (T?) -> T
   mut sources : HashSet[ASource]?
@@ -210,12 +210,12 @@ pub fn[T] Effect::run(effect : Effect[T]) -> Unit {
 
 ///|
 pub trait EffectRunner {
-  fn get_id(Self) -> UInt
+  fn get_id(Self) -> UInt32
   fn run_effect(Self) -> Unit
 }
 
 ///|
-pub impl[T : EffectRunner] EffectRunner for Ref[T] with fn get_id(self) -> UInt {
+pub impl[T : EffectRunner] EffectRunner for Ref[T] with fn get_id(self) -> UInt32 {
   self.val.get_id()
 }
 
@@ -225,7 +225,7 @@ pub impl[T : EffectRunner] EffectRunner for Ref[T] with fn run_effect(self) -> U
 }
 
 ///|
-pub impl[T] EffectRunner for Effect[T] with fn get_id(self) -> UInt {
+pub impl[T] EffectRunner for Effect[T] with fn get_id(self) -> UInt32 {
   self.inner.val.id
 }
 
@@ -235,7 +235,7 @@ pub impl[T] EffectRunner for Effect[T] with fn run_effect(self) -> Unit {
 }
 
 ///|
-pub impl[T] EffectRunner for RenderEffect[T] with fn get_id(self) -> UInt {
+pub impl[T] EffectRunner for RenderEffect[T] with fn get_id(self) -> UInt32 {
   self.inner.val.id
 }
 

@@ -52,9 +52,9 @@ pub(all) enum AttrValue {
 ///|
 pub(all) struct Lexer {
   src : String
-  mut cur : Int
-  mut brace_depth : Int
-  mut tag_depth : Int
+  mut cur : Int32
+  mut brace_depth : Int32
+  mut tag_depth : Int32
   mut in_closing_tag : Bool
 }
 
@@ -69,7 +69,7 @@ pub fn Lexer::is_end(self : Lexer) -> Bool {
 }
 
 ///|
-pub fn Lexer::peek(self : Lexer, count : Int) -> UInt16? {
+pub fn Lexer::peek(self : Lexer, count : Int32) -> UInt16? {
   if self.cur + count >= self.src.length() {
     None
   } else {

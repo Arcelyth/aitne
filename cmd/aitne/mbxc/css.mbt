@@ -240,7 +240,7 @@ pub fn compile_css(
 }
 
 ///|
-fn slice_string(s : String, start : Int, end : Int) -> String {
+fn slice_string(s : String, start : Int32, end : Int32) -> String {
   let buf = StringBuilder()
   for i = start; i < end; i = i + 1 {
     match s[i].to_char() {

@@ -1,8 +1,8 @@
 ///|
-let trigger_id_counter : Ref[UInt] = @ref.new(0U)
+let trigger_id_counter : Ref[UInt32] = @ref.new(0U)
 
 ///|
-fn next_trigger_id() -> UInt {
+fn next_trigger_id() -> UInt32 {
   let id = trigger_id_counter.val
   trigger_id_counter.val = id + 1U
   id
@@ -10,7 +10,7 @@ fn next_trigger_id() -> UInt {
 
 ///|
 pub struct Trigger {
-  id : UInt
+  id : UInt32
   subs : @hashset.HashSet[ASubscriber]
 } derive(Debug)
 

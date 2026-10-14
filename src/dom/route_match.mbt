@@ -2,10 +2,10 @@
 using @reactive {type Trigger}
 
 ///|
-let route_id : Ref[UInt] = @ref.new(0U)
+let route_id : Ref[UInt32] = @ref.new(0U)
 
 ///|
-fn next_route_id() -> UInt {
+fn next_route_id() -> UInt32 {
   let id = route_id.val
   route_id.val = id + 1U
   id
@@ -13,7 +13,7 @@ fn next_route_id() -> UInt {
 
 ///|
 pub(all) struct NestedRoute {
-  id : UInt
+  id : UInt32
   path : String
   child : Array[NestedRoute]
   view : ViewFn
@@ -44,7 +44,7 @@ pub fn NestedRoute::child(
 
 ///|
 pub(all) struct NestedMatch {
-  id : UInt
+  id : UInt32
   matched : String
   params : Array[(String, String)]
   child : NestedMatch?
@@ -151,10 +151,10 @@ pub fn NestedMatch::rebuild(
   self : NestedMatch,
   url : Url,
   base : String?,
-  level : Int,
+  level : Int32,
   outlets : Ref[Array[RouteContext]],
   outer_owner : Ref[Owner],
-) -> Int {
+) -> Int32 {
   // Collect parent params/matched signals from outlets above this level.
   // These are used to build `*_with_parents` memos when the route ID changes.
   let (parent_params, parent_matches) = {
@@ -277,7 +277,7 @@ fn split_segments(path : String) -> Array[String] {
 }
 
 ///|
-fn join_prefix(segs : Array[String], end : Int) -> String {
+fn join_prefix(segs : Array[String], end : Int32) -> String {
   if end <= 0 {
     return ""
   }
@@ -291,7 +291,7 @@ fn join_prefix(segs : Array[String], end : Int) -> String {
 }
 
 ///|
-fn join_suffix(segs : Array[String], start : Int) -> String {
+fn join_suffix(segs : Array[String], start : Int32) -> String {
   if start >= segs.length() {
     return ""
   }
@@ -351,14 +351,14 @@ pub fn[Ch : MatchNestedRoutes] RouteDefs::match_route(
 
 ///|
 pub trait MatchNestedRoutes {
-  fn match_nested(Self, String) -> ((UInt, NestedMatch)?, String)
+  fn match_nested(Self, String) -> ((UInt32, NestedMatch)?, String)
 }
 
 ///|
 pub impl[T : MatchNestedRoutes] MatchNestedRoutes for Array[T] with fn match_nested(
   self,
   path : String,
-) -> ((UInt, NestedMatch)?, String) {
+) -> ((UInt32, NestedMatch)?, String) {
   for i in self {
     match i.match_nested(path) {
       (Some((id, m)), remain) => return (Some((id, m)), remain)
@@ -372,7 +372,7 @@ pub impl[T : MatchNestedRoutes] MatchNestedRoutes for Array[T] with fn match_nes
 pub impl[T : MatchNestedRoutes] MatchNestedRoutes for T? with fn match_nested(
   self,
   path : String,
-) -> ((UInt, NestedMatch)?, String) {
+) -> ((UInt32, NestedMatch)?, String) {
   match self {
     Some(t) => t.match_nested(path)
     _ => (None, path)
@@ -381,7 +381,7 @@ pub impl[T : MatchNestedRoutes] MatchNestedRoutes for T? with fn match_nested(
 
 ///|
 pub impl MatchNestedRoutes for Unit with fn match_nested(_self, path : String) -> (
-  (UInt, NestedMatch)?,
+  (UInt32, NestedMatch)?,
   String,
 ) {
   (None, path)
@@ -391,7 +391,7 @@ pub impl MatchNestedRoutes for Unit with fn match_nested(_self, path : String) -
 pub impl MatchNestedRoutes for NestedRoute with fn match_nested(
   self,
   path : String,
-) -> ((UInt, NestedMatch)?, String) {
+) -> ((UInt32, NestedMatch)?, String) {
   self.match_nested(path)
 }
 
@@ -399,7 +399,7 @@ pub impl MatchNestedRoutes for NestedRoute with fn match_nested(
 pub fn NestedRoute::match_nested(
   self : NestedRoute,
   path : String,
-) -> ((UInt, NestedMatch)?, String) {
+) -> ((UInt32, NestedMatch)?, String) {
   let route_segs = split_segments(self.path)
   let path_segs = split_segments(path)
 

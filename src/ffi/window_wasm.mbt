@@ -26,7 +26,7 @@ pub extern "wasm" fn window_event_listener(
 
 ///|
 #cfg(target="wasm-gc")
-pub extern "wasm" fn set_timeout(cb : () -> Unit, ms : Int) -> TimeoutHandle = "aitne" "set_timeout"
+pub extern "wasm" fn set_timeout(cb : () -> Unit, ms : Int32) -> TimeoutHandle = "aitne" "set_timeout"
 
 ///|
 #cfg(target="wasm-gc")
@@ -34,7 +34,10 @@ pub extern "wasm" fn clear_timeout(handle : TimeoutHandle) -> Unit = "aitne" "cl
 
 ///|
 #cfg(target="wasm-gc")
-pub extern "wasm" fn set_interval(cb : () -> Unit, ms : Int) -> IntervalHandle = "aitne" "set_interval"
+pub extern "wasm" fn set_interval(
+  cb : () -> Unit,
+  ms : Int32,
+) -> IntervalHandle = "aitne" "set_interval"
 
 ///|
 #cfg(target="wasm-gc")

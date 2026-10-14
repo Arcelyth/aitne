@@ -14,7 +14,7 @@ pub fn[P] prop(key : String, value : P) -> Property[P] {
 }
 
 ///|
-pub impl[P : IntoProperty] Attribute for Property[P] with fn html_len(_self) -> Int {
+pub impl[P : IntoProperty] Attribute for Property[P] with fn html_len(_self) -> Int32 {
   0
 }
 
@@ -68,7 +68,7 @@ pub impl[P : IntoProperty] Attribute for Property[P] with fn add_attr(
 
 ///|
 pub trait IntoProperty {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(
     Self,
     buf : StringBuilder,
@@ -85,7 +85,7 @@ pub trait IntoProperty {
 // ----- String property -----
 
 ///|
-pub impl IntoProperty for String with fn html_len(self) -> Int {
+pub impl IntoProperty for String with fn html_len(self) -> Int32 {
   self.length()
 }
 
@@ -128,7 +128,7 @@ pub impl IntoProperty for String with fn dry_resolve(_self) -> Unit {
 // ----- Reactive signal property (updates via effect) -----
 
 ///|
-pub impl[S : Show] IntoProperty for ReadSignal[S] with fn html_len(_self) -> Int {
+pub impl[S : Show] IntoProperty for ReadSignal[S] with fn html_len(_self) -> Int32 {
   0
 }
 

@@ -1,9 +1,9 @@
 ///|
 /// Global memo id generator.
-let memo_id_counter : Ref[UInt] = @ref.new(0)
+let memo_id_counter : Ref[UInt32] = @ref.new(0)
 
 ///|
-fn next_memo_id() -> UInt {
+fn next_memo_id() -> UInt32 {
   let id = memo_id_counter.val
   memo_id_counter.val = id + 1
   id
@@ -11,7 +11,7 @@ fn next_memo_id() -> UInt {
 
 ///|
 pub struct Memo[T] {
-  id : UInt
+  id : UInt32
   mut value : T?
   mut state : ReactiveNodeState
   /// Upstream sources used by this memo.

@@ -6,7 +6,7 @@ import {
   "moonbitlang/x@0.5.5",
   "Arcelyth/html_escape@0.3.4",
   "moonbitlang/async@0.22.4",
-  "moonbit-community/toml@0.5.0"
+  "moonbit-community/toml@0.5.0",
 }
 
 readme = "README.mbt.md"

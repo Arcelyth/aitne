@@ -17,7 +17,7 @@ pub(all) enum MbxAST {
 ///|
 pub(all) struct Parser {
   tokens : Array[Token]
-  mut cur : Int
+  mut cur : Int32
 }
 
 ///|
@@ -31,7 +31,7 @@ fn Parser::is_end(self : Parser) -> Bool {
 }
 
 ///|
-fn Parser::peek(self : Parser, step? : Int = 0) -> Token? {
+fn Parser::peek(self : Parser, step~ : Int32 = 0) -> Token? {
   if self.is_end() {
     None
   } else {

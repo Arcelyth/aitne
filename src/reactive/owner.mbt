@@ -10,7 +10,7 @@ using @any {type Any}
 ///|
 /// Per-owner runtime state. Mutable fields are lazily allocated (Option).
 pub struct Owner {
-  id : Int
+  id : Int32
   mut parent : Owner?
   mut cleanups : Array[() -> Unit]?
   mut children : Array[Owner]?
@@ -28,14 +28,14 @@ pub impl Debug for Owner with fn to_repr(self) {
 
 ///|
 /// Id allocator.
-let next_owner_id : @ref.Ref[Int] = @ref.new(0)
+let next_owner_id : @ref.Ref[Int32] = @ref.new(0)
 
 ///|
 /// Current owner.
 let current_owner : @ref.Ref[Owner?] = @ref.new(None)
 
 ///|
-fn next_id() -> Int {
+fn next_id() -> Int32 {
   let id = next_owner_id.val
   next_owner_id.val = id + 1
   id

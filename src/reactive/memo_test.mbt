@@ -1,5 +1,5 @@
 ///|
-fn create_counter() -> Ref[Int] {
+fn create_counter() -> Ref[Int32] {
   @ref.new(0)
 }
 

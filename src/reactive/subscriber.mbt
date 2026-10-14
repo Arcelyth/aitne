@@ -14,7 +14,7 @@ pub extend &Subscriber with ReactiveNode::{
 
 ///|
 pub struct ASubscriber {
-  id : UInt
+  id : UInt32
   sub : &Subscriber?
 }
 

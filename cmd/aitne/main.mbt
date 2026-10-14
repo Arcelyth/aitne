@@ -37,8 +37,8 @@ fn compile_mbx_file(
 ///|
 pub fn walk_and_compile(
   dir : String,
-  show? : Bool = false,
-  not_tmp? : Bool = false,
+  show~ : Bool = false,
+  not_tmp~ : Bool = false,
   out_dir : String?,
   style_buffer : Ref[StringBuilder],
   style_root : Array[String],

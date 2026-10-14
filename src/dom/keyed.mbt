@@ -2,7 +2,7 @@
 pub(all) struct Keyed[T, V] {
   items : () -> Iter[T]
   key_fn : (T) -> String
-  view_fn : (Int, T) -> ((Int) -> Unit, V)
+  view_fn : (Int32, T) -> ((Int32) -> Unit, V)
 }
 
 ///|
@@ -90,7 +90,7 @@ pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V] with fn hydrate(
 ///|
 pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V] with fn html_len(
   self,
-) -> Int {
+) -> Int32 {
   let mut len = 7 // "<!---->"
   let items = (self.items)()
   items.eachi((idx, item) => {
@@ -123,20 +123,20 @@ pub enum DiffOpAddMode {
 
 ///|
 pub struct DiffOpAdd {
-  at : Int
+  at : Int32
   mode : DiffOpAddMode
 }
 
 ///|
 pub struct DiffOpRemove {
-  at : Int
+  at : Int32
 }
 
 ///|
 pub struct DiffOpMove {
-  from : Int
-  to : Int
-  mut len : Int
+  from : Int32
+  to : Int32
+  mut len : Int32
   move_in_dom : Bool
 }
 
@@ -145,7 +145,7 @@ pub struct Diff {
   removed : Array[DiffOpRemove]
   moved : Array[DiffOpMove]
   added : Array[DiffOpAdd]
-  items_to_move : Int
+  items_to_move : Int32
   clear : Bool
 }
 
@@ -255,8 +255,8 @@ pub fn[T, V : Render] apply_diff(
   parent : @ffi.Element?,
   marker : @ffi.Node,
   diff : Diff,
-  children : Array[((Int) -> Unit, RenderState)?],
-  view_fn : (Int, T) -> ((Int) -> Unit, V),
+  children : Array[((Int32) -> Unit, RenderState)?],
+  view_fn : (Int32, T) -> ((Int32) -> Unit, V),
   items : Array[T?],
 ) -> Unit {
   if diff.clear {
@@ -294,7 +294,7 @@ pub fn[T, V : Render] apply_diff(
     total_moves = total_moves + group.len
   }
 
-  let move_ops : Array[(Int, Int, Bool, ((Int) -> Unit, RenderState)?)] = []
+  let move_ops : Array[(Int32, Int32, Bool, ((Int32) -> Unit, RenderState)?)] = []
   move_ops.reserve_capacity(total_moves)
 
   for group in diff.moved {
@@ -415,5 +415,5 @@ pub struct KeyedState {
   mut parent : @ffi.Element?
   marker : @ffi.Node
   mut keys : Ref[@utils.IndexSet[String]]
-  rendered_items : Array[((Int) -> Unit, RenderState)?]
+  rendered_items : Array[((Int32) -> Unit, RenderState)?]
 }

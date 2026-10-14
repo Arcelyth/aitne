@@ -37,10 +37,10 @@ pub struct BuildConfig {
 ///|
 pub struct ServerConfig {
   host : String
-  port : Int
+  port : Int32
   spa_fallback : Bool
   hmr_enabled : Bool
-  hmr_port : Int
+  hmr_port : Int32
   https_enabled : Bool
   proxy : Map[String, String]
 } derive(Debug)
@@ -162,8 +162,8 @@ fn get_bool(
 fn get_int(
   table : Map[String, @toml.TomlValue],
   key : String,
-  default : Int,
-) -> Int {
+  default : Int32,
+) -> Int32 {
   match table.get(key) {
     Some(TomlInteger(i)) => i.to_int()
     _ => default

@@ -10,7 +10,7 @@ pub fn[S] style_val(s : S) -> Style[S] {
 }
 
 ///|
-pub impl[S : IntoStyle] Attribute for Style[S] with fn html_len(_self) -> Int {
+pub impl[S : IntoStyle] Attribute for Style[S] with fn html_len(_self) -> Int32 {
   0
 }
 
@@ -64,7 +64,7 @@ pub impl[S : IntoStyle] Attribute for Style[S] with fn add_attr(
 
 ///|
 pub trait IntoStyle {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(Self, style : StringBuilder) -> Unit
   fn build(Self, el : @ffi.Element) -> AttrState
   fn rebuild(Self, state : Ref[AttrState]) -> Unit
@@ -73,7 +73,7 @@ pub trait IntoStyle {
 }
 
 ///|
-pub impl IntoStyle for String with fn html_len(self) -> Int {
+pub impl IntoStyle for String with fn html_len(self) -> Int32 {
   self.length()
 }
 

@@ -20,7 +20,7 @@ pub(open) trait TypeName {
 }
 
 ///|
-pub impl TypeName for Int with fn get_ty() -> String {
+pub impl TypeName for Int32 with fn get_ty() -> String {
   "Int"
 }
 

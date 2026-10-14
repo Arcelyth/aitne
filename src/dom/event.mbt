@@ -34,7 +34,7 @@ fn On::attach_capture(self : On, el : @ffi.Element) -> RemoveEventHandler {
 }
 
 ///|
-pub impl Attribute for On with fn html_len(_self) -> Int {
+pub impl Attribute for On with fn html_len(_self) -> Int32 {
   0
 }
 

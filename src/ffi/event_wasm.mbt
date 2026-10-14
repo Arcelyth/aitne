@@ -44,7 +44,7 @@ pub extern "wasm" fn event_prevent_default(ev : Event) -> Unit = "aitne" "event_
 
 ///|
 #cfg(target="wasm-gc")
-pub extern "wasm" fn event_button(ev : Event) -> Int = "aitne" "event_button"
+pub extern "wasm" fn event_button(ev : Event) -> Int32 = "aitne" "event_button"
 
 ///|
 #cfg(target="wasm-gc")
@@ -68,8 +68,8 @@ pub extern "wasm" fn event_composed_path(ev : Event) -> JsArray = "aitne" "event
 
 ///|
 #cfg(target="wasm-gc")
-pub extern "wasm" fn js_array_length(arr : JsArray) -> Int = "aitne" "js_array_length"
+pub extern "wasm" fn js_array_length(arr : JsArray) -> Int32 = "aitne" "js_array_length"
 
 ///|
 #cfg(target="wasm-gc")
-pub extern "wasm" fn js_array_get(arr : JsArray, idx : Int) -> Node = "aitne" "js_array_get"
+pub extern "wasm" fn js_array_get(arr : JsArray, idx : Int32) -> Node = "aitne" "js_array_get"

@@ -1,9 +1,9 @@
 ///|
-let next_client_id : Ref[Int] = { val: 0, }
+let next_client_id : Ref[Int32] = { val: 0, }
 
 ///|
 pub(all) struct HmrState {
-  mut clients : Array[(Int, @websocket.Conn)]
+  mut clients : Array[(Int32, @websocket.Conn)]
   mut watcher : @async_fs.Watcher?
   cfg : Config
   enabled : Bool
@@ -38,15 +38,15 @@ pub fn HmrState::shutdown(self : HmrState) -> Unit {
 ///|
 pub fn HmrState::add_client(
   self : HmrState,
-  id : Int,
+  id : Int32,
   ws : @websocket.Conn,
 ) -> Unit {
   self.clients.push((id, ws))
 }
 
 ///|
-pub fn HmrState::remove_client(self : HmrState, id : Int) -> Unit {
-  let alive : Array[(Int, @websocket.Conn)] = []
+pub fn HmrState::remove_client(self : HmrState, id : Int32) -> Unit {
+  let alive : Array[(Int32, @websocket.Conn)] = []
   for item in self.clients {
     if item.0 != id {
       alive.push(item)

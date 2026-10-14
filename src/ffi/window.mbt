@@ -38,7 +38,7 @@ pub extern "js" fn window_event_listener(
 
 ///|
 #cfg(target="js")
-pub extern "js" fn set_timeout(cb : () -> Unit, ms : Int) -> TimeoutHandle =
+pub extern "js" fn set_timeout(cb : () -> Unit, ms : Int32) -> TimeoutHandle =
   #|(cb, ms) => setTimeout(cb, ms)
 
 ///|
@@ -48,7 +48,7 @@ pub extern "js" fn clear_timeout(handle : TimeoutHandle) -> Unit =
 
 ///|
 #cfg(target="js")
-pub extern "js" fn set_interval(cb : () -> Unit, ms : Int) -> IntervalHandle =
+pub extern "js" fn set_interval(cb : () -> Unit, ms : Int32) -> IntervalHandle =
   #|(cb, ms) => setInterval(cb, ms)
 
 ///|

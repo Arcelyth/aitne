@@ -58,7 +58,7 @@ pub extern "js" fn event_prevent_default(ev : Event) -> Unit =
 
 ///|
 #cfg(target="js")
-pub extern "js" fn event_button(ev : Event) -> Int =
+pub extern "js" fn event_button(ev : Event) -> Int32 =
   #|(ev) => ev.button
 
 ///|
@@ -88,10 +88,10 @@ pub extern "js" fn event_composed_path(ev : Event) -> JsArray =
 
 ///|
 #cfg(target="js")
-pub extern "js" fn js_array_length(arr : JsArray) -> Int =
+pub extern "js" fn js_array_length(arr : JsArray) -> Int32 =
   #|(arr) => arr.length
 
 ///|
 #cfg(target="js")
-pub extern "js" fn js_array_get(arr : JsArray, idx : Int) -> Node =
+pub extern "js" fn js_array_get(arr : JsArray, idx : Int32) -> Node =
   #|(arr, idx) => arr[idx]

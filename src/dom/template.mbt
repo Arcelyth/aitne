@@ -60,7 +60,7 @@ pub impl[V : View + ToTemplate] Render for TemplateView[V] with fn rebuild(
 ///|
 pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V] with fn html_len(
   self,
-) -> Int {
+) -> Int32 {
   RenderHtml::html_len(self.0)
 }
 

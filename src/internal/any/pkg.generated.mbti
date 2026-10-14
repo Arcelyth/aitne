@@ -1,0 +1,36 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "Arcelyth/aitne/src/internal/any"
+
+// Values
+
+// Errors
+pub suberror TypeMismatch {
+  TypeMismatch(expect~ : TypeInfo, actual~ : TypeInfo)
+}
+pub fn TypeMismatch::output(Self, &Logger) -> Unit
+pub fn TypeMismatch::to_json(Self) -> Json
+pub fn TypeMismatch::to_string(Self) -> String
+pub impl Show for TypeMismatch
+pub impl ToJson for TypeMismatch
+
+// Types and methods
+type Any
+pub fn[T, R] Any::map(Self, (T) -> R raise?) -> Self raise?
+#as_free_fn
+pub fn[T] Any::of(T) -> Self
+pub fn[T] Any::to(Self) -> T raise TypeMismatch
+pub fn[T] Any::try_to(Self) -> T?
+pub fn Any::type_id(Self) -> TypeId
+pub fn Any::type_info(Self) -> TypeInfo
+pub fn Any::type_name(Self) -> String
+pub fn[T] Any::unsafe_coerce(Self) -> T
+
+type TypeId
+
+type TypeInfo
+pub fn TypeInfo::id(Self) -> TypeId
+pub fn TypeInfo::name(Self) -> String
+
+// Type aliases
+
+// Traits

@@ -9,7 +9,7 @@ pub trait Render {
 ///|
 /// Optional HTML serialization for SSR / static generation.
 pub trait RenderHtml: Render {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(Self) -> String = _
   fn to_html_with_buf(Self, StringBuilder, Ref[Position]) -> Unit
   fn hydrate(Self, cursor : Cursor, pos : PositionState) -> RenderState
@@ -354,7 +354,7 @@ pub impl RenderHtml for Unit with fn hydrate(_self, _cursor, _pos) -> RenderStat
 }
 
 ///|
-pub impl RenderHtml for Unit with fn html_len(_self) -> Int {
+pub impl RenderHtml for Unit with fn html_len(_self) -> Int32 {
   0
 }
 
@@ -384,7 +384,7 @@ pub impl Render for String with fn rebuild(self, state : Ref[RenderState]) -> Un
 }
 
 ///|
-pub impl RenderHtml for String with fn html_len(self) -> Int {
+pub impl RenderHtml for String with fn html_len(self) -> Int32 {
   self.length()
 }
 

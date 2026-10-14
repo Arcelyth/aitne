@@ -59,8 +59,8 @@ pub async fn start_server(cfg : Config) -> Unit {
               return
             }
           }
-          let headers = Map::from_iter(
-            [("Content-Type", get_mime_type(path))].iter(),
+          let headers : @http.Headers = Map::from_iter(
+            [(@http.CaseInsensitiveString("Content-Type"), get_mime_type(path))].iter(),
           )
           conn.send_response(200, "OK", extra_headers=headers)
           conn.write_string(content)
@@ -76,8 +76,8 @@ pub async fn start_server(cfg : Config) -> Unit {
               return
             }
           }
-          let headers = Map::from_iter(
-            [("Content-Type", "text/html; charset=utf-8")].iter(),
+          let headers : @http.Headers = Map::from_iter(
+            [(@http.CaseInsensitiveString("Content-Type"), "text/html; charset=utf-8")].iter(),
           )
           let response_html = if hmr_state.enabled {
             inject_hmr_script(html_content)

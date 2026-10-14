@@ -14,7 +14,7 @@ fn list_templates_local() -> Unit {
 async fn list_templates_remote() -> Unit {
   println("Fetching available templates from aitne-dev...")
 
-  let headers = Map([], capacity=8)
+  let headers : @http.Headers = Map([], capacity=8)
   headers.set("user-agent", "aitne-cli")
   headers.set("accept", "application/vnd.github+json")
   headers.set("accept-encoding", "identity")
@@ -58,7 +58,7 @@ async fn list_templates_remote() -> Unit {
 async fn fetch_latest_tag(tmpl_name : String) -> String {
   let path = "https://api.github.com/repos/aitne-dev/template-\{tmpl_name}/releases/latest"
 
-  let headers = Map([], capacity=8)
+  let headers : @http.Headers = Map([], capacity=8)
   headers.set("user-agent", USER_AGENT)
   headers.set("accept", "application/vnd.github+json")
   headers.set("accept-encoding", "identity")
@@ -89,7 +89,7 @@ async fn[X] download_template_stream(
 
   println("Downloading asset stream from codeload...")
 
-  let headers = Map([], capacity=8)
+  let headers : @http.Headers = Map([], capacity=8)
   headers.set("user-agent", USER_AGENT)
 
   let (resp, body) = @http.get(url, headers~) catch {

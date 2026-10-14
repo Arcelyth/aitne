@@ -1,6 +1,6 @@
 import {
   "Arcelyth/aitne/cmd/aitne/mbxc",
-  "bobzhang/toml",
+  "moonbit-community/toml",
   "moonbitlang/async",
   "moonbitlang/async/fs" @async_fs,
   "moonbitlang/async/http",

@@ -3,7 +3,7 @@ import {
   "moonbitlang/core/hashmap",
   "moonbitlang/core/debug",
   "moonbitlang/core/ref",
-  "tonyfettes/any",
+  "Arcelyth/aitne/src/internal/any",
 }
 
 options(

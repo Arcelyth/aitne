@@ -38,7 +38,6 @@ jobs:
         run: |
           rm -rf .mooncakes
           moon update
-          moon install
           moon build cmd/aitne --target=native --release
 
       - name: Prepare Artifacts

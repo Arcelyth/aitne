@@ -22,7 +22,7 @@ pub fn address(children? : Array[&View]) -> HtmlElement[TagAddress, Array[&View]
 
 pub fn anchor(href~ : String, children~ : Array[&View]) -> &View
 
-pub fn[T, V : Render] apply_diff(@ffi.Element?, @ffi.Node, Diff, Array[((Int) -> Unit, RenderState)?], (Int, T) -> ((Int) -> Unit, V), Array[T?]) -> Unit
+pub fn[T, V : Render] apply_diff(@ffi.Element?, @ffi.Node, Diff, Array[((Int32) -> Unit, RenderState)?], (Int32, T) -> ((Int32) -> Unit, V), Array[T?]) -> Unit
 
 pub fn area(children? : Array[&View]) -> HtmlElement[TagArea, Array[&View]]
 
@@ -341,12 +341,26 @@ pub fn window() -> @ffi.Window
 
 // Types and methods
 pub(all) struct Attr[K, V](K, V)
+pub fn[K : AttributeKey, V : AttributeValue] Attr::add_attr(Self[K, V], &Attribute) -> &Attribute
+pub fn[K : AttributeKey, V : AttributeValue] Attr::build(Self[K, V], @ffi.Element) -> AttrState
+pub fn[K : AttributeKey, V : AttributeValue] Attr::dry_resolve(Self[K, V]) -> Unit
+pub fn[K : AttributeKey, V : AttributeValue] Attr::html_len(Self[K, V]) -> Int32
+pub fn[K : AttributeKey, V : AttributeValue] Attr::hydrate(Self[K, V], @ffi.Element) -> AttrState
+pub fn[K : AttributeKey, V : AttributeValue] Attr::rebuild(Self[K, V], @ref.Ref[AttrState]) -> Unit
+pub fn[K : AttributeKey, V : AttributeValue] Attr::to_html(Self[K, V], StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
 pub impl[K : AttributeKey, V : AttributeValue] Attribute for Attr[K, V]
 
 pub(all) struct AttrList {
   items : Array[&Attribute]
 }
+pub fn AttrList::add_attr(Self, &Attribute) -> &Attribute
+pub fn AttrList::build(Self, @ffi.Element) -> AttrState
+pub fn AttrList::dry_resolve(Self) -> Unit
+pub fn AttrList::html_len(Self) -> Int32
+pub fn AttrList::hydrate(Self, @ffi.Element) -> AttrState
 pub fn AttrList::new() -> Self
+pub fn AttrList::rebuild(Self, @ref.Ref[AttrState]) -> Unit
+pub fn AttrList::to_html(Self, StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
 pub impl Attribute for AttrList
 
 pub enum AttrState {
@@ -366,12 +380,20 @@ pub(all) struct BrowserUrl {
 }
 pub fn BrowserUrl::complete_navigation(Self, LocationChange) -> Unit
 pub fn BrowserUrl::current() -> Url
+pub fn BrowserUrl::get_ty() -> String
 pub fn BrowserUrl::init(Self, String?) -> Unit
 pub fn BrowserUrl::new() -> Self
 pub fn BrowserUrl::redirect(Self, String) -> Unit
 pub impl @reactive.TypeName for BrowserUrl
 
 pub(all) struct Class[C](C)
+pub fn[C : IntoClass] Class::add_attr(Self[C], &Attribute) -> &Attribute
+pub fn[C : IntoClass] Class::build(Self[C], @ffi.Element) -> AttrState
+pub fn[C : IntoClass] Class::dry_resolve(Self[C]) -> Unit
+pub fn[C : IntoClass] Class::html_len(Self[C]) -> Int32
+pub fn[C : IntoClass] Class::hydrate(Self[C], @ffi.Element) -> AttrState
+pub fn[C : IntoClass] Class::rebuild(Self[C], @ref.Ref[AttrState]) -> Unit
+pub fn[C : IntoClass] Class::to_html(Self[C], StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
 pub impl[C : IntoClass] Attribute for Class[C]
 
 pub struct Cursor {
@@ -391,12 +413,12 @@ pub struct Diff {
   removed : Array[DiffOpRemove]
   moved : Array[DiffOpMove]
   added : Array[DiffOpAdd]
-  items_to_move : Int
+  items_to_move : Int32
   clear : Bool
 }
 
 pub struct DiffOpAdd {
-  at : Int
+  at : Int32
   mode : DiffOpAddMode
 }
 
@@ -404,16 +426,18 @@ pub enum DiffOpAddMode {
   Normal
   Append
 } derive(Eq)
+pub fn DiffOpAddMode::equal(Self, Self) -> Bool
+pub fn DiffOpAddMode::not_equal(Self, Self) -> Bool
 
 pub struct DiffOpMove {
-  from : Int
-  to : Int
-  mut len : Int
+  from : Int32
+  to : Int32
+  mut len : Int32
   move_in_dom : Bool
 }
 
 pub struct DiffOpRemove {
-  at : Int
+  at : Int32
 }
 
 pub struct DomCache {
@@ -424,6 +448,13 @@ pub struct DomCache {
 pub struct DynTextNode {
   getter : () -> String
 }
+pub fn DynTextNode::build(Self) -> RenderState
+pub fn DynTextNode::html_len(Self) -> Int32
+pub fn DynTextNode::hydrate(Self, Cursor, PositionState) -> RenderState
+pub fn DynTextNode::rebuild(Self, @ref.Ref[RenderState]) -> Unit
+pub fn DynTextNode::style(Self, &IntoStyle) -> &View
+pub fn DynTextNode::to_html(Self) -> String
+pub fn DynTextNode::to_html_with_buf(Self, StringBuilder, @ref.Ref[Position]) -> Unit
 pub impl Render for DynTextNode
 pub impl RenderHtml for DynTextNode
 pub impl View for DynTextNode
@@ -455,6 +486,13 @@ pub struct ForEach[T] {
   key : (T) -> String
   children : (T) -> &View
 }
+pub fn[T] ForEach::build(Self[T]) -> RenderState
+pub fn[T] ForEach::html_len(Self[T]) -> Int32
+pub fn[T] ForEach::hydrate(Self[T], Cursor, PositionState) -> RenderState
+pub fn[T] ForEach::rebuild(Self[T], @ref.Ref[RenderState]) -> Unit
+pub fn[T] ForEach::style(Self[T], &IntoStyle) -> &View
+pub fn[T] ForEach::to_html(Self[T]) -> String
+pub fn[T] ForEach::to_html_with_buf(Self[T], StringBuilder, @ref.Ref[Position]) -> Unit
 pub impl[T] Render for ForEach[T]
 pub impl[T] RenderHtml for ForEach[T]
 pub impl[T] View for ForEach[T]
@@ -464,6 +502,13 @@ pub struct ForNode[T, K] {
   key : (T) -> K
   children : (T) -> &View
 }
+pub fn[T, K : Hash + Eq] ForNode::build(Self[T, K]) -> RenderState
+pub fn[T, K : Hash + Eq] ForNode::html_len(Self[T, K]) -> Int32
+pub fn[T, K : Hash + Eq] ForNode::hydrate(Self[T, K], Cursor, PositionState) -> RenderState
+pub fn[T, K : Hash + Eq] ForNode::rebuild(Self[T, K], @ref.Ref[RenderState]) -> Unit
+pub fn[T, K : Hash + Eq] ForNode::style(Self[T, K], &IntoStyle) -> &View
+pub fn[T, K : Hash + Eq] ForNode::to_html(Self[T, K]) -> String
+pub fn[T, K : Hash + Eq] ForNode::to_html_with_buf(Self[T, K], StringBuilder, @ref.Ref[Position]) -> Unit
 pub impl[T, K : Hash + Eq] Render for ForNode[T, K]
 pub impl[T, K : Hash + Eq] RenderHtml for ForNode[T, K]
 pub impl[T, K : Hash + Eq] View for ForNode[T, K]
@@ -478,12 +523,18 @@ pub(all) struct HtmlElement[T, C] {
   children : C
 }
 pub fn[T, C] HtmlElement::add_attr(Self[T, C], &Attribute) -> Self[T, C]
+pub fn[T : ElementType, C : Render] HtmlElement::build(Self[T, C]) -> RenderState
 pub fn[T, C] HtmlElement::children(Self[T, C], Array[&View]) -> Self[T, Array[&View]]
 pub fn[T, C, Cl : IntoClass] HtmlElement::class(Self[T, C], Cl) -> Self[T, C]
+pub fn[T : ElementType, C : RenderHtml] HtmlElement::html_len(Self[T, C]) -> Int32
+pub fn[T : ElementType, C : RenderHtml] HtmlElement::hydrate(Self[T, C], Cursor, PositionState) -> RenderState
 pub fn[T, C] HtmlElement::on(Self[T, C], EventType, (@ffi.Event) -> Unit) -> Self[T, C]
 #alias(attr)
 pub fn[T, C, P : IntoProperty] HtmlElement::prop(Self[T, C], String, P) -> Self[T, C]
+pub fn[T : ElementType, C : Render] HtmlElement::rebuild(Self[T, C], @ref.Ref[RenderState]) -> Unit
 pub fn[T, C, S : IntoStyle] HtmlElement::style(Self[T, C], S) -> Self[T, C]
+pub fn[T : ElementType, C : RenderHtml] HtmlElement::to_html(Self[T, C]) -> String
+pub fn[T : ElementType, C : RenderHtml] HtmlElement::to_html_with_buf(Self[T, C], StringBuilder, @ref.Ref[Position]) -> Unit
 pub fn[T, C, P : IntoProperty] HtmlElement::value(Self[T, C], P) -> Self[T, C]
 pub impl[T : ElementType, C : Render] Render for HtmlElement[T, C]
 pub impl[T : ElementType, C : RenderHtml] RenderHtml for HtmlElement[T, C]
@@ -492,8 +543,15 @@ pub impl[T : ElementType, C : Render + RenderHtml] View for HtmlElement[T, C]
 pub(all) struct Keyed[T, V] {
   items : () -> Iter[T]
   key_fn : (T) -> String
-  view_fn : (Int, T) -> ((Int) -> Unit, V)
+  view_fn : (Int32, T) -> ((Int32) -> Unit, V)
 }
+pub fn[T, V : Render] Keyed::build(Self[T, V]) -> RenderState
+pub fn[T, V : Render + RenderHtml] Keyed::html_len(Self[T, V]) -> Int32
+pub fn[T, V : Render + RenderHtml] Keyed::hydrate(Self[T, V], Cursor, PositionState) -> RenderState
+pub fn[T, V : Render] Keyed::rebuild(Self[T, V], @ref.Ref[RenderState]) -> Unit
+pub fn[T, V : View] Keyed::style(Self[T, V], &IntoStyle) -> &View
+pub fn[T, V : Render + RenderHtml] Keyed::to_html(Self[T, V]) -> String
+pub fn[T, V : Render + RenderHtml] Keyed::to_html_with_buf(Self[T, V], StringBuilder, @ref.Ref[Position]) -> Unit
 pub impl[T, V : Render] Render for Keyed[T, V]
 pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V]
 pub impl[T, V : View] View for Keyed[T, V]
@@ -502,7 +560,7 @@ pub struct KeyedState {
   mut parent : @ffi.Element?
   marker : @ffi.Node
   mut keys : @ref.Ref[@utils.IndexSet[String]]
-  rendered_items : Array[((Int) -> Unit, RenderState)?]
+  rendered_items : Array[((Int32) -> Unit, RenderState)?]
 }
 
 pub(all) struct Location {
@@ -512,14 +570,17 @@ pub(all) struct Location {
 } derive(@debug.Debug)
 pub fn Location::current() -> Self
 pub fn Location::new(@reactive.RwSignal[Url]) -> Self
+pub fn Location::to_repr(Self) -> @debug.Repr
 
 pub struct LocationChange {
   value : String
   replace : Bool
   scroll : Bool
 } derive(Default)
+pub fn LocationChange::default() -> Self
 
 pub(all) struct Matched(@reactive.Memo[String])
+pub fn Matched::get_ty() -> String
 pub impl @reactive.TypeName for Matched
 
 pub struct MultiBlockState {
@@ -532,25 +593,27 @@ pub fn MultiBlockState::new(String, String) -> Self
 pub fn MultiBlockState::set_cleanup(Self, () -> Unit) -> Self
 
 pub(all) struct NestedMatch {
-  id : UInt
+  id : UInt32
   matched : String
   params : Array[(String, String)]
   child : NestedMatch?
   view_fn : () -> &View
 }
 pub fn NestedMatch::build(Self, Url, String?, @ref.Ref[Array[() -> @reactive.Trigger]], @ref.Ref[Array[RouteContext]], @ref.Ref[@reactive.Owner]) -> Unit
-pub fn NestedMatch::rebuild(Self, Url, String?, Int, @ref.Ref[Array[RouteContext]], @ref.Ref[@reactive.Owner]) -> Int
+pub fn NestedMatch::rebuild(Self, Url, String?, Int32, @ref.Ref[Array[RouteContext]], @ref.Ref[@reactive.Owner]) -> Int32
+pub fn NestedMatch::to_repr(Self) -> @debug.Repr
 pub impl @debug.Debug for NestedMatch
 
 pub(all) struct NestedRoute {
-  id : UInt
+  id : UInt32
   path : String
   child : Array[NestedRoute]
   view : () -> &View
 }
 pub fn NestedRoute::child(Self, Array[Self]) -> Self
-pub fn NestedRoute::match_nested(Self, String) -> ((UInt, NestedMatch)?, String)
+pub fn NestedRoute::match_nested(Self, String) -> ((UInt32, NestedMatch)?, String)
 pub fn NestedRoute::new(String, () -> &View) -> Self
+pub fn NestedRoute::to_repr(Self) -> @debug.Repr
 pub impl MatchNestedRoutes for NestedRoute
 pub impl @debug.Debug for NestedRoute
 
@@ -563,6 +626,14 @@ pub(all) struct NestedRouteView[D] {
   fallback : () -> &View
   set_is_routing : ((Bool) -> Unit)?
 }
+pub fn[D : MatchNestedRoutes] NestedRouteView::build(Self[D]) -> RenderState
+pub fn[D : MatchNestedRoutes] NestedRouteView::html_len(Self[D]) -> Int32
+pub fn[D : MatchNestedRoutes] NestedRouteView::hydrate(Self[D], Cursor, PositionState) -> RenderState
+pub fn[D : MatchNestedRoutes] NestedRouteView::rebuild(Self[D], @ref.Ref[RenderState]) -> Unit
+pub fn[D : MatchNestedRoutes] NestedRouteView::style(Self[D], &IntoStyle) -> &View
+pub fn[D : MatchNestedRoutes] NestedRouteView::to_html(Self[D]) -> String
+pub fn[D : MatchNestedRoutes] NestedRouteView::to_html_with_buf(Self[D], StringBuilder, @ref.Ref[Position]) -> Unit
+pub fn[D] NestedRouteView::to_repr(Self[D]) -> @debug.Repr
 pub impl[D : MatchNestedRoutes] Render for NestedRouteView[D]
 pub impl[D : MatchNestedRoutes] RenderHtml for NestedRouteView[D]
 pub impl[D : MatchNestedRoutes] View for NestedRouteView[D]
@@ -573,12 +644,26 @@ pub struct On {
   owner : @reactive.Owner
   fun : (@ffi.Event) -> Unit
 }
+pub fn On::add_attr(Self, &Attribute) -> &Attribute
+pub fn On::build(Self, @ffi.Element) -> AttrState
+pub fn On::dry_resolve(Self) -> Unit
+pub fn On::html_len(Self) -> Int32
+pub fn On::hydrate(Self, @ffi.Element) -> AttrState
+pub fn On::rebuild(Self, @ref.Ref[AttrState]) -> Unit
+pub fn On::to_html(Self, StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
 pub impl Attribute for On
 
 pub struct OutletView {
   child : RouteContext?
   outer_owner : @reactive.Owner
 }
+pub fn OutletView::build(Self) -> RenderState
+pub fn OutletView::html_len(Self) -> Int32
+pub fn OutletView::hydrate(Self, Cursor, PositionState) -> RenderState
+pub fn OutletView::rebuild(Self, @ref.Ref[RenderState]) -> Unit
+pub fn OutletView::style(Self, &IntoStyle) -> &View
+pub fn OutletView::to_html(Self) -> String
+pub fn OutletView::to_html_with_buf(Self, StringBuilder, @ref.Ref[Position]) -> Unit
 pub impl Render for OutletView
 pub impl RenderHtml for OutletView
 pub impl View for OutletView
@@ -587,8 +672,14 @@ pub struct OwnedView[T] {
   owner : @reactive.Owner
   view : T
 }
+pub fn[T : Render] OwnedView::build(Self[T]) -> RenderState
+pub fn[T : RenderHtml] OwnedView::html_len(Self[T]) -> Int32
+pub fn[T : RenderHtml] OwnedView::hydrate(Self[T], Cursor, PositionState) -> RenderState
 pub fn[T] OwnedView::new(T) -> Self[T]
 pub fn[T] OwnedView::new_with_owner(@reactive.Owner, T) -> Self[T]
+pub fn[T : Render] OwnedView::rebuild(Self[T], @ref.Ref[RenderState]) -> Unit
+pub fn[T : RenderHtml] OwnedView::to_html(Self[T]) -> String
+pub fn[T : RenderHtml] OwnedView::to_html_with_buf(Self[T], StringBuilder, @ref.Ref[Position]) -> Unit
 pub impl[T : Render] Render for OwnedView[T]
 pub impl[T : RenderHtml] RenderHtml for OwnedView[T]
 
@@ -596,19 +687,26 @@ pub struct OwnedViewState {
   state : @ref.Ref[RenderState]
   owner : @reactive.Owner
 }
+pub fn OwnedViewState::elements(Self) -> Array[@ffi.Node]
+pub fn OwnedViewState::insert_before(Self, &Mountable) -> Bool
+pub fn OwnedViewState::mount(Self, @ffi.Node, @ffi.Node) -> Unit
 pub fn OwnedViewState::new(RenderState, @reactive.Owner) -> Self
+pub fn OwnedViewState::unmount(Self) -> Unit
 pub impl Mountable for OwnedViewState
 
 pub struct Params(Array[(String, Array[String])]) derive(Eq, @debug.Debug)
 pub fn Params::add(Self, String, String) -> Unit
 pub fn Params::contains(Self, String) -> Bool
 pub fn Params::empty() -> Self
+pub fn Params::equal(Self, Self) -> Bool
 pub fn Params::from_search(String) -> Self
 pub fn Params::get(Self, String) -> String?
 pub fn Params::get_all(Self, String) -> Array[String]
 pub fn Params::iter(Self) -> Iter[(String, String)]
 pub fn Params::merge(Self, Self) -> Self
+pub fn Params::not_equal(Self, Self) -> Bool
 pub fn Params::replace(Self, String, String) -> Unit
+pub fn Params::to_repr(Self) -> @debug.Repr
 
 pub enum Position {
   Current
@@ -618,6 +716,10 @@ pub enum Position {
   OnlyChild
   LastChild
 } derive(Eq, Hash)
+pub fn Position::equal(Self, Self) -> Bool
+pub fn Position::hash(Self) -> Int32
+pub fn Position::hash_combine(Self, Hasher) -> Unit
+pub fn Position::not_equal(Self, Self) -> Bool
 
 pub struct PositionState {
   state : @ref.Ref[Position]
@@ -632,11 +734,25 @@ pub struct Property[P] {
   key : String
   value : P
 }
+pub fn[P : IntoProperty] Property::add_attr(Self[P], &Attribute) -> &Attribute
+pub fn[P : IntoProperty] Property::build(Self[P], @ffi.Element) -> AttrState
+pub fn[P : IntoProperty] Property::dry_resolve(Self[P]) -> Unit
+pub fn[P : IntoProperty] Property::html_len(Self[P]) -> Int32
+pub fn[P : IntoProperty] Property::hydrate(Self[P], @ffi.Element) -> AttrState
+pub fn[P : IntoProperty] Property::rebuild(Self[P], @ref.Ref[AttrState]) -> Unit
+pub fn[P : IntoProperty] Property::to_html(Self[P], StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
 pub impl[P : IntoProperty] Attribute for Property[P]
 
 pub struct RawNodeView {
   node : @ffi.Node
 }
+pub fn RawNodeView::build(Self) -> RenderState
+pub fn RawNodeView::html_len(Self) -> Int32
+pub fn RawNodeView::hydrate(Self, Cursor, PositionState) -> RenderState
+pub fn RawNodeView::rebuild(Self, @ref.Ref[RenderState]) -> Unit
+pub fn RawNodeView::style(Self, &IntoStyle) -> &View
+pub fn RawNodeView::to_html(Self) -> String
+pub fn RawNodeView::to_html_with_buf(Self, StringBuilder, @ref.Ref[Position]) -> Unit
 pub impl Render for RawNodeView
 pub impl RenderHtml for RawNodeView
 pub impl View for RawNodeView
@@ -657,10 +773,14 @@ pub enum RenderState {
   OwnedViewState(OwnedViewState)
   RawNode(@ffi.Node)
 }
+pub fn RenderState::elements(Self) -> Array[@ffi.Node]
+pub fn RenderState::insert_before(Self, &Mountable) -> Bool
+pub fn RenderState::mount(Self, @ffi.Node, @ffi.Node) -> Unit
+pub fn RenderState::unmount(Self) -> Unit
 pub impl Mountable for RenderState
 
 pub(all) struct RouteContext {
-  mut id : UInt
+  mut id : UInt32
   url : @reactive.RwSignal[Url]
   params : @reactive.RwSignal[Params]
   matched : @reactive.RwSignal[String]
@@ -671,6 +791,7 @@ pub(all) struct RouteContext {
   mut child : RouteContext?
   trigger : @reactive.Trigger
 }
+pub fn RouteContext::get_ty() -> String
 pub impl @reactive.TypeName for RouteContext
 
 pub struct RouteDefs[Ch] {
@@ -678,6 +799,7 @@ pub struct RouteDefs[Ch] {
   children : Ch
 }
 pub fn[Ch : MatchNestedRoutes] RouteDefs::match_route(Self[Ch], String) -> NestedMatch?
+pub fn[Ch] RouteDefs::to_repr(Self[Ch]) -> @debug.Repr
 pub impl[Ch] @debug.Debug for RouteDefs[Ch]
 
 pub struct RouterChildren(() -> &View)
@@ -688,6 +810,7 @@ pub(all) struct RouterContext {
   location : Location
   set_is_routing : ((Bool) -> Unit)?
 }
+pub fn RouterContext::get_ty() -> String
 pub fn RouterContext::resolve_path(Self, String, String?) -> String
 pub impl @reactive.TypeName for RouterContext
 
@@ -700,471 +823,723 @@ pub struct RouterState {
 }
 
 pub(all) struct RxClass[T](() -> T)
+pub fn[T : IntoClass] RxClass::build(Self[T], @ffi.Element) -> AttrState
+pub fn[T : IntoClass] RxClass::dry_resolve(Self[T]) -> Unit
+pub fn[T : IntoClass] RxClass::html_len(Self[T]) -> Int32
+pub fn[T : IntoClass] RxClass::hydrate(Self[T], @ffi.Element) -> AttrState
+pub fn[T : IntoClass] RxClass::rebuild(Self[T], @ref.Ref[AttrState]) -> Unit
+pub fn[T : IntoClass] RxClass::to_html(Self[T], StringBuilder) -> Unit
 pub impl[T : IntoClass] IntoClass for RxClass[T]
 
 pub struct Style[S](S)
+pub fn[S : IntoStyle] Style::add_attr(Self[S], &Attribute) -> &Attribute
+pub fn[S : IntoStyle] Style::build(Self[S], @ffi.Element) -> AttrState
+pub fn[S : IntoStyle] Style::dry_resolve(Self[S]) -> Unit
+pub fn[S : IntoStyle] Style::html_len(Self[S]) -> Int32
+pub fn[S : IntoStyle] Style::hydrate(Self[S], @ffi.Element) -> AttrState
+pub fn[S : IntoStyle] Style::rebuild(Self[S], @ref.Ref[AttrState]) -> Unit
+pub fn[S : IntoStyle] Style::to_html(Self[S], StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
 pub impl[S : IntoStyle] Attribute for Style[S]
 
 pub struct TagA {
 }
+pub fn TagA::is_self_closing(Self) -> Bool
+pub fn TagA::tag(Self) -> String
 pub impl ElementType for TagA
 
 pub struct TagAbbr {
 }
+pub fn TagAbbr::is_self_closing(Self) -> Bool
+pub fn TagAbbr::tag(Self) -> String
 pub impl ElementType for TagAbbr
 
 pub struct TagAddress {
 }
+pub fn TagAddress::is_self_closing(Self) -> Bool
+pub fn TagAddress::tag(Self) -> String
 pub impl ElementType for TagAddress
 
 pub struct TagArea {
 }
+pub fn TagArea::is_self_closing(Self) -> Bool
+pub fn TagArea::tag(Self) -> String
 pub impl ElementType for TagArea
 
 pub struct TagArticle {
 }
+pub fn TagArticle::is_self_closing(Self) -> Bool
+pub fn TagArticle::tag(Self) -> String
 pub impl ElementType for TagArticle
 
 pub struct TagAside {
 }
+pub fn TagAside::is_self_closing(Self) -> Bool
+pub fn TagAside::tag(Self) -> String
 pub impl ElementType for TagAside
 
 pub struct TagAudio {
 }
+pub fn TagAudio::is_self_closing(Self) -> Bool
+pub fn TagAudio::tag(Self) -> String
 pub impl ElementType for TagAudio
 
 pub struct TagB {
 }
+pub fn TagB::is_self_closing(Self) -> Bool
+pub fn TagB::tag(Self) -> String
 pub impl ElementType for TagB
 
 pub struct TagBase {
 }
+pub fn TagBase::is_self_closing(Self) -> Bool
+pub fn TagBase::tag(Self) -> String
 pub impl ElementType for TagBase
 
 pub struct TagBdi {
 }
+pub fn TagBdi::is_self_closing(Self) -> Bool
+pub fn TagBdi::tag(Self) -> String
 pub impl ElementType for TagBdi
 
 pub struct TagBdo {
 }
+pub fn TagBdo::is_self_closing(Self) -> Bool
+pub fn TagBdo::tag(Self) -> String
 pub impl ElementType for TagBdo
 
 pub struct TagBlockquote {
 }
+pub fn TagBlockquote::is_self_closing(Self) -> Bool
+pub fn TagBlockquote::tag(Self) -> String
 pub impl ElementType for TagBlockquote
 
 pub struct TagBody {
 }
+pub fn TagBody::is_self_closing(Self) -> Bool
+pub fn TagBody::tag(Self) -> String
 pub impl ElementType for TagBody
 
 pub struct TagBr {
 }
+pub fn TagBr::is_self_closing(Self) -> Bool
+pub fn TagBr::tag(Self) -> String
 pub impl ElementType for TagBr
 
 pub struct TagButton {
 }
+pub fn TagButton::is_self_closing(Self) -> Bool
+pub fn TagButton::tag(Self) -> String
 pub impl ElementType for TagButton
 
 pub struct TagCanvas {
 }
+pub fn TagCanvas::is_self_closing(Self) -> Bool
+pub fn TagCanvas::tag(Self) -> String
 pub impl ElementType for TagCanvas
 
 pub struct TagCaption {
 }
+pub fn TagCaption::is_self_closing(Self) -> Bool
+pub fn TagCaption::tag(Self) -> String
 pub impl ElementType for TagCaption
 
 pub struct TagCite {
 }
+pub fn TagCite::is_self_closing(Self) -> Bool
+pub fn TagCite::tag(Self) -> String
 pub impl ElementType for TagCite
 
 pub struct TagCode {
 }
+pub fn TagCode::is_self_closing(Self) -> Bool
+pub fn TagCode::tag(Self) -> String
 pub impl ElementType for TagCode
 
 pub struct TagCol {
 }
+pub fn TagCol::is_self_closing(Self) -> Bool
+pub fn TagCol::tag(Self) -> String
 pub impl ElementType for TagCol
 
 pub struct TagColgroup {
 }
+pub fn TagColgroup::is_self_closing(Self) -> Bool
+pub fn TagColgroup::tag(Self) -> String
 pub impl ElementType for TagColgroup
 
 pub struct TagData {
 }
+pub fn TagData::is_self_closing(Self) -> Bool
+pub fn TagData::tag(Self) -> String
 pub impl ElementType for TagData
 
 pub struct TagDatalist {
 }
+pub fn TagDatalist::is_self_closing(Self) -> Bool
+pub fn TagDatalist::tag(Self) -> String
 pub impl ElementType for TagDatalist
 
 pub struct TagDd {
 }
+pub fn TagDd::is_self_closing(Self) -> Bool
+pub fn TagDd::tag(Self) -> String
 pub impl ElementType for TagDd
 
 pub struct TagDel {
 }
+pub fn TagDel::is_self_closing(Self) -> Bool
+pub fn TagDel::tag(Self) -> String
 pub impl ElementType for TagDel
 
 pub struct TagDetails {
 }
+pub fn TagDetails::is_self_closing(Self) -> Bool
+pub fn TagDetails::tag(Self) -> String
 pub impl ElementType for TagDetails
 
 pub struct TagDfn {
 }
+pub fn TagDfn::is_self_closing(Self) -> Bool
+pub fn TagDfn::tag(Self) -> String
 pub impl ElementType for TagDfn
 
 pub struct TagDialog {
 }
+pub fn TagDialog::is_self_closing(Self) -> Bool
+pub fn TagDialog::tag(Self) -> String
 pub impl ElementType for TagDialog
 
 pub struct TagDiv {
 }
+pub fn TagDiv::is_self_closing(Self) -> Bool
+pub fn TagDiv::tag(Self) -> String
 pub impl ElementType for TagDiv
 
 pub struct TagDl {
 }
+pub fn TagDl::is_self_closing(Self) -> Bool
+pub fn TagDl::tag(Self) -> String
 pub impl ElementType for TagDl
 
 pub struct TagDt {
 }
+pub fn TagDt::is_self_closing(Self) -> Bool
+pub fn TagDt::tag(Self) -> String
 pub impl ElementType for TagDt
 
 pub struct TagEm {
 }
+pub fn TagEm::is_self_closing(Self) -> Bool
+pub fn TagEm::tag(Self) -> String
 pub impl ElementType for TagEm
 
 pub struct TagEmbed {
 }
+pub fn TagEmbed::is_self_closing(Self) -> Bool
+pub fn TagEmbed::tag(Self) -> String
 pub impl ElementType for TagEmbed
 
 pub struct TagFieldset {
 }
+pub fn TagFieldset::is_self_closing(Self) -> Bool
+pub fn TagFieldset::tag(Self) -> String
 pub impl ElementType for TagFieldset
 
 pub struct TagFigcaption {
 }
+pub fn TagFigcaption::is_self_closing(Self) -> Bool
+pub fn TagFigcaption::tag(Self) -> String
 pub impl ElementType for TagFigcaption
 
 pub struct TagFigure {
 }
+pub fn TagFigure::is_self_closing(Self) -> Bool
+pub fn TagFigure::tag(Self) -> String
 pub impl ElementType for TagFigure
 
 pub struct TagFooter {
 }
+pub fn TagFooter::is_self_closing(Self) -> Bool
+pub fn TagFooter::tag(Self) -> String
 pub impl ElementType for TagFooter
 
 pub struct TagForm {
 }
+pub fn TagForm::is_self_closing(Self) -> Bool
+pub fn TagForm::tag(Self) -> String
 pub impl ElementType for TagForm
 
 pub struct TagH1 {
 }
+pub fn TagH1::is_self_closing(Self) -> Bool
+pub fn TagH1::tag(Self) -> String
 pub impl ElementType for TagH1
 
 pub struct TagH2 {
 }
+pub fn TagH2::is_self_closing(Self) -> Bool
+pub fn TagH2::tag(Self) -> String
 pub impl ElementType for TagH2
 
 pub struct TagH3 {
 }
+pub fn TagH3::is_self_closing(Self) -> Bool
+pub fn TagH3::tag(Self) -> String
 pub impl ElementType for TagH3
 
 pub struct TagH4 {
 }
+pub fn TagH4::is_self_closing(Self) -> Bool
+pub fn TagH4::tag(Self) -> String
 pub impl ElementType for TagH4
 
 pub struct TagH5 {
 }
+pub fn TagH5::is_self_closing(Self) -> Bool
+pub fn TagH5::tag(Self) -> String
 pub impl ElementType for TagH5
 
 pub struct TagH6 {
 }
+pub fn TagH6::is_self_closing(Self) -> Bool
+pub fn TagH6::tag(Self) -> String
 pub impl ElementType for TagH6
 
 pub struct TagHead {
 }
+pub fn TagHead::is_self_closing(Self) -> Bool
+pub fn TagHead::tag(Self) -> String
 pub impl ElementType for TagHead
 
 pub struct TagHeader {
 }
+pub fn TagHeader::is_self_closing(Self) -> Bool
+pub fn TagHeader::tag(Self) -> String
 pub impl ElementType for TagHeader
 
 pub struct TagHgroup {
 }
+pub fn TagHgroup::is_self_closing(Self) -> Bool
+pub fn TagHgroup::tag(Self) -> String
 pub impl ElementType for TagHgroup
 
 pub struct TagHr {
 }
+pub fn TagHr::is_self_closing(Self) -> Bool
+pub fn TagHr::tag(Self) -> String
 pub impl ElementType for TagHr
 
 pub struct TagHtml {
 }
+pub fn TagHtml::is_self_closing(Self) -> Bool
+pub fn TagHtml::tag(Self) -> String
 pub impl ElementType for TagHtml
 
 pub struct TagI {
 }
+pub fn TagI::is_self_closing(Self) -> Bool
+pub fn TagI::tag(Self) -> String
 pub impl ElementType for TagI
 
 pub struct TagIframe {
 }
+pub fn TagIframe::is_self_closing(Self) -> Bool
+pub fn TagIframe::tag(Self) -> String
 pub impl ElementType for TagIframe
 
 pub struct TagImg {
 }
+pub fn TagImg::is_self_closing(Self) -> Bool
+pub fn TagImg::tag(Self) -> String
 pub impl ElementType for TagImg
 
 pub struct TagInput {
 }
+pub fn TagInput::is_self_closing(Self) -> Bool
+pub fn TagInput::tag(Self) -> String
 pub impl ElementType for TagInput
 
 pub struct TagIns {
 }
+pub fn TagIns::is_self_closing(Self) -> Bool
+pub fn TagIns::tag(Self) -> String
 pub impl ElementType for TagIns
 
 pub struct TagKbd {
 }
+pub fn TagKbd::is_self_closing(Self) -> Bool
+pub fn TagKbd::tag(Self) -> String
 pub impl ElementType for TagKbd
 
 pub struct TagLabel {
 }
+pub fn TagLabel::is_self_closing(Self) -> Bool
+pub fn TagLabel::tag(Self) -> String
 pub impl ElementType for TagLabel
 
 pub struct TagLegend {
 }
+pub fn TagLegend::is_self_closing(Self) -> Bool
+pub fn TagLegend::tag(Self) -> String
 pub impl ElementType for TagLegend
 
 pub struct TagLi {
 }
+pub fn TagLi::is_self_closing(Self) -> Bool
+pub fn TagLi::tag(Self) -> String
 pub impl ElementType for TagLi
 
 pub struct TagLink {
 }
+pub fn TagLink::is_self_closing(Self) -> Bool
+pub fn TagLink::tag(Self) -> String
 pub impl ElementType for TagLink
 
 pub struct TagMain_ {
 }
+pub fn TagMain_::is_self_closing(Self) -> Bool
+pub fn TagMain_::tag(Self) -> String
 pub impl ElementType for TagMain_
 
 pub struct TagMap {
 }
+pub fn TagMap::is_self_closing(Self) -> Bool
+pub fn TagMap::tag(Self) -> String
 pub impl ElementType for TagMap
 
 pub struct TagMark {
 }
+pub fn TagMark::is_self_closing(Self) -> Bool
+pub fn TagMark::tag(Self) -> String
 pub impl ElementType for TagMark
 
 pub struct TagMenu {
 }
+pub fn TagMenu::is_self_closing(Self) -> Bool
+pub fn TagMenu::tag(Self) -> String
 pub impl ElementType for TagMenu
 
 pub struct TagMeta {
 }
+pub fn TagMeta::is_self_closing(Self) -> Bool
+pub fn TagMeta::tag(Self) -> String
 pub impl ElementType for TagMeta
 
 pub struct TagMeter {
 }
+pub fn TagMeter::is_self_closing(Self) -> Bool
+pub fn TagMeter::tag(Self) -> String
 pub impl ElementType for TagMeter
 
 pub struct TagNav {
 }
+pub fn TagNav::is_self_closing(Self) -> Bool
+pub fn TagNav::tag(Self) -> String
 pub impl ElementType for TagNav
 
 pub struct TagNoscript {
 }
+pub fn TagNoscript::is_self_closing(Self) -> Bool
+pub fn TagNoscript::tag(Self) -> String
 pub impl ElementType for TagNoscript
 
 pub struct TagObject {
 }
+pub fn TagObject::is_self_closing(Self) -> Bool
+pub fn TagObject::tag(Self) -> String
 pub impl ElementType for TagObject
 
 pub struct TagOl {
 }
+pub fn TagOl::is_self_closing(Self) -> Bool
+pub fn TagOl::tag(Self) -> String
 pub impl ElementType for TagOl
 
 pub struct TagOptgroup {
 }
+pub fn TagOptgroup::is_self_closing(Self) -> Bool
+pub fn TagOptgroup::tag(Self) -> String
 pub impl ElementType for TagOptgroup
 
 pub struct TagOption_ {
 }
+pub fn TagOption_::is_self_closing(Self) -> Bool
+pub fn TagOption_::tag(Self) -> String
 pub impl ElementType for TagOption_
 
 pub struct TagOutput {
 }
+pub fn TagOutput::is_self_closing(Self) -> Bool
+pub fn TagOutput::tag(Self) -> String
 pub impl ElementType for TagOutput
 
 pub struct TagP {
 }
+pub fn TagP::is_self_closing(Self) -> Bool
+pub fn TagP::tag(Self) -> String
 pub impl ElementType for TagP
 
 pub struct TagPicture {
 }
+pub fn TagPicture::is_self_closing(Self) -> Bool
+pub fn TagPicture::tag(Self) -> String
 pub impl ElementType for TagPicture
 
 pub struct TagPortal {
 }
+pub fn TagPortal::is_self_closing(Self) -> Bool
+pub fn TagPortal::tag(Self) -> String
 pub impl ElementType for TagPortal
 
 pub struct TagPre {
 }
+pub fn TagPre::is_self_closing(Self) -> Bool
+pub fn TagPre::tag(Self) -> String
 pub impl ElementType for TagPre
 
 pub struct TagProgress {
 }
+pub fn TagProgress::is_self_closing(Self) -> Bool
+pub fn TagProgress::tag(Self) -> String
 pub impl ElementType for TagProgress
 
 pub struct TagQ {
 }
+pub fn TagQ::is_self_closing(Self) -> Bool
+pub fn TagQ::tag(Self) -> String
 pub impl ElementType for TagQ
 
 pub struct TagRp {
 }
+pub fn TagRp::is_self_closing(Self) -> Bool
+pub fn TagRp::tag(Self) -> String
 pub impl ElementType for TagRp
 
 pub struct TagRt {
 }
+pub fn TagRt::is_self_closing(Self) -> Bool
+pub fn TagRt::tag(Self) -> String
 pub impl ElementType for TagRt
 
 pub struct TagRuby {
 }
+pub fn TagRuby::is_self_closing(Self) -> Bool
+pub fn TagRuby::tag(Self) -> String
 pub impl ElementType for TagRuby
 
 pub struct TagS {
 }
+pub fn TagS::is_self_closing(Self) -> Bool
+pub fn TagS::tag(Self) -> String
 pub impl ElementType for TagS
 
 pub struct TagSamp {
 }
+pub fn TagSamp::is_self_closing(Self) -> Bool
+pub fn TagSamp::tag(Self) -> String
 pub impl ElementType for TagSamp
 
 pub struct TagScript {
 }
+pub fn TagScript::is_self_closing(Self) -> Bool
+pub fn TagScript::tag(Self) -> String
 pub impl ElementType for TagScript
 
 pub struct TagSearch {
 }
+pub fn TagSearch::is_self_closing(Self) -> Bool
+pub fn TagSearch::tag(Self) -> String
 pub impl ElementType for TagSearch
 
 pub struct TagSection {
 }
+pub fn TagSection::is_self_closing(Self) -> Bool
+pub fn TagSection::tag(Self) -> String
 pub impl ElementType for TagSection
 
 pub struct TagSelect {
 }
+pub fn TagSelect::is_self_closing(Self) -> Bool
+pub fn TagSelect::tag(Self) -> String
 pub impl ElementType for TagSelect
 
 pub struct TagSlot {
 }
+pub fn TagSlot::is_self_closing(Self) -> Bool
+pub fn TagSlot::tag(Self) -> String
 pub impl ElementType for TagSlot
 
 pub struct TagSmall {
 }
+pub fn TagSmall::is_self_closing(Self) -> Bool
+pub fn TagSmall::tag(Self) -> String
 pub impl ElementType for TagSmall
 
 pub struct TagSource {
 }
+pub fn TagSource::is_self_closing(Self) -> Bool
+pub fn TagSource::tag(Self) -> String
 pub impl ElementType for TagSource
 
 pub struct TagSpan {
 }
+pub fn TagSpan::is_self_closing(Self) -> Bool
+pub fn TagSpan::tag(Self) -> String
 pub impl ElementType for TagSpan
 
 pub struct TagStrong {
 }
+pub fn TagStrong::is_self_closing(Self) -> Bool
+pub fn TagStrong::tag(Self) -> String
 pub impl ElementType for TagStrong
 
 pub struct TagStyle {
 }
+pub fn TagStyle::is_self_closing(Self) -> Bool
+pub fn TagStyle::tag(Self) -> String
 pub impl ElementType for TagStyle
 
 pub struct TagSub {
 }
+pub fn TagSub::is_self_closing(Self) -> Bool
+pub fn TagSub::tag(Self) -> String
 pub impl ElementType for TagSub
 
 pub struct TagSummary {
 }
+pub fn TagSummary::is_self_closing(Self) -> Bool
+pub fn TagSummary::tag(Self) -> String
 pub impl ElementType for TagSummary
 
 pub struct TagSup {
 }
+pub fn TagSup::is_self_closing(Self) -> Bool
+pub fn TagSup::tag(Self) -> String
 pub impl ElementType for TagSup
 
 pub struct TagTable {
 }
+pub fn TagTable::is_self_closing(Self) -> Bool
+pub fn TagTable::tag(Self) -> String
 pub impl ElementType for TagTable
 
 pub struct TagTbody {
 }
+pub fn TagTbody::is_self_closing(Self) -> Bool
+pub fn TagTbody::tag(Self) -> String
 pub impl ElementType for TagTbody
 
 pub struct TagTd {
 }
+pub fn TagTd::is_self_closing(Self) -> Bool
+pub fn TagTd::tag(Self) -> String
 pub impl ElementType for TagTd
 
 pub struct TagTemplate {
 }
+pub fn TagTemplate::is_self_closing(Self) -> Bool
+pub fn TagTemplate::tag(Self) -> String
 pub impl ElementType for TagTemplate
 
 pub struct TagTextarea {
 }
+pub fn TagTextarea::is_self_closing(Self) -> Bool
+pub fn TagTextarea::tag(Self) -> String
 pub impl ElementType for TagTextarea
 
 pub struct TagTfoot {
 }
+pub fn TagTfoot::is_self_closing(Self) -> Bool
+pub fn TagTfoot::tag(Self) -> String
 pub impl ElementType for TagTfoot
 
 pub struct TagTh {
 }
+pub fn TagTh::is_self_closing(Self) -> Bool
+pub fn TagTh::tag(Self) -> String
 pub impl ElementType for TagTh
 
 pub struct TagThead {
 }
+pub fn TagThead::is_self_closing(Self) -> Bool
+pub fn TagThead::tag(Self) -> String
 pub impl ElementType for TagThead
 
 pub struct TagTime {
 }
+pub fn TagTime::is_self_closing(Self) -> Bool
+pub fn TagTime::tag(Self) -> String
 pub impl ElementType for TagTime
 
 pub struct TagTitle {
 }
+pub fn TagTitle::is_self_closing(Self) -> Bool
+pub fn TagTitle::tag(Self) -> String
 pub impl ElementType for TagTitle
 
 pub struct TagTr {
 }
+pub fn TagTr::is_self_closing(Self) -> Bool
+pub fn TagTr::tag(Self) -> String
 pub impl ElementType for TagTr
 
 pub struct TagTrack {
 }
+pub fn TagTrack::is_self_closing(Self) -> Bool
+pub fn TagTrack::tag(Self) -> String
 pub impl ElementType for TagTrack
 
 pub struct TagU {
 }
+pub fn TagU::is_self_closing(Self) -> Bool
+pub fn TagU::tag(Self) -> String
 pub impl ElementType for TagU
 
 pub struct TagUl {
 }
+pub fn TagUl::is_self_closing(Self) -> Bool
+pub fn TagUl::tag(Self) -> String
 pub impl ElementType for TagUl
 
 pub struct TagVar_ {
 }
+pub fn TagVar_::is_self_closing(Self) -> Bool
+pub fn TagVar_::tag(Self) -> String
 pub impl ElementType for TagVar_
 
 pub struct TagVideo {
 }
+pub fn TagVideo::is_self_closing(Self) -> Bool
+pub fn TagVideo::tag(Self) -> String
 pub impl ElementType for TagVideo
 
 pub struct TagWbr {
 }
+pub fn TagWbr::is_self_closing(Self) -> Bool
+pub fn TagWbr::tag(Self) -> String
 pub impl ElementType for TagWbr
 
 pub(all) struct TemplateView[V](V)
+pub fn[V : View + ToTemplate] TemplateView::build(Self[V]) -> RenderState
+pub fn[V : View + ToTemplate] TemplateView::html_len(Self[V]) -> Int32
+pub fn[V : View + ToTemplate] TemplateView::hydrate(Self[V], Cursor, PositionState) -> RenderState
 pub fn[V] TemplateView::new(V) -> Self[V]
+pub fn[V : View + ToTemplate] TemplateView::rebuild(Self[V], @ref.Ref[RenderState]) -> Unit
+pub fn[V : View + ToTemplate] TemplateView::to_html(Self[V]) -> String
+pub fn[V : View + ToTemplate] TemplateView::to_html_with_buf(Self[V], StringBuilder, @ref.Ref[Position]) -> Unit
 pub impl[V : View + ToTemplate] Render for TemplateView[V]
 pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V]
 
 pub struct TextNode {
   val : String
 }
+pub fn TextNode::build(Self) -> RenderState
+pub fn TextNode::html_len(Self) -> Int32
+pub fn TextNode::hydrate(Self, Cursor, PositionState) -> RenderState
+pub fn TextNode::rebuild(Self, @ref.Ref[RenderState]) -> Unit
+pub fn TextNode::style(Self, &IntoStyle) -> &View
+pub fn TextNode::to_html(Self) -> String
+pub fn TextNode::to_html_with_buf(Self, StringBuilder, @ref.Ref[Position]) -> Unit
 pub impl Render for TextNode
 pub impl RenderHtml for TextNode
 pub impl View for TextNode
@@ -1183,14 +1558,18 @@ pub(all) struct Url {
   hash : String
 } derive(Eq, @debug.Debug)
 pub fn Url::current() -> Self
+pub fn Url::equal(Self, Self) -> Bool
+pub fn Url::get_ty() -> String
+pub fn Url::not_equal(Self, Self) -> Bool
 pub fn Url::to_full_path(Self) -> String
+pub fn Url::to_repr(Self) -> @debug.Repr
 pub impl @reactive.TypeName for Url
 
 // Type aliases
 
 // Traits
 pub trait Attribute {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(Self, StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
   fn build(Self, @ffi.Element) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
@@ -1207,7 +1586,7 @@ pub trait AttributeKey {
 pub impl AttributeKey for String
 
 pub trait AttributeValue {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(Self, String, StringBuilder) -> Unit
   fn build(Self, String, @ffi.Element) -> AttrState
   fn rebuild(Self, String, @ref.Ref[AttrState]) -> Unit
@@ -1224,7 +1603,7 @@ pub trait ElementType {
 }
 
 pub trait IntoClass {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(Self, StringBuilder) -> Unit
   fn build(Self, @ffi.Element) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
@@ -1234,7 +1613,7 @@ pub trait IntoClass {
 pub impl IntoClass for String
 
 pub trait IntoProperty {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(Self, StringBuilder, StringBuilder, StringBuilder, StringBuilder) -> Unit
   fn build(Self, @ffi.Element, String) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState], String) -> Unit
@@ -1245,7 +1624,7 @@ pub impl IntoProperty for String
 pub impl[S : Show] IntoProperty for @reactive.ReadSignal[S]
 
 pub trait IntoStyle {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(Self, StringBuilder) -> Unit
   fn build(Self, @ffi.Element) -> AttrState
   fn rebuild(Self, @ref.Ref[AttrState]) -> Unit
@@ -1255,7 +1634,7 @@ pub trait IntoStyle {
 pub impl IntoStyle for String
 
 pub trait MatchNestedRoutes {
-  fn match_nested(Self, String) -> ((UInt, NestedMatch)?, String)
+  fn match_nested(Self, String) -> ((UInt32, NestedMatch)?, String)
 }
 pub impl MatchNestedRoutes for Unit
 pub impl[T : MatchNestedRoutes] MatchNestedRoutes for T?
@@ -1277,7 +1656,7 @@ pub impl Render for String
 pub impl Render for Array[&View]
 
 pub trait RenderHtml : Render {
-  fn html_len(Self) -> Int
+  fn html_len(Self) -> Int32
   fn to_html(Self) -> String
   fn to_html_with_buf(Self, StringBuilder, @ref.Ref[Position]) -> Unit
   fn hydrate(Self, Cursor, PositionState) -> RenderState

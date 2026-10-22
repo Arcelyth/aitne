@@ -2,7 +2,7 @@
 test "lexer basic html" {
   let src =
     #|<div>hello</div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -22,7 +22,7 @@ test "lexer string handle" {
   let src =
     #|let a = "<div>"
     #|<div>"<div>"</div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -43,7 +43,7 @@ test "lexer < handle outside" {
   let src =
     #|if a < b
     #|<div>"<div>"</div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -63,7 +63,7 @@ test "lexer < handle outside" {
 test "lexer < handle inside" {
   let src =
     #|<div>a < b</div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -82,7 +82,7 @@ test "lexer < handle inside" {
 test "lexer attributes" {
   let src =
     #|<div id="app"></div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -105,7 +105,7 @@ test "lexer attributes" {
 test "lexer event attribute" {
   let src =
     #|<button on:click={() => 1}>+</button>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -134,7 +134,7 @@ test "lexer event attribute" {
 test "lexer self closing str" {
   let src =
     #|<img src="a.png"/>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -156,7 +156,7 @@ test "lexer self closing str" {
 test "lexer self closing expr" {
   let src =
     #|<button on:click={() => a}/>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -184,7 +184,7 @@ test "lexer code then html" {
   let src =
     #|let a = 1
     #|<div>{() => a}</div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -207,7 +207,7 @@ test "lexer no brace" {
   let src =
     #|let a = 1
     #|<div>() => a</div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -227,7 +227,7 @@ test "lexer no brace" {
 test "lexer nested code block attr" {
   let src =
     #|<div value={{ a: { b: 1 } }}></div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -255,7 +255,7 @@ test "lexer nested code block attr" {
 test "custom component" {
   let src =
     #|<What />
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -270,7 +270,7 @@ test "custom component" {
 test "lexer mixed attributes" {
   let src =
     #|<div data-count={123}></div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -301,7 +301,7 @@ test "lexer muti string" {
     #|#|<div> <div>
     #|$|abec <button/>
 
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -322,7 +322,7 @@ test "lexer css block" {
     #|}$
     #|let external = ${ !"./style.css" }$
 
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = try! lexer.tokenizer()
 
   debug_inspect(
@@ -348,7 +348,7 @@ test "lexer css block with comments and strings" {
     #|  }
     #|}$
 
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = try! lexer.tokenizer()
 
   debug_inspect(
@@ -369,7 +369,7 @@ test "lexer nested tag in attribute expression" {
   // <Apple eat={() => {<li>{()=>name.get()}</li>}}/>
   let src =
     #|<Apple eat={() => {<li>{()=>name.get()}</li>}}/>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -397,7 +397,7 @@ test "lexer nested tag in children expression" {
   // <div>{() => {<li>{()=>name.get()}</li>}}</div>
   let src =
     #|<div>{() => {<li>{()=>name.get()}</li>}}</div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -426,7 +426,7 @@ test "lexer deeply nested tag in attribute" {
   // <Outer data={() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}}/>
   let src =
     #|<Outer data={() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}}/>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(
@@ -457,7 +457,7 @@ test "lexer nested tag with method call" {
   // <div>{items.map(() => {<li>{()=>name.get()}</li>})}</div>
   let src =
     #|<div>{items.map(() => {<li>{()=>name.get()}</li>})}</div>
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = lexer.tokenizer()
 
   debug_inspect(

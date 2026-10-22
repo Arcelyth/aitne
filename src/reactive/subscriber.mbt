@@ -145,3 +145,26 @@ pub impl ReactiveNode for @hashset.HashSet[ASubscriber] with fn update_value(
 pub impl Notify for @hashset.HashSet[ASubscriber] with fn notify(self) -> Unit {
   self.each(s => ReactiveNode::mark_stale(s))
 }
+
+///|
+pub extend ASubscriber with Debug::{to_repr}
+
+///|
+pub extend ASubscriber with Eq::{not_equal, equal}
+
+///|
+pub extend ASubscriber with Hash::{hash, hash_combine}
+
+///|
+pub extend ASubscriber with Notify::{notify}
+
+///|
+pub extend ASubscriber with ReactiveNode::{
+  mark_pending,
+  mark_stale,
+  update_value,
+  mark_all_pending,
+}
+
+///|
+pub extend ASubscriber with Subscriber::{add_source, clean_sources}

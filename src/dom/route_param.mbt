@@ -149,3 +149,9 @@ pub fn to_params(tp : Array[(String, String)]) -> Params {
 
   Params(res)
 }
+
+///|
+pub extend Params with Debug::{to_repr}
+
+///|
+pub extend Params with Eq::{not_equal, equal}

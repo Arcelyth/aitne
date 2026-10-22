@@ -417,3 +417,15 @@ pub struct KeyedState {
   mut keys : Ref[@utils.IndexSet[String]]
   rendered_items : Array[((Int32) -> Unit, RenderState)?]
 }
+
+///|
+pub extend DiffOpAddMode with Eq::{not_equal, equal}
+
+///|
+pub extend Keyed with Render::{build, rebuild}
+
+///|
+pub extend Keyed with RenderHtml::{to_html, html_len, hydrate, to_html_with_buf}
+
+///|
+pub extend Keyed with View::{style}

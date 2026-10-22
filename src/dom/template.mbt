@@ -81,3 +81,14 @@ pub impl[V : View + ToTemplate] RenderHtml for TemplateView[V] with fn to_html_w
 ) -> Unit {
   RenderHtml::to_html_with_buf(self.0, buf, position)
 }
+
+///|
+pub extend TemplateView with Render::{build, rebuild}
+
+///|
+pub extend TemplateView with RenderHtml::{
+  to_html,
+  html_len,
+  hydrate,
+  to_html_with_buf,
+}

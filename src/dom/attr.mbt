@@ -376,3 +376,14 @@ pub impl[A : Attribute, B : Attribute] Attribute for (A, B) with fn add_attr(
 ) -> &Attribute {
   (self as &Attribute, attr)
 }
+
+///|
+pub extend Attr with Attribute::{
+  to_html,
+  add_attr,
+  html_len,
+  build,
+  hydrate,
+  dry_resolve,
+  rebuild,
+}

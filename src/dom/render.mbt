@@ -474,3 +474,12 @@ pub fn insert_at(
     @ffi.dom_insert_before(parent, node, marker)
   }
 }
+
+///|
+pub extend Position with Eq::{not_equal, equal}
+
+///|
+pub extend Position with Hash::{hash, hash_combine}
+
+///|
+pub extend RenderState with Mountable::{mount, elements, unmount, insert_before}

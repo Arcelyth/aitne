@@ -210,3 +210,24 @@ pub impl[T : IntoClass] IntoClass for RxClass[T] with fn rebuild(
     _ => ()
   }
 }
+
+///|
+pub extend Class with Attribute::{
+  to_html,
+  add_attr,
+  html_len,
+  build,
+  hydrate,
+  dry_resolve,
+  rebuild,
+}
+
+///|
+pub extend RxClass with IntoClass::{
+  to_html,
+  html_len,
+  build,
+  hydrate,
+  dry_resolve,
+  rebuild,
+}

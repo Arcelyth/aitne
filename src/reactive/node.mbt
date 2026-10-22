@@ -12,3 +12,9 @@ pub(all) enum ReactiveNodeState {
   Pending
   Stale
 } derive(Eq, Debug)
+
+///|
+pub extend ReactiveNodeState with Debug::{to_repr}
+
+///|
+pub extend ReactiveNodeState with Eq::{not_equal, equal}

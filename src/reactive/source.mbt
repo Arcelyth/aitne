@@ -93,3 +93,23 @@ pub impl Source for ASource with fn clear_subs(self) -> Unit {
     None => ()
   }
 }
+
+///|
+pub extend ASource with Debug::{to_repr}
+
+///|
+pub extend ASource with Eq::{not_equal, equal}
+
+///|
+pub extend ASource with Hash::{hash, hash_combine}
+
+///|
+pub extend ASource with ReactiveNode::{
+  mark_pending,
+  mark_stale,
+  update_value,
+  mark_all_pending,
+}
+
+///|
+pub extend ASource with Source::{clear_subs, add_sub, remove_sub}

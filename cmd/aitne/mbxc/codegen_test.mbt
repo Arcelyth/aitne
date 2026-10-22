@@ -1,9 +1,11 @@
 ///|
 test "generate dynamic code block" {
-  let cg = CodeGen::new()
+  let cg = @mbxc.CodeGen::new()
 
-  let ast_dyn_closure : Array[MbxAST] = [
-    MbxAST::DynamicCode([MbxAST::PureCode("() => count.get().to_string()")]),
+  let ast_dyn_closure : Array[@mbxc.MbxAST] = [
+    @mbxc.MbxAST::DynamicCode([
+      @mbxc.MbxAST::PureCode("() => count.get().to_string()"),
+    ]),
   ]
 
   let result_closure = cg.generate(ast_dyn_closure)
@@ -17,8 +19,10 @@ test "generate dynamic code block" {
 
 ///|
 test "output style" {
-  let cg = CodeGen::new(path="index.mbx")
-  let ast : Array[MbxAST] = [MbxAST::StyleNode(".btn { color: red; }")]
+  let cg = @mbxc.CodeGen::new(path="index.mbx")
+  let ast : Array[@mbxc.MbxAST] = [
+    @mbxc.MbxAST::StyleNode(".btn { color: red; }"),
+  ]
 
   let _ = cg.generate(ast)
   inspect(cg.output_style() != "", content="true")
@@ -29,14 +33,16 @@ test "generate nested tag in attribute expression" {
   let attrs = []
   attrs.push(
     (
-      TokenAttr::{ ns: None, name: "eat", },
-      AttrValue::Expr("() => {<li>{()=>name.get()}</li>}"),
+      @mbxc.TokenAttr::{ ns: None, name: "eat", },
+      @mbxc.AttrValue::Expr("() => {<li>{()=>name.get()}</li>}"),
     ),
   )
 
-  let ast : Array[MbxAST] = [MbxAST::ElementNode("Apple", attrs, [])]
+  let ast : Array[@mbxc.MbxAST] = [
+    @mbxc.MbxAST::ElementNode("Apple", attrs, []),
+  ]
 
-  let cg = CodeGen::new()
+  let cg = @mbxc.CodeGen::new()
   let result = cg.generate(ast)
 
   let expected =
@@ -50,19 +56,19 @@ test "generate nested tag in attribute expression" {
 ///|
 test "generate nested tag in children" {
   // <div>{() => {<li>{()=>name.get()}</li>}}</div>
-  let ast : Array[MbxAST] = [
-    MbxAST::ElementNode("div", [], [
-      MbxAST::DynamicCode([
-        MbxAST::PureCode("() => {"),
-        MbxAST::ElementNode("li", [], [
-          MbxAST::DynamicCode([MbxAST::PureCode("()=>name.get()")]),
+  let ast : Array[@mbxc.MbxAST] = [
+    @mbxc.MbxAST::ElementNode("div", [], [
+      @mbxc.MbxAST::DynamicCode([
+        @mbxc.MbxAST::PureCode("() => {"),
+        @mbxc.MbxAST::ElementNode("li", [], [
+          @mbxc.MbxAST::DynamicCode([@mbxc.MbxAST::PureCode("()=>name.get()")]),
         ]),
-        MbxAST::PureCode("}"),
+        @mbxc.MbxAST::PureCode("}"),
       ]),
     ]),
   ]
 
-  let cg = CodeGen::new()
+  let cg = @mbxc.CodeGen::new()
   let result = cg.generate(ast)
 
   let expected =
@@ -78,16 +84,18 @@ test "generate deeply nested tag" {
   let attrs = []
   attrs.push(
     (
-      TokenAttr::{ ns: None, name: "data", },
-      AttrValue::Expr(
+      @mbxc.TokenAttr::{ ns: None, name: "data", },
+      @mbxc.AttrValue::Expr(
         "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}",
       ),
     ),
   )
 
-  let ast : Array[MbxAST] = [MbxAST::ElementNode("Outer", attrs, [])]
+  let ast : Array[@mbxc.MbxAST] = [
+    @mbxc.MbxAST::ElementNode("Outer", attrs, []),
+  ]
 
-  let cg = CodeGen::new()
+  let cg = @mbxc.CodeGen::new()
   let result = cg.generate(ast)
 
   let expected =
@@ -101,19 +109,19 @@ test "generate deeply nested tag" {
 ///|
 test "generate nested tag with method call" {
   // <div>{items.map(() => {<li>{()=>name.get()}</li>})}</div>
-  let ast : Array[MbxAST] = [
-    MbxAST::ElementNode("div", [], [
-      MbxAST::DynamicCode([
-        MbxAST::PureCode("items.map(() => {"),
-        MbxAST::ElementNode("li", [], [
-          MbxAST::DynamicCode([MbxAST::PureCode("()=>name.get()")]),
+  let ast : Array[@mbxc.MbxAST] = [
+    @mbxc.MbxAST::ElementNode("div", [], [
+      @mbxc.MbxAST::DynamicCode([
+        @mbxc.MbxAST::PureCode("items.map(() => {"),
+        @mbxc.MbxAST::ElementNode("li", [], [
+          @mbxc.MbxAST::DynamicCode([@mbxc.MbxAST::PureCode("()=>name.get()")]),
         ]),
-        MbxAST::PureCode("})"),
+        @mbxc.MbxAST::PureCode("})"),
       ]),
     ]),
   ]
 
-  let cg = CodeGen::new()
+  let cg = @mbxc.CodeGen::new()
   let result = cg.generate(ast)
 
   let expected =
@@ -127,14 +135,14 @@ test "generate nested tag with method call" {
 ///|
 test "generate sibling brace expressions" {
   // <div>{a}{b}</div>
-  let ast : Array[MbxAST] = [
-    MbxAST::ElementNode("div", [], [
-      MbxAST::DynamicCode([MbxAST::PureCode("a")]),
-      MbxAST::DynamicCode([MbxAST::PureCode("b")]),
+  let ast : Array[@mbxc.MbxAST] = [
+    @mbxc.MbxAST::ElementNode("div", [], [
+      @mbxc.MbxAST::DynamicCode([@mbxc.MbxAST::PureCode("a")]),
+      @mbxc.MbxAST::DynamicCode([@mbxc.MbxAST::PureCode("b")]),
     ]),
   ]
 
-  let cg = CodeGen::new()
+  let cg = @mbxc.CodeGen::new()
   let result = cg.generate(ast)
 
   let expected =
@@ -146,20 +154,20 @@ test "generate sibling brace expressions" {
 ///|
 test "generate conditional with nested tags" {
   // <div>{condition ? <span>{()=>x.get()}</span> : <em>static</em>}</div>
-  let ast : Array[MbxAST] = [
-    MbxAST::ElementNode("div", [], [
-      MbxAST::DynamicCode([
-        MbxAST::PureCode("condition ? "),
-        MbxAST::ElementNode("span", [], [
-          MbxAST::DynamicCode([MbxAST::PureCode("()=>x.get()")]),
+  let ast : Array[@mbxc.MbxAST] = [
+    @mbxc.MbxAST::ElementNode("div", [], [
+      @mbxc.MbxAST::DynamicCode([
+        @mbxc.MbxAST::PureCode("condition ? "),
+        @mbxc.MbxAST::ElementNode("span", [], [
+          @mbxc.MbxAST::DynamicCode([@mbxc.MbxAST::PureCode("()=>x.get()")]),
         ]),
-        MbxAST::PureCode(" : "),
-        MbxAST::ElementNode("em", [], [MbxAST::RawText("static")]),
+        @mbxc.MbxAST::PureCode(" : "),
+        @mbxc.MbxAST::ElementNode("em", [], [@mbxc.MbxAST::RawText("static")]),
       ]),
     ]),
   ]
 
-  let cg = CodeGen::new()
+  let cg = @mbxc.CodeGen::new()
   let result = cg.generate(ast)
 
   let expected =

@@ -22,12 +22,16 @@ pub fn make_builtin_elements() -> @hashset.HashSet[String]
 
 // Errors
 type MbxcError derive(@debug.Debug)
+pub fn MbxcError::to_repr(Self) -> @debug.Repr
 
 // Types and methods
 pub(all) enum AttrValue {
   Str(StringView)
   Expr(StringView)
 } derive(Eq, @debug.Debug)
+pub fn AttrValue::equal(Self, Self) -> Bool
+pub fn AttrValue::not_equal(Self, Self) -> Bool
+pub fn AttrValue::to_repr(Self) -> @debug.Repr
 
 pub struct CodeGen {
   buf : StringBuilder
@@ -45,7 +49,7 @@ pub(all) struct CodeGenTmp {
   style : StringBuilder
   last_buf : StringBuilder
   path : String
-  tmpl_id : @ref.Ref[Int]
+  tmpl_id : @ref.Ref[Int32]
 }
 pub fn CodeGenTmp::generate(Self) -> String
 pub fn CodeGenTmp::new(Array[MbxAST], path? : String) -> Self
@@ -53,18 +57,21 @@ pub fn CodeGenTmp::output_style(Self) -> String
 
 pub struct DocTag {
 } derive(Eq, @debug.Debug)
+pub fn DocTag::equal(Self, Self) -> Bool
+pub fn DocTag::not_equal(Self, Self) -> Bool
+pub fn DocTag::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Lexer {
   src : String
-  mut cur : Int
-  mut brace_depth : Int
-  mut tag_depth : Int
+  mut cur : Int32
+  mut brace_depth : Int32
+  mut tag_depth : Int32
   mut in_closing_tag : Bool
 }
 pub fn Lexer::is_end(Self) -> Bool
 pub fn Lexer::new(String) -> Self
 pub fn Lexer::next_token(Self) -> Token? raise MbxcError
-pub fn Lexer::peek(Self, Int) -> UInt16?
+pub fn Lexer::peek(Self, Int32) -> UInt16?
 pub fn Lexer::scan_comment(Self) -> Unit
 pub fn Lexer::scan_string(Self) -> Unit raise MbxcError
 pub fn Lexer::tokenizer(Self) -> Array[Token] raise MbxcError
@@ -76,10 +83,13 @@ pub(all) enum MbxAST {
   ElementNode(StringView, Array[(TokenAttr, AttrValue)], Array[MbxAST])
   StyleNode(StringView)
 } derive(Eq, @debug.Debug)
+pub fn MbxAST::equal(Self, Self) -> Bool
+pub fn MbxAST::not_equal(Self, Self) -> Bool
+pub fn MbxAST::to_repr(Self) -> @debug.Repr
 
 pub(all) struct Parser {
   tokens : Array[Token]
-  mut cur : Int
+  mut cur : Int32
 }
 pub fn Parser::new(Array[Token]) -> Self
 pub fn Parser::parse(Self) -> Array[MbxAST] raise MbxcError
@@ -87,16 +97,25 @@ pub fn Parser::parse(Self) -> Array[MbxAST] raise MbxcError
 pub(all) struct TagClose {
   tag : StringView
 } derive(Eq, @debug.Debug)
+pub fn TagClose::equal(Self, Self) -> Bool
+pub fn TagClose::not_equal(Self, Self) -> Bool
+pub fn TagClose::to_repr(Self) -> @debug.Repr
 
 pub(all) struct TagOpen {
   tag : StringView
   attrs : Array[(TokenAttr, AttrValue)]
 } derive(Eq, @debug.Debug)
+pub fn TagOpen::equal(Self, Self) -> Bool
+pub fn TagOpen::not_equal(Self, Self) -> Bool
+pub fn TagOpen::to_repr(Self) -> @debug.Repr
 
 pub(all) struct TagSelfClose {
   tag : StringView
   attrs : Array[(TokenAttr, AttrValue)]
 } derive(Eq, @debug.Debug)
+pub fn TagSelfClose::equal(Self, Self) -> Bool
+pub fn TagSelfClose::not_equal(Self, Self) -> Bool
+pub fn TagSelfClose::to_repr(Self) -> @debug.Repr
 
 pub(all) enum Token {
   TagOpen(TagOpen)
@@ -109,11 +128,19 @@ pub(all) enum Token {
   BraceClose
   CSSBlock(StringView)
 } derive(Eq, @debug.Debug)
+pub fn Token::equal(Self, Self) -> Bool
+pub fn Token::not_equal(Self, Self) -> Bool
+pub fn Token::to_repr(Self) -> @debug.Repr
 
 pub(all) struct TokenAttr {
   ns : StringView?
   name : StringView
 } derive(Eq, Hash, @debug.Debug)
+pub fn TokenAttr::equal(Self, Self) -> Bool
+pub fn TokenAttr::hash(Self) -> Int32
+pub fn TokenAttr::hash_combine(Self, Hasher) -> Unit
+pub fn TokenAttr::not_equal(Self, Self) -> Bool
+pub fn TokenAttr::to_repr(Self) -> @debug.Repr
 
 // Type aliases
 

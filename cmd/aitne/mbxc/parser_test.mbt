@@ -2,22 +2,25 @@
 test "parse valid mbx node with attributes and dynamic expression" {
   let div_attrs = []
   div_attrs.push(
-    (TokenAttr::{ ns: None, name: "eat", }, AttrValue::Expr("() => omg()")),
+    (
+      @mbxc.TokenAttr::{ ns: None, name: "eat", },
+      @mbxc.AttrValue::Expr("() => omg()"),
+    ),
   )
 
   let tokens = [
     // <div eat={() => omg()}> {() => <div/>} </div>
-    Token::TagOpen({ tag: "div", attrs: div_attrs, }),
-    Token::RawText(" "),
-    Token::BraceOpen,
-    Token::RawText("() => "),
-    Token::TagSelfClose({ tag: "div", attrs: [], }),
-    Token::BraceClose,
-    Token::RawText(" "),
-    Token::TagClose({ tag: "div", }),
+    @mbxc.Token::TagOpen({ tag: "div", attrs: div_attrs, }),
+    @mbxc.Token::RawText(" "),
+    @mbxc.Token::BraceOpen,
+    @mbxc.Token::RawText("() => "),
+    @mbxc.Token::TagSelfClose({ tag: "div", attrs: [], }),
+    @mbxc.Token::BraceClose,
+    @mbxc.Token::RawText(" "),
+    @mbxc.Token::TagClose({ tag: "div", }),
   ]
 
-  let parser = Parser::new(tokens)
+  let parser = @mbxc.Parser::new(tokens)
   let result = parser.parse()
 
   debug_inspect(
@@ -58,10 +61,10 @@ test "parse style block" {
     #|}$
     #|let external = ${ !"./style.css" }$
 
-  let lexer = Lexer::new(src)
+  let lexer = @mbxc.Lexer::new(src)
   let tokens = try! lexer.tokenizer()
 
-  let parser = Parser::new(tokens)
+  let parser = @mbxc.Parser::new(tokens)
   let result = try! parser.parse()
 
   debug_inspect(
@@ -81,21 +84,21 @@ test "parse style block" {
 test "parse nested tag in children" {
   let tokens = [
     // <div>{() => {<li>{()=>name.get()}</li>}}</div>
-    Token::TagOpen({ tag: "div", attrs: [], }),
-    Token::BraceOpen,
-    Token::RawText("() => "),
-    Token::BraceOpen,
-    Token::TagOpen({ tag: "li", attrs: [], }),
-    Token::BraceOpen,
-    Token::RawText("()=>name.get()"),
-    Token::BraceClose,
-    Token::TagClose({ tag: "li", }),
-    Token::BraceClose,
-    Token::BraceClose,
-    Token::TagClose({ tag: "div", }),
+    @mbxc.Token::TagOpen({ tag: "div", attrs: [], }),
+    @mbxc.Token::BraceOpen,
+    @mbxc.Token::RawText("() => "),
+    @mbxc.Token::BraceOpen,
+    @mbxc.Token::TagOpen({ tag: "li", attrs: [], }),
+    @mbxc.Token::BraceOpen,
+    @mbxc.Token::RawText("()=>name.get()"),
+    @mbxc.Token::BraceClose,
+    @mbxc.Token::TagClose({ tag: "li", }),
+    @mbxc.Token::BraceClose,
+    @mbxc.Token::BraceClose,
+    @mbxc.Token::TagClose({ tag: "div", }),
   ]
 
-  let parser = Parser::new(tokens)
+  let parser = @mbxc.Parser::new(tokens)
   let result = parser.parse()
 
   debug_inspect(
@@ -129,8 +132,8 @@ test "parse deeply nested tag" {
   let attrs = []
   attrs.push(
     (
-      TokenAttr::{ ns: None, name: "data", },
-      AttrValue::Expr(
+      @mbxc.TokenAttr::{ ns: None, name: "data", },
+      @mbxc.AttrValue::Expr(
         "() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}",
       ),
     ),
@@ -138,10 +141,10 @@ test "parse deeply nested tag" {
 
   let tokens = [
     // <Outer data={() => {<Middle label={() => {<Inner>{()=>name.get()}</Inner>}}/>}}/>
-    Token::TagSelfClose({ tag: "Outer", attrs, }),
+    @mbxc.Token::TagSelfClose({ tag: "Outer", attrs, }),
   ]
 
-  let parser = Parser::new(tokens)
+  let parser = @mbxc.Parser::new(tokens)
   let result = parser.parse()
 
   debug_inspect(
@@ -170,17 +173,17 @@ test "parse deeply nested tag" {
 test "parse sibling brace expressions" {
   let tokens = [
     // <div>{a}{b}</div>
-    Token::TagOpen({ tag: "div", attrs: [], }),
-    Token::BraceOpen,
-    Token::RawText("a"),
-    Token::BraceClose,
-    Token::BraceOpen,
-    Token::RawText("b"),
-    Token::BraceClose,
-    Token::TagClose({ tag: "div", }),
+    @mbxc.Token::TagOpen({ tag: "div", attrs: [], }),
+    @mbxc.Token::BraceOpen,
+    @mbxc.Token::RawText("a"),
+    @mbxc.Token::BraceClose,
+    @mbxc.Token::BraceOpen,
+    @mbxc.Token::RawText("b"),
+    @mbxc.Token::BraceClose,
+    @mbxc.Token::TagClose({ tag: "div", }),
   ]
 
-  let parser = Parser::new(tokens)
+  let parser = @mbxc.Parser::new(tokens)
   let result = parser.parse()
 
   debug_inspect(

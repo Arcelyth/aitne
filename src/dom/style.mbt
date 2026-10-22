@@ -112,3 +112,14 @@ pub impl IntoStyle for String with fn rebuild(self, state : Ref[AttrState]) -> U
 pub impl IntoStyle for String with fn dry_resolve(_self) -> Unit {
 
 }
+
+///|
+pub extend Style with Attribute::{
+  to_html,
+  add_attr,
+  html_len,
+  build,
+  hydrate,
+  dry_resolve,
+  rebuild,
+}

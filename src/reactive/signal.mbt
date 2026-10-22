@@ -1,6 +1,6 @@
 ///|
 /// Simple signal id generator.
-let signal_id_counter : Ref[UInt32] = @ref.new(0)
+let signal_id_counter : Ref[UInt32] = Ref(0)
 
 ///|
 #inline
@@ -20,11 +20,7 @@ pub struct SignalInner[T] {
 
 ///|
 pub fn[T] SignalInner::new(value : T) -> @ref.Ref[SignalInner[T]] {
-  @ref.new(SignalInner::{
-    id: next_signal_id(),
-    value,
-    subs: @hashset.HashSet([]),
-  })
+  Ref(SignalInner::{ id: next_signal_id(), value, subs: @hashset.HashSet([]), })
 }
 
 // ----- WriteSignal -----
@@ -531,3 +527,114 @@ pub impl[T : TypeName] TypeName for WriteSignal[T] with fn get_ty() -> String {
 pub impl[T : TypeName] TypeName for ReadSignal[T] with fn get_ty() -> String {
   "ReadSignal_" + T::get_ty()
 }
+
+///|
+pub extend ReadSignal with Debug::{to_repr}
+
+///|
+pub extend ReadSignal with Default::{default}
+
+///|
+pub extend ReadSignal with Eq::{not_equal, equal}
+
+///|
+pub extend ReadSignal with Hash::{hash, hash_combine}
+
+///|
+pub extend ReadSignal with IsDisposed::{is_disposed}
+
+///|
+pub extend ReadSignal with ReactiveNode::{
+  mark_pending,
+  mark_stale,
+  update_value,
+  mark_all_pending,
+}
+
+///|
+pub extend ReadSignal with Source::{clear_subs, add_sub, remove_sub}
+
+///|
+pub extend ReadSignal with ToASource::{to_asource}
+
+///|
+pub extend ReadSignal with Track::{track}
+
+///|
+pub extend ReadSignal with TypeName::{get_ty}
+
+///|
+pub extend RwSignal with Debug::{to_repr}
+
+///|
+pub extend RwSignal with Default::{default}
+
+///|
+pub extend RwSignal with Eq::{not_equal, equal}
+
+///|
+pub extend RwSignal with Hash::{hash, hash_combine}
+
+///|
+pub extend RwSignal with IsDisposed::{is_disposed}
+
+///|
+pub extend RwSignal with Notify::{notify}
+
+///|
+pub extend RwSignal with ReactiveNode::{
+  mark_pending,
+  mark_stale,
+  update_value,
+  mark_all_pending,
+}
+
+///|
+pub extend RwSignal with Source::{clear_subs, add_sub, remove_sub}
+
+///|
+pub extend RwSignal with ToASource::{to_asource}
+
+///|
+pub extend RwSignal with Track::{track}
+
+///|
+pub extend RwSignal with TypeName::{get_ty}
+
+///|
+pub extend WriteSignal with Debug::{to_repr}
+
+///|
+pub extend WriteSignal with Default::{default}
+
+///|
+pub extend WriteSignal with Eq::{not_equal, equal}
+
+///|
+pub extend WriteSignal with Hash::{hash, hash_combine}
+
+///|
+pub extend WriteSignal with IsDisposed::{is_disposed}
+
+///|
+pub extend WriteSignal with Notify::{notify}
+
+///|
+pub extend WriteSignal with ReactiveNode::{
+  mark_pending,
+  mark_stale,
+  update_value,
+  mark_all_pending,
+}
+
+///|
+pub extend WriteSignal with Source::{clear_subs, add_sub, remove_sub}
+
+///|
+pub extend WriteSignal with ToASource::{to_asource}
+
+///|
+pub extend WriteSignal with Track::{track}
+
+///|
+pub extend WriteSignal with TypeName::{get_ty}

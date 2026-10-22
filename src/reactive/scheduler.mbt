@@ -9,7 +9,7 @@ pub struct Scheduler {
 
 ///|
 /// Global scheduler instance.
-pub let scheduler : Ref[Scheduler] = @ref.new(Scheduler::{
+pub let scheduler : Ref[Scheduler] = Ref(Scheduler::{
   pending: [],
   queued: @hashset.HashSet([]),
   flushing: false,

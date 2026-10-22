@@ -31,7 +31,7 @@ test "load config" {
     #| static_dir = "static"
     #| inject_scripts = ["https://cdn.com/a.js", "https://cdn.com/b.js"]
 
-  let config = try! load_config(toml_content)
+  let config = try! @eirene.load_config(toml_content)
   debug_inspect(
     config.app.name,
     content=(
@@ -116,7 +116,7 @@ test "load minimal config" {
     #| [app]
     #| name = "minimal-app"
 
-  let config = try! load_config(toml_content)
+  let config = try! @eirene.load_config(toml_content)
   debug_inspect(
     config.app.name,
     content=(

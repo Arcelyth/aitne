@@ -32,7 +32,7 @@ test "gen_style_struct" {
   let code = Ref(StringBuilder())
   let def_code = Ref(StringBuilder())
 
-  gen_style_struct(classes, suffix, "Style_test", code, def_code)
+  @mbxc.gen_style_struct(classes, suffix, "Style_test", code, def_code)
 
   debug_inspect(
     def_code.val.to_string(),
@@ -63,7 +63,7 @@ test "compile_css_and_gen_style_struct" {
   let code = Ref(StringBuilder())
   let def_code = Ref(StringBuilder())
 
-  compile_css(css, "src/components/Header.mbx", style, code, def_code)
+  @mbxc.compile_css(css, "src/components/Header.mbx", style, code, def_code)
 
   let compiled_style = style.val.to_string()
   let generated_code = code.val.to_string()

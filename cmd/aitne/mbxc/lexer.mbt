@@ -508,3 +508,48 @@ pub fn Lexer::tokenizer(self : Lexer) -> Array[Token] raise MbxcError {
   }
   tokens
 }
+
+///|
+pub extend AttrValue with Debug::{to_repr}
+
+///|
+pub extend AttrValue with Eq::{not_equal, equal}
+
+///|
+pub extend DocTag with Debug::{to_repr}
+
+///|
+pub extend DocTag with Eq::{not_equal, equal}
+
+///|
+pub extend TagClose with Debug::{to_repr}
+
+///|
+pub extend TagClose with Eq::{not_equal, equal}
+
+///|
+pub extend TagOpen with Debug::{to_repr}
+
+///|
+pub extend TagOpen with Eq::{not_equal, equal}
+
+///|
+pub extend TagSelfClose with Debug::{to_repr}
+
+///|
+pub extend TagSelfClose with Eq::{not_equal, equal}
+
+///|
+pub extend Token with Debug::{to_repr}
+
+///|
+pub extend Token with Eq::{not_equal, equal}
+
+///|
+pub extend TokenAttr with Debug::{to_repr}
+
+///|
+pub extend TokenAttr with Eq::{not_equal, equal}
+
+///|
+pub extend TokenAttr with Hash::{hash, hash_combine}

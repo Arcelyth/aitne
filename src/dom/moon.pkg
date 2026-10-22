@@ -5,7 +5,6 @@ import {
   "Arcelyth/html_escape" @escape,
   "moonbitlang/core/hashmap",
   "moonbitlang/core/hashset",
-  "moonbitlang/core/ref",
   "moonbitlang/core/debug",
 }
 

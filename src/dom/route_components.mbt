@@ -28,3 +28,6 @@ pub(all) struct Matched(Memo[String])
 pub impl TypeName for Matched with fn get_ty() {
   "Matched"
 }
+
+///|
+pub extend Matched with @reactive.TypeName::{get_ty}

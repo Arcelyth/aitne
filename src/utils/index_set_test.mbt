@@ -1,6 +1,6 @@
 ///|
 test "IndexSet basic operations" {
-  let set = IndexSet::new()
+  let set = @utils.IndexSet::new()
 
   debug_inspect(set.length(), content="0")
 

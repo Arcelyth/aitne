@@ -1,5 +1,5 @@
 ///|
-let trigger_id_counter : Ref[UInt32] = @ref.new(0U)
+let trigger_id_counter : Ref[UInt32] = Ref(0U)
 
 ///|
 fn next_trigger_id() -> UInt32 {
@@ -98,3 +98,29 @@ pub impl Track for Trigger with fn track(self) -> Unit {
     _ => ()
   }
 }
+
+///|
+pub extend Trigger with Debug::{to_repr}
+
+///|
+pub extend Trigger with IsDisposed::{is_disposed}
+
+///|
+pub extend Trigger with Notify::{notify}
+
+///|
+pub extend Trigger with ReactiveNode::{
+  mark_pending,
+  mark_stale,
+  update_value,
+  mark_all_pending,
+}
+
+///|
+pub extend Trigger with Source::{clear_subs, add_sub, remove_sub}
+
+///|
+pub extend Trigger with ToASource::{to_asource}
+
+///|
+pub extend Trigger with Track::{track}

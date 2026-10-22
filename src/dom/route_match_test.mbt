@@ -1,7 +1,7 @@
 ///|
 test "match /users/123" {
-  let route = NestedRoute::new("/users", () => "users").child([
-    NestedRoute::new("/:id", () => "profile"),
+  let route = @dom.NestedRoute::new("/users", () => "users").child([
+    @dom.NestedRoute::new("/:id", () => "profile"),
   ])
   let (res, remain) = route.match_nested("/users/123")
 
@@ -30,7 +30,7 @@ test "match /users/123" {
 
 ///|
 test "match static route" {
-  let route = NestedRoute::new("/about", () => "about")
+  let route = @dom.NestedRoute::new("/about", () => "about")
 
   let (res, remain) = route.match_nested("/about")
 
@@ -47,7 +47,7 @@ test "match static route" {
 
 ///|
 test "not match" {
-  let route = NestedRoute::new("/users", () => "users")
+  let route = @dom.NestedRoute::new("/users", () => "users")
 
   let (res, remain) = route.match_nested("/posts")
 
@@ -61,9 +61,9 @@ test "not match" {
 
 ///|
 test "nested route" {
-  let route = NestedRoute::new("/users", () => "users").child([
-    NestedRoute::new("/:id", () => "profile").child([
-      NestedRoute::new("/messages", () => "messages"),
+  let route = @dom.NestedRoute::new("/users", () => "users").child([
+    @dom.NestedRoute::new("/:id", () => "profile").child([
+      @dom.NestedRoute::new("/messages", () => "messages"),
     ]),
   ])
 
@@ -93,7 +93,7 @@ test "nested route" {
 
 ///|
 test "params" {
-  let route = NestedRoute::new("/users/:id/posts/:post", () => "page")
+  let route = @dom.NestedRoute::new("/users/:id/posts/:post", () => "page")
 
   let (res, _) = route.match_nested("/users/123/posts/456")
 
@@ -113,83 +113,83 @@ test "params" {
 
 ///|
 test "has_scheme" {
-  inspect(has_scheme("http://github.com"), content="true")
-  inspect(has_scheme("https://moonbitlang.com"), content="true")
-  inspect(has_scheme("mailto:test@example.com"), content="true")
-  inspect(has_scheme("tel:10086"), content="true")
-  inspect(has_scheme("//cdn.example.com"), content="true")
+  inspect(@dom.has_scheme("http://github.com"), content="true")
+  inspect(@dom.has_scheme("https://moonbitlang.com"), content="true")
+  inspect(@dom.has_scheme("mailto:test@example.com"), content="true")
+  inspect(@dom.has_scheme("tel:10086"), content="true")
+  inspect(@dom.has_scheme("//cdn.example.com"), content="true")
 
-  inspect(has_scheme("/local/path"), content="false")
-  inspect(has_scheme("relative/path"), content="false")
+  inspect(@dom.has_scheme("/local/path"), content="false")
+  inspect(@dom.has_scheme("relative/path"), content="false")
 }
 
 ///|
 test "normalize" {
-  inspect(normalize("/foo/bar/", false), content="/foo/bar/")
-  inspect(normalize("foo/bar//", false), content="/foo/bar/")
-  inspect(normalize("///foo///bar", false), content="/foo///bar")
-  inspect(normalize("", false), content="")
+  inspect(@dom.normalize("/foo/bar/", false), content="/foo/bar/")
+  inspect(@dom.normalize("foo/bar//", false), content="/foo/bar/")
+  inspect(@dom.normalize("///foo///bar", false), content="/foo///bar")
+  inspect(@dom.normalize("", false), content="")
 
-  inspect(normalize("?query=true", false), content="?query=true")
-  inspect(normalize("#hash-tag", false), content="#hash-tag")
+  inspect(@dom.normalize("?query=true", false), content="?query=true")
+  inspect(@dom.normalize("#hash-tag", false), content="#hash-tag")
 }
 
 ///|
 test "resolve_path" {
   inspect(
-    resolve_path("/base", "https://moonbitlang.com", None),
+    @dom.resolve_path("/base", "https://moonbitlang.com", None),
     content="https://moonbitlang.com",
   )
   inspect(
-    resolve_path("/base", "mailto:a@b.com", Some("/base/current")),
+    @dom.resolve_path("/base", "mailto:a@b.com", Some("/base/current")),
     content="mailto:a@b.com",
   )
 
-  inspect(resolve_path("/base", "about", None), content="/base/about")
-  inspect(resolve_path("/base", "/about", None), content="/base/about")
+  inspect(@dom.resolve_path("/base", "about", None), content="/base/about")
+  inspect(@dom.resolve_path("/base", "/about", None), content="/base/about")
 
   inspect(
-    resolve_path("/base", "settings", Some("/base/user")),
+    @dom.resolve_path("/base", "settings", Some("/base/user")),
     content="/base/user/settings",
   )
 
   inspect(
-    resolve_path("/base", "settings", Some("/other")),
+    @dom.resolve_path("/base", "settings", Some("/other")),
     content="/base/other/settings",
   )
 
   inspect(
-    resolve_path("/base", "/dashboard", Some("/base/user")),
+    @dom.resolve_path("/base", "/dashboard", Some("/base/user")),
     content="/base/dashboard",
   )
 
-  inspect(resolve_path("/base", "?query=1", None), content="/base?query=1")
+  inspect(@dom.resolve_path("/base", "?query=1", None), content="/base?query=1")
   inspect(
-    resolve_path("/base", "#section-2", Some("/base/about")),
+    @dom.resolve_path("/base", "#section-2", Some("/base/about")),
     content="/base/about#section-2",
   )
 }
 
 ///|
 test "normalize_path_tests" {
-  inspect(normalize_path(""), content="")
+  inspect(@dom.normalize_path(""), content="")
 
-  inspect(normalize_path("/a/b/c"), content="/a/b/c")
+  inspect(@dom.normalize_path("/a/b/c"), content="/a/b/c")
 
-  inspect(normalize_path("/a/b/../c"), content="/a/c")
+  inspect(@dom.normalize_path("/a/b/../c"), content="/a/c")
 
-  inspect(normalize_path("/a/./b/../../c"), content="/c")
+  inspect(@dom.normalize_path("/a/./b/../../c"), content="/c")
 
-  inspect(normalize_path("/a/b/c/.."), content="/a/b")
+  inspect(@dom.normalize_path("/a/b/c/.."), content="/a/b")
 
-  inspect(normalize_path("/../.."), content="/")
+  inspect(@dom.normalize_path("/../.."), content="/")
 
-  inspect(normalize_path("/a/../../b"), content="/b")
+  inspect(@dom.normalize_path("/a/../../b"), content="/b")
 
-  inspect(normalize_path("/a/b/../c?query=1#hash"), content="/a/c")
+  inspect(@dom.normalize_path("/a/b/../c?query=1#hash"), content="/a/c")
 
-  inspect(normalize_path("/?only_query=true"), content="/")
+  inspect(@dom.normalize_path("/?only_query=true"), content="/")
 
-  inspect(normalize_path("a/b/../c"), content="/a/c")
-  inspect(normalize_path("//a//b/.."), content="//a")
+  inspect(@dom.normalize_path("a/b/../c"), content="/a/c")
+  inspect(@dom.normalize_path("//a//b/.."), content="//a")
 }

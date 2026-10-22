@@ -174,3 +174,14 @@ pub impl[S : Show] IntoProperty for ReadSignal[S] with fn rebuild(
 pub impl[S : Show] IntoProperty for ReadSignal[S] with fn dry_resolve(_self) -> Unit {
 
 }
+
+///|
+pub extend Property with Attribute::{
+  to_html,
+  add_attr,
+  html_len,
+  build,
+  hydrate,
+  dry_resolve,
+  rebuild,
+}

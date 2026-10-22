@@ -26,9 +26,9 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
   let key_fn = self.key
   let render_fn = self.children
 
-  let cache : Ref[@hashmap.HashMap[K, RenderState]] = @ref.new(HashMap([]))
-  let mounted : Ref[Bool] = @ref.new(false)
-  let parent_ref : Ref[@ffi.Node?] = @ref.new(None)
+  let cache : Ref[@hashmap.HashMap[K, RenderState]] = Ref(HashMap([]))
+  let mounted : Ref[Bool] = Ref(false)
+  let parent_ref : Ref[@ffi.Node?] = Ref(None)
 
   let do_reconcile = fn(_) {
     let items = each()
@@ -309,3 +309,31 @@ pub impl[T] RenderHtml for ForEach[T] with fn hydrate(
 pub impl[T] View for ForEach[T] with fn style(self, _s) -> &View {
   self
 }
+
+///|
+pub extend ForEach with Render::{build, rebuild}
+
+///|
+pub extend ForEach with RenderHtml::{
+  to_html,
+  html_len,
+  hydrate,
+  to_html_with_buf,
+}
+
+///|
+pub extend ForEach with View::{style}
+
+///|
+pub extend ForNode with Render::{build, rebuild}
+
+///|
+pub extend ForNode with RenderHtml::{
+  to_html,
+  html_len,
+  hydrate,
+  to_html_with_buf,
+}
+
+///|
+pub extend ForNode with View::{style}

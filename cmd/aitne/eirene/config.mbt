@@ -207,3 +207,27 @@ fn get_proxy_map(
   }
   proxy_map
 }
+
+///|
+pub extend AppConfig with Debug::{to_repr}
+
+///|
+pub extend AssetsConfig with Debug::{to_repr}
+
+///|
+pub extend BuildConfig with Debug::{to_repr}
+
+///|
+pub extend CfgMode with Debug::{to_repr}
+
+///|
+pub extend CfgTarget with Debug::{to_repr}
+
+///|
+pub extend Config with Debug::{to_repr}
+
+///|
+pub extend EireneError with Debug::{to_repr}
+
+///|
+pub extend ServerConfig with Debug::{to_repr}

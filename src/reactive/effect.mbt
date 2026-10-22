@@ -1,5 +1,5 @@
 ///|
-let effect_id_counter : Ref[UInt32] = @ref.new(0)
+let effect_id_counter : Ref[UInt32] = Ref(0)
 
 ///|
 fn next_effect_id() -> UInt32 {
@@ -253,3 +253,9 @@ pub fn[T] create_effect(cb : (T?) -> T) -> Unit {
   inner.val.schedule = Some(() => schedule_effect(ref_e))
   schedule_effect(ref_e)
 }
+
+///|
+pub extend Effect with EffectRunner::{get_id, run_effect}
+
+///|
+pub extend RenderEffect with EffectRunner::{get_id, run_effect}

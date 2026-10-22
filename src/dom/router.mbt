@@ -23,7 +23,7 @@ pub fn RouterContext::resolve_path(
 }
 
 ///|
-let global_router_context : Ref[RouterContext?] = @ref.new(None)
+let global_router_context : Ref[RouterContext?] = Ref(None)
 
 ///|
 pub fn provide_router_context(ctx : RouterContext) -> Unit {
@@ -623,3 +623,40 @@ pub fn outlet() -> &View {
 
   OutletView::{ child, outer_owner, }
 }
+
+///|
+pub extend NestedRouteView with Debug::{to_repr}
+
+///|
+pub extend NestedRouteView with Render::{build, rebuild}
+
+///|
+pub extend NestedRouteView with RenderHtml::{
+  to_html,
+  html_len,
+  hydrate,
+  to_html_with_buf,
+}
+
+///|
+pub extend NestedRouteView with View::{style}
+
+///|
+pub extend OutletView with Render::{build, rebuild}
+
+///|
+pub extend OutletView with RenderHtml::{
+  to_html,
+  html_len,
+  hydrate,
+  to_html_with_buf,
+}
+
+///|
+pub extend OutletView with View::{style}
+
+///|
+pub extend RouteContext with @reactive.TypeName::{get_ty}
+
+///|
+pub extend RouterContext with @reactive.TypeName::{get_ty}

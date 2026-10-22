@@ -13,7 +13,7 @@ pub struct ObserverState {
 /// Global observer context.
 ///
 /// Holds the subscriber currently collecting dependencies.
-let observer_context : @ref.Ref[ObserverState?] = @ref.new(None)
+let observer_context : @ref.Ref[ObserverState?] = Ref(None)
 
 ///|
 /// Reactive observer utilities.

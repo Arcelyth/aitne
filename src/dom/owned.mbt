@@ -105,3 +105,22 @@ pub impl[T : RenderHtml] RenderHtml for OwnedView[T] with fn to_html_with_buf(
 ) -> Unit {
   self.owner.with_(() => self.view.to_html_with_buf(buf, position))
 }
+
+///|
+pub extend OwnedView with Render::{build, rebuild}
+
+///|
+pub extend OwnedView with RenderHtml::{
+  to_html,
+  html_len,
+  hydrate,
+  to_html_with_buf,
+}
+
+///|
+pub extend OwnedViewState with Mountable::{
+  mount,
+  elements,
+  unmount,
+  insert_before,
+}

@@ -180,3 +180,12 @@ pub fn Parser::parse(self : Parser) -> Array[MbxAST] raise MbxcError {
 
   ast_list
 }
+
+///|
+pub extend MbxAST with Debug::{to_repr}
+
+///|
+pub extend MbxAST with Eq::{not_equal, equal}
+
+///|
+pub extend MbxcError with Debug::{to_repr}

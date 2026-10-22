@@ -14,6 +14,9 @@ pub impl ElementType for TagArea with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagArea with ElementType::{tag, is_self_closing}
+
+///|
 pub fn area(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagArea, Array[&View]] {
@@ -32,6 +35,9 @@ pub impl ElementType for TagBase with fn tag(_self) {
 pub impl ElementType for TagBase with fn is_self_closing(_self) {
   true
 }
+
+///|
+pub extend TagBase with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn base(
@@ -54,6 +60,9 @@ pub impl ElementType for TagBr with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagBr with ElementType::{tag, is_self_closing}
+
+///|
 pub fn br(children~ : Array[&View] = []) -> HtmlElement[TagBr, Array[&View]] {
   { tag: TagBr::{ }, attrs: AttrList::new(), children, }
 }
@@ -72,6 +81,9 @@ pub impl ElementType for TagCol with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagCol with ElementType::{tag, is_self_closing}
+
+///|
 pub fn col(children~ : Array[&View] = []) -> HtmlElement[TagCol, Array[&View]] {
   { tag: TagCol::{ }, attrs: AttrList::new(), children, }
 }
@@ -88,6 +100,9 @@ pub impl ElementType for TagEmbed with fn tag(_self) {
 pub impl ElementType for TagEmbed with fn is_self_closing(_self) {
   true
 }
+
+///|
+pub extend TagEmbed with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn embed(
@@ -110,6 +125,9 @@ pub impl ElementType for TagHr with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagHr with ElementType::{tag, is_self_closing}
+
+///|
 pub fn hr(children~ : Array[&View] = []) -> HtmlElement[TagHr, Array[&View]] {
   { tag: TagHr::{ }, attrs: AttrList::new(), children, }
 }
@@ -128,6 +146,9 @@ pub impl ElementType for TagImg with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagImg with ElementType::{tag, is_self_closing}
+
+///|
 pub fn img(children~ : Array[&View] = []) -> HtmlElement[TagImg, Array[&View]] {
   { tag: TagImg::{ }, attrs: AttrList::new(), children, }
 }
@@ -144,6 +165,9 @@ pub impl ElementType for TagInput with fn tag(_self) {
 pub impl ElementType for TagInput with fn is_self_closing(_self) {
   true
 }
+
+///|
+pub extend TagInput with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn input(
@@ -166,6 +190,9 @@ pub impl ElementType for TagLink with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagLink with ElementType::{tag, is_self_closing}
+
+///|
 pub fn link(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagLink, Array[&View]] {
@@ -184,6 +211,9 @@ pub impl ElementType for TagMeta with fn tag(_self) {
 pub impl ElementType for TagMeta with fn is_self_closing(_self) {
   true
 }
+
+///|
+pub extend TagMeta with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn meta(
@@ -206,6 +236,9 @@ pub impl ElementType for TagSource with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagSource with ElementType::{tag, is_self_closing}
+
+///|
 pub fn source(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagSource, Array[&View]] {
@@ -224,6 +257,9 @@ pub impl ElementType for TagTrack with fn tag(_self) {
 pub impl ElementType for TagTrack with fn is_self_closing(_self) {
   true
 }
+
+///|
+pub extend TagTrack with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn track(
@@ -246,6 +282,9 @@ pub impl ElementType for TagWbr with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagWbr with ElementType::{tag, is_self_closing}
+
+///|
 pub fn wbr(children~ : Array[&View] = []) -> HtmlElement[TagWbr, Array[&View]] {
   { tag: TagWbr::{ }, attrs: AttrList::new(), children, }
 }
@@ -264,6 +303,9 @@ pub impl ElementType for TagA with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagA with ElementType::{tag, is_self_closing}
+
+///|
 pub fn a(children~ : Array[&View] = []) -> HtmlElement[TagA, Array[&View]] {
   { tag: TagA::{ }, attrs: AttrList::new(), children, }
 }
@@ -280,6 +322,9 @@ pub impl ElementType for TagAbbr with fn tag(_self) {
 pub impl ElementType for TagAbbr with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagAbbr with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn abbr(
@@ -302,6 +347,9 @@ pub impl ElementType for TagAddress with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagAddress with ElementType::{tag, is_self_closing}
+
+///|
 pub fn address(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagAddress, Array[&View]] {
@@ -320,6 +368,9 @@ pub impl ElementType for TagArticle with fn tag(_self) {
 pub impl ElementType for TagArticle with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagArticle with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn article(
@@ -342,6 +393,9 @@ pub impl ElementType for TagAside with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagAside with ElementType::{tag, is_self_closing}
+
+///|
 pub fn aside(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagAside, Array[&View]] {
@@ -360,6 +414,9 @@ pub impl ElementType for TagAudio with fn tag(_self) {
 pub impl ElementType for TagAudio with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagAudio with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn audio(
@@ -382,6 +439,9 @@ pub impl ElementType for TagB with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagB with ElementType::{tag, is_self_closing}
+
+///|
 pub fn b(children~ : Array[&View] = []) -> HtmlElement[TagB, Array[&View]] {
   { tag: TagB::{ }, attrs: AttrList::new(), children, }
 }
@@ -398,6 +458,9 @@ pub impl ElementType for TagBdi with fn tag(_self) {
 pub impl ElementType for TagBdi with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagBdi with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn bdi(children~ : Array[&View] = []) -> HtmlElement[TagBdi, Array[&View]] {
@@ -418,6 +481,9 @@ pub impl ElementType for TagBdo with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagBdo with ElementType::{tag, is_self_closing}
+
+///|
 pub fn bdo(children~ : Array[&View] = []) -> HtmlElement[TagBdo, Array[&View]] {
   { tag: TagBdo::{ }, attrs: AttrList::new(), children, }
 }
@@ -434,6 +500,9 @@ pub impl ElementType for TagBlockquote with fn tag(_self) {
 pub impl ElementType for TagBlockquote with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagBlockquote with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn blockquote(
@@ -456,6 +525,9 @@ pub impl ElementType for TagBody with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagBody with ElementType::{tag, is_self_closing}
+
+///|
 pub fn body(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagBody, Array[&View]] {
@@ -474,6 +546,9 @@ pub impl ElementType for TagButton with fn tag(_self) {
 pub impl ElementType for TagButton with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagButton with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn button(
@@ -496,6 +571,9 @@ pub impl ElementType for TagCanvas with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagCanvas with ElementType::{tag, is_self_closing}
+
+///|
 pub fn canvas(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagCanvas, Array[&View]] {
@@ -514,6 +592,9 @@ pub impl ElementType for TagCaption with fn tag(_self) {
 pub impl ElementType for TagCaption with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagCaption with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn caption(
@@ -536,6 +617,9 @@ pub impl ElementType for TagCite with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagCite with ElementType::{tag, is_self_closing}
+
+///|
 pub fn cite(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagCite, Array[&View]] {
@@ -554,6 +638,9 @@ pub impl ElementType for TagCode with fn tag(_self) {
 pub impl ElementType for TagCode with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagCode with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn code(
@@ -576,6 +663,9 @@ pub impl ElementType for TagColgroup with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagColgroup with ElementType::{tag, is_self_closing}
+
+///|
 pub fn colgroup(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagColgroup, Array[&View]] {
@@ -594,6 +684,9 @@ pub impl ElementType for TagData with fn tag(_self) {
 pub impl ElementType for TagData with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagData with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn data(
@@ -616,6 +709,9 @@ pub impl ElementType for TagDatalist with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagDatalist with ElementType::{tag, is_self_closing}
+
+///|
 pub fn datalist(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagDatalist, Array[&View]] {
@@ -636,6 +732,9 @@ pub impl ElementType for TagDd with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagDd with ElementType::{tag, is_self_closing}
+
+///|
 pub fn dd(children~ : Array[&View] = []) -> HtmlElement[TagDd, Array[&View]] {
   { tag: TagDd::{ }, attrs: AttrList::new(), children, }
 }
@@ -654,6 +753,9 @@ pub impl ElementType for TagDel with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagDel with ElementType::{tag, is_self_closing}
+
+///|
 pub fn del(children~ : Array[&View] = []) -> HtmlElement[TagDel, Array[&View]] {
   { tag: TagDel::{ }, attrs: AttrList::new(), children, }
 }
@@ -670,6 +772,9 @@ pub impl ElementType for TagDetails with fn tag(_self) {
 pub impl ElementType for TagDetails with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagDetails with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn details(
@@ -692,6 +797,9 @@ pub impl ElementType for TagDfn with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagDfn with ElementType::{tag, is_self_closing}
+
+///|
 pub fn dfn(children~ : Array[&View] = []) -> HtmlElement[TagDfn, Array[&View]] {
   { tag: TagDfn::{ }, attrs: AttrList::new(), children, }
 }
@@ -708,6 +816,9 @@ pub impl ElementType for TagDialog with fn tag(_self) {
 pub impl ElementType for TagDialog with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagDialog with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn dialog(
@@ -730,6 +841,9 @@ pub impl ElementType for TagDiv with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagDiv with ElementType::{tag, is_self_closing}
+
+///|
 pub fn div(children~ : Array[&View] = []) -> HtmlElement[TagDiv, Array[&View]] {
   { tag: TagDiv::{ }, attrs: AttrList::new(), children, }
 }
@@ -746,6 +860,9 @@ pub impl ElementType for TagDl with fn tag(_self) {
 pub impl ElementType for TagDl with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagDl with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn dl(children~ : Array[&View] = []) -> HtmlElement[TagDl, Array[&View]] {
@@ -766,6 +883,9 @@ pub impl ElementType for TagDt with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagDt with ElementType::{tag, is_self_closing}
+
+///|
 pub fn dt(children~ : Array[&View] = []) -> HtmlElement[TagDt, Array[&View]] {
   { tag: TagDt::{ }, attrs: AttrList::new(), children, }
 }
@@ -784,6 +904,9 @@ pub impl ElementType for TagEm with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagEm with ElementType::{tag, is_self_closing}
+
+///|
 pub fn em(children~ : Array[&View] = []) -> HtmlElement[TagEm, Array[&View]] {
   { tag: TagEm::{ }, attrs: AttrList::new(), children, }
 }
@@ -800,6 +923,9 @@ pub impl ElementType for TagFieldset with fn tag(_self) {
 pub impl ElementType for TagFieldset with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagFieldset with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn fieldset(
@@ -822,6 +948,9 @@ pub impl ElementType for TagFigcaption with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagFigcaption with ElementType::{tag, is_self_closing}
+
+///|
 pub fn figcaption(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagFigcaption, Array[&View]] {
@@ -840,6 +969,9 @@ pub impl ElementType for TagFigure with fn tag(_self) {
 pub impl ElementType for TagFigure with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagFigure with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn figure(
@@ -862,6 +994,9 @@ pub impl ElementType for TagFooter with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagFooter with ElementType::{tag, is_self_closing}
+
+///|
 pub fn footer(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagFooter, Array[&View]] {
@@ -880,6 +1015,9 @@ pub impl ElementType for TagForm with fn tag(_self) {
 pub impl ElementType for TagForm with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagForm with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn form(
@@ -902,6 +1040,9 @@ pub impl ElementType for TagH1 with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagH1 with ElementType::{tag, is_self_closing}
+
+///|
 pub fn h1(children~ : Array[&View] = []) -> HtmlElement[TagH1, Array[&View]] {
   { tag: TagH1::{ }, attrs: AttrList::new(), children, }
 }
@@ -918,6 +1059,9 @@ pub impl ElementType for TagH2 with fn tag(_self) {
 pub impl ElementType for TagH2 with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagH2 with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn h2(children~ : Array[&View] = []) -> HtmlElement[TagH2, Array[&View]] {
@@ -938,6 +1082,9 @@ pub impl ElementType for TagH3 with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagH3 with ElementType::{tag, is_self_closing}
+
+///|
 pub fn h3(children~ : Array[&View] = []) -> HtmlElement[TagH3, Array[&View]] {
   { tag: TagH3::{ }, attrs: AttrList::new(), children, }
 }
@@ -954,6 +1101,9 @@ pub impl ElementType for TagH4 with fn tag(_self) {
 pub impl ElementType for TagH4 with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagH4 with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn h4(children~ : Array[&View] = []) -> HtmlElement[TagH4, Array[&View]] {
@@ -974,6 +1124,9 @@ pub impl ElementType for TagH5 with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagH5 with ElementType::{tag, is_self_closing}
+
+///|
 pub fn h5(children~ : Array[&View] = []) -> HtmlElement[TagH5, Array[&View]] {
   { tag: TagH5::{ }, attrs: AttrList::new(), children, }
 }
@@ -992,6 +1145,9 @@ pub impl ElementType for TagH6 with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagH6 with ElementType::{tag, is_self_closing}
+
+///|
 pub fn h6(children~ : Array[&View] = []) -> HtmlElement[TagH6, Array[&View]] {
   { tag: TagH6::{ }, attrs: AttrList::new(), children, }
 }
@@ -1008,6 +1164,9 @@ pub impl ElementType for TagHead with fn tag(_self) {
 pub impl ElementType for TagHead with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagHead with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn head(
@@ -1030,6 +1189,9 @@ pub impl ElementType for TagHeader with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagHeader with ElementType::{tag, is_self_closing}
+
+///|
 pub fn header(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagHeader, Array[&View]] {
@@ -1048,6 +1210,9 @@ pub impl ElementType for TagHgroup with fn tag(_self) {
 pub impl ElementType for TagHgroup with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagHgroup with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn hgroup(
@@ -1070,6 +1235,9 @@ pub impl ElementType for TagHtml with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagHtml with ElementType::{tag, is_self_closing}
+
+///|
 pub fn html(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagHtml, Array[&View]] {
@@ -1090,6 +1258,9 @@ pub impl ElementType for TagI with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagI with ElementType::{tag, is_self_closing}
+
+///|
 pub fn i(children~ : Array[&View] = []) -> HtmlElement[TagI, Array[&View]] {
   { tag: TagI::{ }, attrs: AttrList::new(), children, }
 }
@@ -1106,6 +1277,9 @@ pub impl ElementType for TagIframe with fn tag(_self) {
 pub impl ElementType for TagIframe with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagIframe with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn iframe(
@@ -1128,6 +1302,9 @@ pub impl ElementType for TagIns with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagIns with ElementType::{tag, is_self_closing}
+
+///|
 pub fn ins(children~ : Array[&View] = []) -> HtmlElement[TagIns, Array[&View]] {
   { tag: TagIns::{ }, attrs: AttrList::new(), children, }
 }
@@ -1146,6 +1323,9 @@ pub impl ElementType for TagKbd with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagKbd with ElementType::{tag, is_self_closing}
+
+///|
 pub fn kbd(children~ : Array[&View] = []) -> HtmlElement[TagKbd, Array[&View]] {
   { tag: TagKbd::{ }, attrs: AttrList::new(), children, }
 }
@@ -1162,6 +1342,9 @@ pub impl ElementType for TagLabel with fn tag(_self) {
 pub impl ElementType for TagLabel with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagLabel with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn label(
@@ -1184,6 +1367,9 @@ pub impl ElementType for TagLegend with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagLegend with ElementType::{tag, is_self_closing}
+
+///|
 pub fn legend(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagLegend, Array[&View]] {
@@ -1204,6 +1390,9 @@ pub impl ElementType for TagLi with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagLi with ElementType::{tag, is_self_closing}
+
+///|
 pub fn li(children~ : Array[&View] = []) -> HtmlElement[TagLi, Array[&View]] {
   { tag: TagLi::{ }, attrs: AttrList::new(), children, }
 }
@@ -1220,6 +1409,9 @@ pub impl ElementType for TagMain_ with fn tag(_self) {
 pub impl ElementType for TagMain_ with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagMain_ with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn main_(
@@ -1242,6 +1434,9 @@ pub impl ElementType for TagMap with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagMap with ElementType::{tag, is_self_closing}
+
+///|
 pub fn map(children~ : Array[&View] = []) -> HtmlElement[TagMap, Array[&View]] {
   { tag: TagMap::{ }, attrs: AttrList::new(), children, }
 }
@@ -1258,6 +1453,9 @@ pub impl ElementType for TagMark with fn tag(_self) {
 pub impl ElementType for TagMark with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagMark with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn mark(
@@ -1280,6 +1478,9 @@ pub impl ElementType for TagMenu with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagMenu with ElementType::{tag, is_self_closing}
+
+///|
 pub fn menu(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagMenu, Array[&View]] {
@@ -1298,6 +1499,9 @@ pub impl ElementType for TagMeter with fn tag(_self) {
 pub impl ElementType for TagMeter with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagMeter with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn meter(
@@ -1320,6 +1524,9 @@ pub impl ElementType for TagNav with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagNav with ElementType::{tag, is_self_closing}
+
+///|
 pub fn nav(children~ : Array[&View] = []) -> HtmlElement[TagNav, Array[&View]] {
   { tag: TagNav::{ }, attrs: AttrList::new(), children, }
 }
@@ -1336,6 +1543,9 @@ pub impl ElementType for TagNoscript with fn tag(_self) {
 pub impl ElementType for TagNoscript with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagNoscript with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn noscript(
@@ -1358,6 +1568,9 @@ pub impl ElementType for TagObject with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagObject with ElementType::{tag, is_self_closing}
+
+///|
 pub fn object(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagObject, Array[&View]] {
@@ -1378,6 +1591,9 @@ pub impl ElementType for TagOl with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagOl with ElementType::{tag, is_self_closing}
+
+///|
 pub fn ol(children~ : Array[&View] = []) -> HtmlElement[TagOl, Array[&View]] {
   { tag: TagOl::{ }, attrs: AttrList::new(), children, }
 }
@@ -1394,6 +1610,9 @@ pub impl ElementType for TagOptgroup with fn tag(_self) {
 pub impl ElementType for TagOptgroup with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagOptgroup with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn optgroup(
@@ -1416,6 +1635,9 @@ pub impl ElementType for TagOutput with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagOutput with ElementType::{tag, is_self_closing}
+
+///|
 pub fn output(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagOutput, Array[&View]] {
@@ -1436,6 +1658,9 @@ pub impl ElementType for TagP with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagP with ElementType::{tag, is_self_closing}
+
+///|
 pub fn p(children~ : Array[&View] = []) -> HtmlElement[TagP, Array[&View]] {
   { tag: TagP::{ }, attrs: AttrList::new(), children, }
 }
@@ -1452,6 +1677,9 @@ pub impl ElementType for TagPicture with fn tag(_self) {
 pub impl ElementType for TagPicture with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagPicture with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn picture(
@@ -1474,6 +1702,9 @@ pub impl ElementType for TagPortal with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagPortal with ElementType::{tag, is_self_closing}
+
+///|
 pub fn portal(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagPortal, Array[&View]] {
@@ -1494,6 +1725,9 @@ pub impl ElementType for TagPre with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagPre with ElementType::{tag, is_self_closing}
+
+///|
 pub fn pre(children~ : Array[&View] = []) -> HtmlElement[TagPre, Array[&View]] {
   { tag: TagPre::{ }, attrs: AttrList::new(), children, }
 }
@@ -1510,6 +1744,9 @@ pub impl ElementType for TagProgress with fn tag(_self) {
 pub impl ElementType for TagProgress with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagProgress with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn progress(
@@ -1532,6 +1769,9 @@ pub impl ElementType for TagQ with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagQ with ElementType::{tag, is_self_closing}
+
+///|
 pub fn q(children~ : Array[&View] = []) -> HtmlElement[TagQ, Array[&View]] {
   { tag: TagQ::{ }, attrs: AttrList::new(), children, }
 }
@@ -1548,6 +1788,9 @@ pub impl ElementType for TagRp with fn tag(_self) {
 pub impl ElementType for TagRp with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagRp with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn rp(children~ : Array[&View] = []) -> HtmlElement[TagRp, Array[&View]] {
@@ -1568,6 +1811,9 @@ pub impl ElementType for TagRt with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagRt with ElementType::{tag, is_self_closing}
+
+///|
 pub fn rt(children~ : Array[&View] = []) -> HtmlElement[TagRt, Array[&View]] {
   { tag: TagRt::{ }, attrs: AttrList::new(), children, }
 }
@@ -1584,6 +1830,9 @@ pub impl ElementType for TagRuby with fn tag(_self) {
 pub impl ElementType for TagRuby with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagRuby with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn ruby(
@@ -1606,6 +1855,9 @@ pub impl ElementType for TagS with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagS with ElementType::{tag, is_self_closing}
+
+///|
 pub fn s(children~ : Array[&View] = []) -> HtmlElement[TagS, Array[&View]] {
   { tag: TagS::{ }, attrs: AttrList::new(), children, }
 }
@@ -1622,6 +1874,9 @@ pub impl ElementType for TagSamp with fn tag(_self) {
 pub impl ElementType for TagSamp with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagSamp with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn samp(
@@ -1644,6 +1899,9 @@ pub impl ElementType for TagScript with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagScript with ElementType::{tag, is_self_closing}
+
+///|
 pub fn script(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagScript, Array[&View]] {
@@ -1662,6 +1920,9 @@ pub impl ElementType for TagSearch with fn tag(_self) {
 pub impl ElementType for TagSearch with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagSearch with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn search(
@@ -1684,6 +1945,9 @@ pub impl ElementType for TagSection with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagSection with ElementType::{tag, is_self_closing}
+
+///|
 pub fn section(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagSection, Array[&View]] {
@@ -1702,6 +1966,9 @@ pub impl ElementType for TagSelect with fn tag(_self) {
 pub impl ElementType for TagSelect with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagSelect with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn select(
@@ -1724,6 +1991,9 @@ pub impl ElementType for TagSlot with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagSlot with ElementType::{tag, is_self_closing}
+
+///|
 pub fn slot(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagSlot, Array[&View]] {
@@ -1742,6 +2012,9 @@ pub impl ElementType for TagSmall with fn tag(_self) {
 pub impl ElementType for TagSmall with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagSmall with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn small(
@@ -1764,6 +2037,9 @@ pub impl ElementType for TagSpan with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagSpan with ElementType::{tag, is_self_closing}
+
+///|
 pub fn span(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagSpan, Array[&View]] {
@@ -1782,6 +2058,9 @@ pub impl ElementType for TagStrong with fn tag(_self) {
 pub impl ElementType for TagStrong with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagStrong with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn strong(
@@ -1804,6 +2083,9 @@ pub impl ElementType for TagStyle with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagStyle with ElementType::{tag, is_self_closing}
+
+///|
 pub fn style(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagStyle, Array[&View]] {
@@ -1824,6 +2106,9 @@ pub impl ElementType for TagSub with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagSub with ElementType::{tag, is_self_closing}
+
+///|
 pub fn sub(children~ : Array[&View] = []) -> HtmlElement[TagSub, Array[&View]] {
   { tag: TagSub::{ }, attrs: AttrList::new(), children, }
 }
@@ -1840,6 +2125,9 @@ pub impl ElementType for TagSummary with fn tag(_self) {
 pub impl ElementType for TagSummary with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagSummary with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn summary(
@@ -1862,6 +2150,9 @@ pub impl ElementType for TagSup with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagSup with ElementType::{tag, is_self_closing}
+
+///|
 pub fn sup(children~ : Array[&View] = []) -> HtmlElement[TagSup, Array[&View]] {
   { tag: TagSup::{ }, attrs: AttrList::new(), children, }
 }
@@ -1878,6 +2169,9 @@ pub impl ElementType for TagTable with fn tag(_self) {
 pub impl ElementType for TagTable with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagTable with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn table(
@@ -1900,6 +2194,9 @@ pub impl ElementType for TagTbody with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagTbody with ElementType::{tag, is_self_closing}
+
+///|
 pub fn tbody(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagTbody, Array[&View]] {
@@ -1920,6 +2217,9 @@ pub impl ElementType for TagTd with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagTd with ElementType::{tag, is_self_closing}
+
+///|
 pub fn td(children~ : Array[&View] = []) -> HtmlElement[TagTd, Array[&View]] {
   { tag: TagTd::{ }, attrs: AttrList::new(), children, }
 }
@@ -1936,6 +2236,9 @@ pub impl ElementType for TagTemplate with fn tag(_self) {
 pub impl ElementType for TagTemplate with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagTemplate with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn template(
@@ -1958,6 +2261,9 @@ pub impl ElementType for TagTextarea with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagTextarea with ElementType::{tag, is_self_closing}
+
+///|
 pub fn textarea(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagTextarea, Array[&View]] {
@@ -1976,6 +2282,9 @@ pub impl ElementType for TagTfoot with fn tag(_self) {
 pub impl ElementType for TagTfoot with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagTfoot with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn tfoot(
@@ -1998,6 +2307,9 @@ pub impl ElementType for TagTh with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagTh with ElementType::{tag, is_self_closing}
+
+///|
 pub fn th(children~ : Array[&View] = []) -> HtmlElement[TagTh, Array[&View]] {
   { tag: TagTh::{ }, attrs: AttrList::new(), children, }
 }
@@ -2014,6 +2326,9 @@ pub impl ElementType for TagThead with fn tag(_self) {
 pub impl ElementType for TagThead with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagThead with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn thead(
@@ -2036,6 +2351,9 @@ pub impl ElementType for TagTime with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagTime with ElementType::{tag, is_self_closing}
+
+///|
 pub fn time(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagTime, Array[&View]] {
@@ -2054,6 +2372,9 @@ pub impl ElementType for TagTitle with fn tag(_self) {
 pub impl ElementType for TagTitle with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagTitle with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn title(
@@ -2076,6 +2397,9 @@ pub impl ElementType for TagTr with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagTr with ElementType::{tag, is_self_closing}
+
+///|
 pub fn tr(children~ : Array[&View] = []) -> HtmlElement[TagTr, Array[&View]] {
   { tag: TagTr::{ }, attrs: AttrList::new(), children, }
 }
@@ -2092,6 +2416,9 @@ pub impl ElementType for TagU with fn tag(_self) {
 pub impl ElementType for TagU with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagU with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn u(children~ : Array[&View] = []) -> HtmlElement[TagU, Array[&View]] {
@@ -2112,6 +2439,9 @@ pub impl ElementType for TagUl with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagUl with ElementType::{tag, is_self_closing}
+
+///|
 pub fn ul(children~ : Array[&View] = []) -> HtmlElement[TagUl, Array[&View]] {
   { tag: TagUl::{ }, attrs: AttrList::new(), children, }
 }
@@ -2128,6 +2458,9 @@ pub impl ElementType for TagVar_ with fn tag(_self) {
 pub impl ElementType for TagVar_ with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagVar_ with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn var_(
@@ -2150,6 +2483,9 @@ pub impl ElementType for TagVideo with fn is_self_closing(_self) {
 }
 
 ///|
+pub extend TagVideo with ElementType::{tag, is_self_closing}
+
+///|
 pub fn video(
   children~ : Array[&View] = [],
 ) -> HtmlElement[TagVideo, Array[&View]] {
@@ -2168,6 +2504,9 @@ pub impl ElementType for TagOption_ with fn tag(_self) {
 pub impl ElementType for TagOption_ with fn is_self_closing(_self) {
   false
 }
+
+///|
+pub extend TagOption_ with ElementType::{tag, is_self_closing}
 
 ///|
 pub fn option_(

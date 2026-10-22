@@ -320,3 +320,21 @@ fn strip_leading_qmark(str : String) -> String {
 pub impl TypeName for BrowserUrl with fn get_ty() -> String {
   "BrowserUrl"
 }
+
+///|
+pub extend BrowserUrl with @reactive.TypeName::{get_ty}
+
+///|
+pub extend Location with Debug::{to_repr}
+
+///|
+pub extend LocationChange with Default::{default}
+
+///|
+pub extend Url with @reactive.TypeName::{get_ty}
+
+///|
+pub extend Url with Debug::{to_repr}
+
+///|
+pub extend Url with Eq::{not_equal, equal}

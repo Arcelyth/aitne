@@ -1,6 +1,6 @@
 ///|
 /// Global memo id generator.
-let memo_id_counter : Ref[UInt32] = @ref.new(0)
+let memo_id_counter : Ref[UInt32] = Ref(0)
 
 ///|
 fn next_memo_id() -> UInt32 {
@@ -304,3 +304,21 @@ pub fn[T] Memo::has_value(self : Memo[T]) -> Bool {
 pub impl[T : TypeName] TypeName for Memo[T] with fn get_ty() -> String {
   "Memo_" + T::get_ty()
 }
+
+///|
+pub extend Memo with Debug::{to_repr}
+
+///|
+pub extend Memo with Notify::{notify}
+
+///|
+pub extend Memo with ReactiveNode::{mark_pending, mark_stale, mark_all_pending}
+
+///|
+pub extend Memo with Source::{clear_subs, add_sub, remove_sub}
+
+///|
+pub extend Memo with Subscriber::{add_source, clean_sources}
+
+///|
+pub extend Memo with TypeName::{get_ty}

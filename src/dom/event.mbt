@@ -99,3 +99,14 @@ pub(all) struct EventDesp {
   bubbles : Bool
   capture : Bool
 }
+
+///|
+pub extend On with Attribute::{
+  to_html,
+  add_attr,
+  html_len,
+  build,
+  hydrate,
+  dry_resolve,
+  rebuild,
+}

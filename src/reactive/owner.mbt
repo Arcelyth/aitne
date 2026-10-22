@@ -28,11 +28,11 @@ pub impl Debug for Owner with fn to_repr(self) {
 
 ///|
 /// Id allocator.
-let next_owner_id : @ref.Ref[Int32] = @ref.new(0)
+let next_owner_id : @ref.Ref[Int32] = Ref(0)
 
 ///|
 /// Current owner.
-let current_owner : @ref.Ref[Owner?] = @ref.new(None)
+let current_owner : @ref.Ref[Owner?] = Ref(None)
 
 ///|
 fn next_id() -> Int32 {
@@ -495,3 +495,6 @@ fn[T : TypeName] Owner::find_context_in_children(self : Owner) -> T? {
 
   None
 }
+
+///|
+pub extend Owner with Debug::{to_repr}

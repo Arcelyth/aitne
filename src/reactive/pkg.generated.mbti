@@ -32,9 +32,21 @@ pub fn[T : TypeName] use_context() -> T?
 
 // Types and methods
 pub struct ASource {
-  id : UInt
+  id : UInt32
   src : &Source?
 }
+pub fn ASource::add_sub(Self, ASubscriber) -> Unit
+pub fn ASource::clear_subs(Self) -> Unit
+pub fn ASource::equal(Self, Self) -> Bool
+pub fn ASource::hash(Self) -> Int32
+pub fn ASource::hash_combine(Self, Hasher) -> Unit
+pub fn ASource::mark_all_pending(Self) -> Unit
+pub fn ASource::mark_pending(Self) -> Unit
+pub fn ASource::mark_stale(Self) -> Unit
+pub fn ASource::not_equal(Self, Self) -> Bool
+pub fn ASource::remove_sub(Self, ASubscriber) -> Unit
+pub fn ASource::to_repr(Self) -> @debug.Repr
+pub fn ASource::update_value(Self) -> Bool
 pub impl ReactiveNode for ASource
 pub impl Source for ASource
 pub impl Eq for ASource
@@ -42,9 +54,21 @@ pub impl Hash for ASource
 pub impl @debug.Debug for ASource
 
 pub struct ASubscriber {
-  id : UInt
+  id : UInt32
   sub : &Subscriber?
 }
+pub fn ASubscriber::add_source(Self, ASource) -> Unit
+pub fn ASubscriber::clean_sources(Self, Self) -> Unit
+pub fn ASubscriber::equal(Self, Self) -> Bool
+pub fn ASubscriber::hash(Self) -> Int32
+pub fn ASubscriber::hash_combine(Self, Hasher) -> Unit
+pub fn ASubscriber::mark_all_pending(Self) -> Unit
+pub fn ASubscriber::mark_pending(Self) -> Unit
+pub fn ASubscriber::mark_stale(Self) -> Unit
+pub fn ASubscriber::not_equal(Self, Self) -> Bool
+pub fn ASubscriber::notify(Self) -> Unit
+pub fn ASubscriber::to_repr(Self) -> @debug.Repr
+pub fn ASubscriber::update_value(Self) -> Bool
 pub impl Notify for ASubscriber
 pub impl ReactiveNode for ASubscriber
 pub impl Subscriber for ASubscriber
@@ -56,12 +80,14 @@ pub struct Effect[T] {
   inner : @ref.Ref[EffectInner[T]]
   owner : Owner
 }
+pub fn[T] Effect::get_id(Self[T]) -> UInt32
 pub fn[T] Effect::new((T?) -> T) -> Self[T]
 pub fn[T] Effect::run(Self[T]) -> Unit
+pub fn[T] Effect::run_effect(Self[T]) -> Unit
 pub impl[T] EffectRunner for Effect[T]
 
 pub struct EffectInner[T] {
-  id : UInt
+  id : UInt32
   mut stale : Bool
   cb : (T?) -> T
   mut sources : @hashset.HashSet[ASource]?
@@ -70,7 +96,7 @@ pub struct EffectInner[T] {
 pub fn[T] EffectInner::new((T?) -> T) -> Self[T]
 
 pub struct Memo[T] {
-  id : UInt
+  id : UInt32
   mut value : T?
   mut state : ReactiveNodeState
   sources : @hashset.HashSet[ASource]
@@ -80,16 +106,27 @@ pub struct Memo[T] {
   compute : (T?) -> T
   changed : (T?, T?) -> Bool
 } derive(@debug.Debug)
+pub fn[T] Memo::add_source(Self[T], ASource) -> Unit
+pub fn[T] Memo::add_sub(Self[T], ASubscriber) -> Unit
+pub fn[T] Memo::clean_sources(Self[T], ASubscriber) -> Unit
+pub fn[T] Memo::clear_subs(Self[T]) -> Unit
 pub fn[T] Memo::dispose(Self[T]) -> Unit
 pub fn[T] Memo::get(Self[T]) -> T
+pub fn[T : TypeName] Memo::get_ty() -> String
 pub fn[T] Memo::get_untracked(Self[T]) -> T
 pub fn[T] Memo::has_value(Self[T]) -> Bool
 pub fn[T] Memo::is_disposed(Self[T]) -> Bool
+pub fn[T] Memo::mark_all_pending(Self[T]) -> Unit
+pub fn[T] Memo::mark_pending(Self[T]) -> Unit
+pub fn[T] Memo::mark_stale(Self[T]) -> Unit
 pub fn[T : Eq] Memo::new((T?) -> T) -> Self[T]
 pub fn[T] Memo::new_owning((T?) -> T, (T?, T?) -> Bool) -> Self[T]
 pub fn[T] Memo::new_with_compare((T?) -> T, (T?, T?) -> Bool) -> Self[T]
+pub fn[T] Memo::notify(Self[T]) -> Unit
+pub fn[T] Memo::remove_sub(Self[T], ASubscriber) -> Unit
 pub fn[T] Memo::to_asource(Self[T]) -> ASource
 pub fn[T] Memo::to_asubscriber(Self[T]) -> ASubscriber
+pub fn[T : @debug.Debug] Memo::to_repr(Self[T]) -> @debug.Repr
 pub fn[T] Memo::track(Self[T]) -> Unit
 pub fn[T] Memo::update_value(Self[T]) -> Bool
 pub fn[T, U] Memo::with_(Self[T], (T) -> U) -> U
@@ -116,7 +153,7 @@ pub struct ObserverState {
 }
 
 pub struct Owner {
-  id : Int
+  id : Int32
   mut parent : Owner?
   mut cleanups : Array[() -> Unit]?
   mut children : Array[Owner]?
@@ -133,6 +170,7 @@ pub fn Owner::new() -> Self
 pub fn[T : TypeName] Owner::provide_context(Self, T) -> Unit
 pub fn Owner::set(Self) -> Unit
 pub fn[T : TypeName] Owner::take_context(Self) -> T?
+pub fn Owner::to_repr(Self) -> @debug.Repr
 pub fn Owner::unset(Self) -> Unit
 pub fn[T : TypeName, R] Owner::update_context(Self, (T) -> R) -> R?
 pub fn[T : TypeName] Owner::use_context(Self) -> T?
@@ -147,15 +185,35 @@ pub(all) enum ReactiveNodeState {
   Pending
   Stale
 } derive(Eq, @debug.Debug)
+pub fn ReactiveNodeState::equal(Self, Self) -> Bool
+pub fn ReactiveNodeState::not_equal(Self, Self) -> Bool
+pub fn ReactiveNodeState::to_repr(Self) -> @debug.Repr
 
 pub struct ReadSignal[T] {
   inner : @ref.Ref[SignalInner[T]]
 }
+pub fn[T] ReadSignal::add_sub(Self[T], ASubscriber) -> Unit
+pub fn[T] ReadSignal::clear_subs(Self[T]) -> Unit
+pub fn[T : Default] ReadSignal::default() -> Self[T]
+pub fn[T] ReadSignal::equal(Self[T], Self[T]) -> Bool
 pub fn[T] ReadSignal::get(Self[T]) -> T
+pub fn[T : TypeName] ReadSignal::get_ty() -> String
 pub fn[T] ReadSignal::get_untracked(Self[T]) -> T
+pub fn[T] ReadSignal::hash(Self[T]) -> Int32
+pub fn[T] ReadSignal::hash_combine(Self[T], Hasher) -> Unit
+pub fn[T] ReadSignal::is_disposed(Self[T]) -> Bool
+pub fn[T] ReadSignal::mark_all_pending(Self[T]) -> Unit
+pub fn[T] ReadSignal::mark_pending(Self[T]) -> Unit
+pub fn[T] ReadSignal::mark_stale(Self[T]) -> Unit
 pub fn[T] ReadSignal::new(T) -> Self[T]
+pub fn[T] ReadSignal::not_equal(Self[T], Self[T]) -> Bool
+pub fn[T] ReadSignal::remove_sub(Self[T], ASubscriber) -> Unit
+pub fn[T] ReadSignal::to_asource(Self[T]) -> ASource
+pub fn[T : @debug.Debug] ReadSignal::to_repr(Self[T]) -> @debug.Repr
+pub fn[T] ReadSignal::track(Self[T]) -> Unit
 pub fn[T] ReadSignal::try_get(Self[T]) -> T?
 pub fn[T, U] ReadSignal::try_with(Self[T], (T) -> U) -> U?
+pub fn[T] ReadSignal::update_value(Self[T]) -> Bool
 pub impl[T] IsDisposed for ReadSignal[T]
 pub impl[T] ReactiveNode for ReadSignal[T]
 pub impl[T] Source for ReadSignal[T]
@@ -172,29 +230,49 @@ pub struct RenderEffect[T] {
   inner : @ref.Ref[EffectInner[T]]
   owner : Owner
 }
+pub fn[T] RenderEffect::get_id(Self[T]) -> UInt32
 pub fn[T] RenderEffect::new((T?) -> T) -> @ref.Ref[Self[T]]
 pub fn[T] RenderEffect::new_isomorphic((T?) -> T) -> @ref.Ref[Self[T]]
 pub fn[T] RenderEffect::new_with_value((T?) -> T, T?) -> @ref.Ref[Self[T]]
 pub fn[T] RenderEffect::run(Self[T]) -> Unit
+pub fn[T] RenderEffect::run_effect(Self[T]) -> Unit
 pub fn[T] RenderEffect::take_value(Self[T]) -> T?
 pub impl[T] EffectRunner for RenderEffect[T]
 
 pub struct RwSignal[T] {
   inner : @ref.Ref[SignalInner[T]]
 }
+pub fn[T] RwSignal::add_sub(Self[T], ASubscriber) -> Unit
+pub fn[T] RwSignal::clear_subs(Self[T]) -> Unit
+pub fn[T : Default] RwSignal::default() -> Self[T]
+pub fn[T] RwSignal::equal(Self[T], Self[T]) -> Bool
 pub fn[T] RwSignal::get(Self[T]) -> T
+pub fn[T : TypeName] RwSignal::get_ty() -> String
 pub fn[T] RwSignal::get_untracked(Self[T]) -> T
+pub fn[T] RwSignal::hash(Self[T]) -> Int32
+pub fn[T] RwSignal::hash_combine(Self[T], Hasher) -> Unit
+pub fn[T] RwSignal::is_disposed(Self[T]) -> Bool
+pub fn[T] RwSignal::mark_all_pending(Self[T]) -> Unit
+pub fn[T] RwSignal::mark_pending(Self[T]) -> Unit
+pub fn[T] RwSignal::mark_stale(Self[T]) -> Unit
 pub fn[T] RwSignal::new(T) -> Self[T]
+pub fn[T] RwSignal::not_equal(Self[T], Self[T]) -> Bool
+pub fn[T] RwSignal::notify(Self[T]) -> Unit
 pub fn[T] RwSignal::read_only(Self[T]) -> ReadSignal[T]
+pub fn[T] RwSignal::remove_sub(Self[T], ASubscriber) -> Unit
 pub fn[T] RwSignal::set(Self[T], T) -> Unit
 pub fn[T] RwSignal::set_untracked(Self[T], T) -> Unit
 pub fn[T] RwSignal::split(Self[T]) -> (ReadSignal[T], WriteSignal[T])
+pub fn[T] RwSignal::to_asource(Self[T]) -> ASource
+pub fn[T : @debug.Debug] RwSignal::to_repr(Self[T]) -> @debug.Repr
+pub fn[T] RwSignal::track(Self[T]) -> Unit
 pub fn[T] RwSignal::try_get(Self[T]) -> T?
 pub fn[T] RwSignal::try_set(Self[T], T) -> T?
 pub fn[T] RwSignal::try_update(Self[T], (T) -> T) -> Unit?
 pub fn[T, U] RwSignal::try_with(Self[T], (T) -> U) -> U?
 pub fn[T] RwSignal::unite(ReadSignal[T], WriteSignal[T]) -> Self[T]?
 pub fn[T] RwSignal::update(Self[T], (T) -> T) -> Unit
+pub fn[T] RwSignal::update_value(Self[T]) -> Bool
 pub fn[T, U] RwSignal::with_val(Self[T], (T) -> U) -> U
 pub fn[T] RwSignal::write_only(Self[T]) -> WriteSignal[T]
 pub impl[T] IsDisposed for RwSignal[T]
@@ -211,9 +289,9 @@ pub impl[T : @debug.Debug] @debug.Debug for RwSignal[T]
 
 pub struct Scheduler {
   mut pending : Array[&EffectRunner]
-  queued : @hashset.HashSet[UInt]
+  queued : @hashset.HashSet[UInt32]
   mut flushing : Bool
-  mut batch_depth : Int
+  mut batch_depth : Int32
 }
 
 pub(all) struct Selector[T] {
@@ -226,17 +304,29 @@ pub fn[T : Eq + Hash] Selector::remove(Self[T], T) -> Unit
 pub fn[T : Eq + Hash] Selector::selected(Self[T], T) -> Bool
 
 pub struct SignalInner[T] {
-  id : UInt
+  id : UInt32
   mut value : T
   subs : @hashset.HashSet[ASubscriber]
 }
 pub fn[T] SignalInner::new(T) -> @ref.Ref[Self[T]]
 
 pub struct Trigger {
-  id : UInt
+  id : UInt32
   subs : @hashset.HashSet[ASubscriber]
 } derive(@debug.Debug)
+pub fn Trigger::add_sub(Self, ASubscriber) -> Unit
+pub fn Trigger::clear_subs(Self) -> Unit
+pub fn Trigger::is_disposed(Self) -> Bool
+pub fn Trigger::mark_all_pending(Self) -> Unit
+pub fn Trigger::mark_pending(Self) -> Unit
+pub fn Trigger::mark_stale(Self) -> Unit
 pub fn Trigger::new() -> Self
+pub fn Trigger::notify(Self) -> Unit
+pub fn Trigger::remove_sub(Self, ASubscriber) -> Unit
+pub fn Trigger::to_asource(Self) -> ASource
+pub fn Trigger::to_repr(Self) -> @debug.Repr
+pub fn Trigger::track(Self) -> Unit
+pub fn Trigger::update_value(Self) -> Bool
 pub impl IsDisposed for Trigger
 pub impl Notify for Trigger
 pub impl ReactiveNode for Trigger
@@ -247,12 +337,30 @@ pub impl Track for Trigger
 pub struct WriteSignal[T] {
   inner : @ref.Ref[SignalInner[T]]
 }
+pub fn[T] WriteSignal::add_sub(Self[T], ASubscriber) -> Unit
+pub fn[T] WriteSignal::clear_subs(Self[T]) -> Unit
+pub fn[T : Default] WriteSignal::default() -> Self[T]
+pub fn[T] WriteSignal::equal(Self[T], Self[T]) -> Bool
+pub fn[T : TypeName] WriteSignal::get_ty() -> String
+pub fn[T] WriteSignal::hash(Self[T]) -> Int32
+pub fn[T] WriteSignal::hash_combine(Self[T], Hasher) -> Unit
+pub fn[T] WriteSignal::is_disposed(Self[T]) -> Bool
+pub fn[T] WriteSignal::mark_all_pending(Self[T]) -> Unit
+pub fn[T] WriteSignal::mark_pending(Self[T]) -> Unit
+pub fn[T] WriteSignal::mark_stale(Self[T]) -> Unit
 pub fn[T] WriteSignal::new(T) -> Self[T]
+pub fn[T] WriteSignal::not_equal(Self[T], Self[T]) -> Bool
+pub fn[T] WriteSignal::notify(Self[T]) -> Unit
+pub fn[T] WriteSignal::remove_sub(Self[T], ASubscriber) -> Unit
 pub fn[T] WriteSignal::set(Self[T], T) -> Unit
 pub fn[T] WriteSignal::set_untracked(Self[T], T) -> Unit
+pub fn[T] WriteSignal::to_asource(Self[T]) -> ASource
+pub fn[T : @debug.Debug] WriteSignal::to_repr(Self[T]) -> @debug.Repr
+pub fn[T] WriteSignal::track(Self[T]) -> Unit
 pub fn[T] WriteSignal::try_set(Self[T], T) -> T?
 pub fn[T] WriteSignal::try_update(Self[T], (T) -> T) -> Unit?
 pub fn[T] WriteSignal::update(Self[T], (T) -> T) -> Unit
+pub fn[T] WriteSignal::update_value(Self[T]) -> Bool
 pub impl[T] IsDisposed for WriteSignal[T]
 pub impl[T] Notify for WriteSignal[T]
 pub impl[T] ReactiveNode for WriteSignal[T]
@@ -269,7 +377,7 @@ pub impl[T : @debug.Debug] @debug.Debug for WriteSignal[T]
 
 // Traits
 pub trait EffectRunner {
-  fn get_id(Self) -> UInt
+  fn get_id(Self) -> UInt32
   fn run_effect(Self) -> Unit
 }
 pub impl[T : EffectRunner] EffectRunner for @ref.Ref[T]
@@ -324,7 +432,7 @@ pub(open) trait TypeName {
 pub impl TypeName for Unit
 pub impl TypeName for Bool
 pub impl TypeName for Char
-pub impl TypeName for Int
+pub impl TypeName for Int32
 pub impl TypeName for String
 pub impl[T : TypeName] TypeName for T?
 pub impl[T : TypeName] TypeName for Array[T]

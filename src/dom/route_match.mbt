@@ -2,7 +2,7 @@
 using @reactive {type Trigger}
 
 ///|
-let route_id : Ref[UInt32] = @ref.new(0U)
+let route_id : Ref[UInt32] = Ref(0U)
 
 ///|
 fn next_route_id() -> UInt32 {
@@ -665,3 +665,12 @@ pub fn normalize_path(path : String) -> String {
 
   res
 }
+
+///|
+pub extend NestedMatch with Debug::{to_repr}
+
+///|
+pub extend NestedRoute with Debug::{to_repr}
+
+///|
+pub extend RouteDefs with Debug::{to_repr}

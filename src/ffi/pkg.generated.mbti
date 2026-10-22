@@ -96,7 +96,7 @@ pub fn element_is_null(Element) -> Bool
 
 pub fn event_alt_key(Event) -> Bool
 
-pub fn event_button(Event) -> Int
+pub fn event_button(Event) -> Int32
 
 pub fn event_composed_path(Event) -> JsArray
 
@@ -124,15 +124,15 @@ pub fn history_push_state(String) -> Unit
 
 pub fn history_replace_state(String) -> Unit
 
-pub fn int_to_string(Int) -> String
+pub fn int_to_string(Int32) -> String
 
 pub fn is_comment_node(Node) -> Bool
 
 pub fn is_text_node(Node) -> Bool
 
-pub fn js_array_get(JsArray, Int) -> Node
+pub fn js_array_get(JsArray, Int32) -> Node
 
-pub fn js_array_length(JsArray) -> Int
+pub fn js_array_length(JsArray) -> Int32
 
 pub fn next_sibling_skip_comments(Node) -> Node
 
@@ -181,11 +181,11 @@ pub fn request_animation_frame(() -> Unit) -> AnimationFrameHandle
 
 pub fn set_inner_html(TemplateElement, String) -> Unit
 
-pub fn set_interval(() -> Unit, Int) -> IntervalHandle
+pub fn set_interval(() -> Unit, Int32) -> IntervalHandle
 
 pub fn set_property(Element, String, String) -> Unit
 
-pub fn set_timeout(() -> Unit, Int) -> TimeoutHandle
+pub fn set_timeout(() -> Unit, Int32) -> TimeoutHandle
 
 pub fn set_window_href(String) -> Unit
 

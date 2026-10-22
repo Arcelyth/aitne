@@ -107,14 +107,7 @@ pub fn start_hmr_watcher(
           Some(w) => w
           None => break
         }
-        let events = w.wait() catch {
-          err => {
-            if @async.is_cancellation_error(err) {
-              break
-            }
-            continue
-          }
-        }
+        let events = w.wait() catch { _ => continue }
 
         let mut trigger = ""
         for event in events {

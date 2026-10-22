@@ -589,3 +589,67 @@ pub impl RenderHtml for RawNodeView with fn hydrate(
 pub impl View for RawNodeView with fn style(self, _i) -> &View {
   self
 }
+
+///|
+pub extend AttrList with Attribute::{
+  to_html,
+  add_attr,
+  html_len,
+  build,
+  hydrate,
+  dry_resolve,
+  rebuild,
+}
+
+///|
+pub extend DynTextNode with Render::{build, rebuild}
+
+///|
+pub extend DynTextNode with RenderHtml::{
+  to_html,
+  html_len,
+  hydrate,
+  to_html_with_buf,
+}
+
+///|
+pub extend DynTextNode with View::{style}
+
+///|
+pub extend HtmlElement with Render::{build, rebuild}
+
+///|
+pub extend HtmlElement with RenderHtml::{
+  to_html,
+  html_len,
+  hydrate,
+  to_html_with_buf,
+}
+
+///|
+pub extend RawNodeView with Render::{build, rebuild}
+
+///|
+pub extend RawNodeView with RenderHtml::{
+  to_html,
+  html_len,
+  hydrate,
+  to_html_with_buf,
+}
+
+///|
+pub extend RawNodeView with View::{style}
+
+///|
+pub extend TextNode with Render::{build, rebuild}
+
+///|
+pub extend TextNode with RenderHtml::{
+  to_html,
+  html_len,
+  hydrate,
+  to_html_with_buf,
+}
+
+///|
+pub extend TextNode with View::{style}

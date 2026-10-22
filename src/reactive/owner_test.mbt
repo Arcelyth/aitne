@@ -1,6 +1,6 @@
 ///|
 test "provide and use context" {
-  let owner = Owner::new()
+  let owner = @reactive.Owner::new()
 
   owner.provide_context("hello")
 
@@ -9,7 +9,7 @@ test "provide and use context" {
 
 ///|
 test "child inherits parent context" {
-  let root = Owner::new()
+  let root = @reactive.Owner::new()
   let child = root.child()
 
   root.provide_context("root")
@@ -18,7 +18,7 @@ test "child inherits parent context" {
 
 ///|
 test "parent cannot access child context" {
-  let root = Owner::new()
+  let root = @reactive.Owner::new()
   let child = root.child()
 
   child.provide_context("child")
@@ -28,7 +28,7 @@ test "parent cannot access child context" {
 
 ///|
 test "context in closure" {
-  let root = Owner::new()
+  let root = @reactive.Owner::new()
   let child = root.child()
 
   let f = () => assert_eq(child.use_context(), Some("child"))
@@ -41,7 +41,7 @@ test "context in closure" {
 
 ///|
 test "nearest context wins" {
-  let root = Owner::new()
+  let root = @reactive.Owner::new()
   let child = root.child()
 
   root.provide_context("root")
@@ -53,7 +53,7 @@ test "nearest context wins" {
 
 ///|
 test "take context removes it" {
-  let owner = Owner::new()
+  let owner = @reactive.Owner::new()
 
   owner.provide_context("hello")
 
@@ -64,7 +64,7 @@ test "take context removes it" {
 
 ///|
 test "take context from parent" {
-  let root = Owner::new()
+  let root = @reactive.Owner::new()
   let child = root.child()
 
   root.provide_context("root")
@@ -76,7 +76,7 @@ test "take context from parent" {
 
 ///|
 test "bidirectional finds child context" {
-  let root = Owner::new()
+  let root = @reactive.Owner::new()
   let child = root.child()
 
   child.provide_context("child")
@@ -86,7 +86,7 @@ test "bidirectional finds child context" {
 
 ///|
 test "bidirectional bfs" {
-  let root = Owner::new()
+  let root = @reactive.Owner::new()
 
   let child = root.child()
 

@@ -2,13 +2,14 @@
 using @reactive {type Memo, type RwSignal, trait TypeName, provide_context}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct Url {
   origin : String
   path : String
   search : String
   search_params : Params
   hash : String
-} derive(Debug, Eq)
+}
 
 ///|
 /// Read the current browser URL.
@@ -39,11 +40,12 @@ pub impl TypeName for Url with fn get_ty() -> String {
 
 ///|
 /// Reactive browser location state.
+#derive(Debug)
 pub(all) struct Location {
   pathname : Memo[String]
   search : Memo[String]
   hash : Memo[String]
-} derive(Debug)
+}
 
 ///|
 /// Create a reactive Location instance from the current browser URL.
@@ -70,11 +72,12 @@ pub fn Location::new(url : RwSignal[Url]) -> Location {
 
 ///|
 ///
+#derive(Default)
 pub struct LocationChange {
   value : String
   replace : Bool
   scroll : Bool
-} derive(Default)
+}
 
 ///|
 pub fn handle_anchor_click(

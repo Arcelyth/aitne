@@ -9,10 +9,11 @@ fn next_trigger_id() -> UInt32 {
 }
 
 ///|
+#derive(Debug)
 pub struct Trigger {
   id : UInt32
   subs : @hashset.HashSet[ASubscriber]
-} derive(Debug)
+}
 
 ///|
 pub fn Trigger::new() -> Trigger {

@@ -116,10 +116,11 @@ pub impl[T, V : Render + RenderHtml] RenderHtml for Keyed[T, V] with fn to_html_
 }
 
 ///|
+#derive(Eq)
 pub enum DiffOpAddMode {
   Normal
   Append
-} derive(Eq)
+}
 
 ///|
 pub struct DiffOpAdd {

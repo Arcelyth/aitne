@@ -1,34 +1,40 @@
 ///|
+#derive(Debug, Eq, Hash)
 pub(all) struct TokenAttr {
   ns : StringView?
   name : StringView
-} derive(Debug, Eq, Hash)
+}
 
 ///|
 /// <div style="">
+#derive(Debug, Eq)
 pub(all) struct TagOpen {
   tag : StringView
   attrs : Array[(TokenAttr, AttrValue)]
-} derive(Debug, Eq)
+}
 
 ///|
 /// </div>
+#derive(Debug, Eq)
 pub(all) struct TagClose {
   tag : StringView
-} derive(Debug, Eq)
+}
 
 ///|
 /// <div />
+#derive(Debug, Eq)
 pub(all) struct TagSelfClose {
   tag : StringView
   attrs : Array[(TokenAttr, AttrValue)]
-} derive(Debug, Eq)
+}
 
 ///|
 /// <!
-pub struct DocTag {} derive(Debug, Eq)
+#derive(Debug, Eq)
+pub struct DocTag {}
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum Token {
   TagOpen(TagOpen)
   TagClose(TagClose)
@@ -41,13 +47,14 @@ pub(all) enum Token {
   // ${ !"./style.css" }$
   // ${ .btn {...} }$
   CSSBlock(StringView)
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum AttrValue {
   Str(StringView)
   Expr(StringView)
-} derive(Debug, Eq)
+}
 
 ///|
 pub(all) struct Lexer {

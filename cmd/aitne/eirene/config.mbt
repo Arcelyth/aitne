@@ -1,28 +1,33 @@
 ///|
+#derive(Debug)
 suberror EireneError {
   TomlError(String)
-} derive(Debug)
+}
 
 ///|
+#derive(Debug)
 pub enum CfgTarget {
   Js
   WasmGc
-} derive(Debug)
+}
 
 ///|
+#derive(Debug)
 pub enum CfgMode {
   Development
   Production
-} derive(Debug)
+}
 
 ///|
+#derive(Debug)
 pub struct AppConfig {
   name : String
   mode : CfgMode
   entry_html : String
-} derive(Debug)
+}
 
 ///|
+#derive(Debug)
 pub struct BuildConfig {
   target : CfgTarget
   src_dir : String
@@ -32,9 +37,10 @@ pub struct BuildConfig {
   minify : Bool
   sourcemap : Bool
   experimental_wasm_gc : Bool
-} derive(Debug)
+}
 
 ///|
+#derive(Debug)
 pub struct ServerConfig {
   host : String
   port : Int32
@@ -43,22 +49,24 @@ pub struct ServerConfig {
   hmr_port : Int32
   https_enabled : Bool
   proxy : Map[String, String]
-} derive(Debug)
+}
 
 ///|
+#derive(Debug)
 pub struct AssetsConfig {
   static_dir : String
   inject_scripts : Array[String]
-} derive(Debug)
+}
 
 ///|
 /// Local server configuration, some fields are not used.
+#derive(Debug)
 pub struct Config {
   app : AppConfig
   build : BuildConfig
   server : ServerConfig
   assets : AssetsConfig
-} derive(Debug)
+}
 
 ///|
 pub fn load_config(toml_content : String) -> Config raise EireneError {

@@ -95,6 +95,7 @@ pub struct EffectInner[T] {
 }
 pub fn[T] EffectInner::new((T?) -> T) -> Self[T]
 
+#derive(@debug.Debug)
 pub struct Memo[T] {
   id : UInt32
   mut value : T?
@@ -105,7 +106,7 @@ pub struct Memo[T] {
   owner : Owner
   compute : (T?) -> T
   changed : (T?, T?) -> Bool
-} derive(@debug.Debug)
+}
 pub fn[T] Memo::add_source(Self[T], ASource) -> Unit
 pub fn[T] Memo::add_sub(Self[T], ASubscriber) -> Unit
 pub fn[T] Memo::clean_sources(Self[T], ASubscriber) -> Unit
@@ -180,11 +181,12 @@ pub fn[T] Owner::with_cleanup(Self, () -> T) -> T
 pub fn[T : TypeName, R] Owner::with_context(Self, (T) -> R) -> R?
 pub impl @debug.Debug for Owner
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ReactiveNodeState {
   Clean
   Pending
   Stale
-} derive(Eq, @debug.Debug)
+}
 pub fn ReactiveNodeState::equal(Self, Self) -> Bool
 pub fn ReactiveNodeState::not_equal(Self, Self) -> Bool
 pub fn ReactiveNodeState::to_repr(Self) -> @debug.Repr
@@ -310,10 +312,11 @@ pub struct SignalInner[T] {
 }
 pub fn[T] SignalInner::new(T) -> @ref.Ref[Self[T]]
 
+#derive(@debug.Debug)
 pub struct Trigger {
   id : UInt32
   subs : @hashset.HashSet[ASubscriber]
-} derive(@debug.Debug)
+}
 pub fn Trigger::add_sub(Self, ASubscriber) -> Unit
 pub fn Trigger::clear_subs(Self) -> Unit
 pub fn Trigger::is_disposed(Self) -> Bool

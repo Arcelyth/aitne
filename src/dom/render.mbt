@@ -33,6 +33,7 @@ pub trait Mountable {
 
 ///|
 /// Tracks where we are during HTML serialization.
+#derive(Eq, Hash)
 pub enum Position {
   Current
   FirstChild
@@ -40,7 +41,7 @@ pub enum Position {
   NextChildAfterText
   OnlyChild
   LastChild
-} derive(Eq, Hash)
+}
 
 ///|
 /// The runtime representation of a rendered view.

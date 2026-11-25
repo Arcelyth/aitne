@@ -7,11 +7,12 @@ pub(open) trait ReactiveNode {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum ReactiveNodeState {
   Clean
   Pending
   Stale
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend ReactiveNodeState with Debug::{to_repr}

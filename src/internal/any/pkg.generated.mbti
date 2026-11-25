@@ -1,6 +1,10 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "Arcelyth/aitne/src/internal/any"
 
+import {
+  "moonbitlang/core/json",
+}
+
 // Values
 
 // Errors
@@ -8,10 +12,10 @@ pub suberror TypeMismatch {
   TypeMismatch(expect~ : TypeInfo, actual~ : TypeInfo)
 }
 pub fn TypeMismatch::output(Self, &Logger) -> Unit
-pub fn TypeMismatch::to_json(Self) -> Json
+pub fn TypeMismatch::to_json(Self) -> @json.Json
 pub fn TypeMismatch::to_string(Self) -> String
 pub impl Show for TypeMismatch
-pub impl ToJson for TypeMismatch
+pub impl @json.ToJson for TypeMismatch
 
 // Types and methods
 type Any

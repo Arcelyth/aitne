@@ -10,6 +10,7 @@ fn next_memo_id() -> UInt32 {
 }
 
 ///|
+#derive(Debug)
 pub struct Memo[T] {
   id : UInt32
   mut value : T?
@@ -26,7 +27,7 @@ pub struct Memo[T] {
   compute : (T?) -> T
   /// Returns true when the value changed.
   changed : (T?, T?) -> Bool
-} derive(Debug)
+}
 
 ///|
 /// Source side of the reactive graph.

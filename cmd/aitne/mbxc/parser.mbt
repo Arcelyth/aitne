@@ -1,10 +1,12 @@
 ///|
+#derive(Debug)
 suberror MbxcError {
   LexerError(String)
   ParserError(String)
-} derive(Debug)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum MbxAST {
   PureCode(StringView)
   RawText(StringView)
@@ -12,7 +14,7 @@ pub(all) enum MbxAST {
   // name, attrs, children
   ElementNode(StringView, Array[(TokenAttr, AttrValue)], Array[MbxAST])
   StyleNode(StringView)
-} derive(Debug, Eq)
+}
 
 ///|
 pub(all) struct Parser {

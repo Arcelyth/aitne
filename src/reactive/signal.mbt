@@ -102,7 +102,7 @@ pub impl[T] IsDisposed for WriteSignal[T] with fn is_disposed(_self) -> Bool {
 
 ///|
 pub impl[T] Source for WriteSignal[T] with fn add_sub(self, sub : ASubscriber) {
-  self.inner.val.subs.add(sub)
+  self.inner.val.subs.insert(sub)
 }
 
 ///|
@@ -246,7 +246,7 @@ pub impl[T] ReactiveNode for ReadSignal[T] with fn update_value(_self) {
 
 ///|
 pub impl[T] Source for ReadSignal[T] with fn add_sub(self, sub : ASubscriber) {
-  self.inner.val.subs.add(sub)
+  self.inner.val.subs.insert(sub)
 }
 
 ///|
@@ -380,7 +380,7 @@ pub impl[T] Notify for RwSignal[T] with fn notify(self) -> Unit {
 
 ///|
 pub impl[T] Source for RwSignal[T] with fn add_sub(self, sub : ASubscriber) {
-  self.inner.val.subs.add(sub)
+  self.inner.val.subs.insert(sub)
 }
 
 ///|

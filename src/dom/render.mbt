@@ -17,7 +17,7 @@ pub trait RenderHtml: Render {
 
 ///|
 impl RenderHtml with fn to_html(self) -> String {
-  let buf = StringBuilder(size_hint=self.html_len())
+  let buf = StringBuilder(capacity=self.html_len())
   self.to_html_with_buf(buf, Ref(Position::FirstChild))
   buf.to_string()
 }

@@ -48,7 +48,7 @@ pub impl[T, K : Hash + Eq] Render for ForNode[T, K] with fn build(self) -> Rende
       let k = key_fn(item)
       match old_cache.get(k) {
         Some(old_state) => {
-          used_old_keys.add(k)
+          used_old_keys.insert(k)
           new_cache[k] = old_state
 
           let nodes = Mountable::elements(old_state)

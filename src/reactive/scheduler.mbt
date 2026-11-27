@@ -22,7 +22,7 @@ pub let scheduler : Ref[Scheduler] = Ref(Scheduler::{
 pub fn[T : EffectRunner] schedule_effect(effect : T) -> Unit {
   guard !scheduler.val.queued.contains(effect.get_id()) else { return }
 
-  scheduler.val.queued.add(effect.get_id())
+  scheduler.val.queued.insert(effect.get_id())
   scheduler.val.pending.push(effect)
 
   guard scheduler.val.batch_depth == 0 && !scheduler.val.flushing else {

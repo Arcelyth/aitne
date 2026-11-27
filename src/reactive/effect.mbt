@@ -67,10 +67,10 @@ pub impl[T] Subscriber for Ref[EffectInner[T]] with fn add_source(
   source : ASource,
 ) -> Unit {
   match self.val.sources {
-    Some(srcs) => srcs.add(source)
+    Some(srcs) => srcs.insert(source)
     None => {
       let srcs = HashSet([])
-      srcs.add(source)
+      srcs.insert(source)
       self.val.sources = Some(srcs)
     }
   }

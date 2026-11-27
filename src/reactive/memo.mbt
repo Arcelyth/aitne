@@ -32,7 +32,7 @@ pub struct Memo[T] {
 ///|
 /// Source side of the reactive graph.
 pub impl[T] Source for Memo[T] with fn add_sub(self, subscriber : ASubscriber) -> Unit {
-  self.subscribers.add(subscriber)
+  self.subscribers.insert(subscriber)
 }
 
 ///|
@@ -88,7 +88,7 @@ pub impl[T] ReactiveNode for Memo[T] with fn update_value(self) -> Bool {
 ///|
 /// Subscriber side of the reactive graph.
 pub impl[T] Subscriber for Memo[T] with fn add_source(self, source : ASource) -> Unit {
-  self.sources.add(source)
+  self.sources.insert(source)
 }
 
 ///|

@@ -70,7 +70,7 @@ pub impl ReactiveNode for Trigger with fn update_value(_self) {
 
 ///|
 pub impl Source for Trigger with fn add_sub(self, sub : ASubscriber) {
-  self.subs.add(sub)
+  self.subs.insert(sub)
 }
 
 ///|
